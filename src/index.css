@@ -1,0 +1,247 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&family=Inter:wght@100..900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 210 40% 98%;
+    /* background: navy - #092f35, teal - #087f78, mint - #dff4ed, coral - #ef7a63,
+    ink - #14363a, muted - #607579, cream - #f7f4ed; */
+    --foreground: 222 47% 11%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    /* UPGRADE: --primary was a muddy orange-rust (hsl(20,96%,40%)) that didn't
+       match the #D92E46 coral-red actually used on every CTA button, badge
+       accent, and gradient across the site (hardcoded separately in dozens of
+       files). Retuned to match that established coral so the "brand color"
+       and the "token color" are finally the same thing — every mesh-bg,
+       gradient-text, badge, and icon tint that already reads var(--primary)
+       picks this up automatically, no per-file edits needed. */
+    --primary: 352 69% 52%;
+    --primary-foreground: 0 0% 100%;
+
+    /* UPGRADE: deepened from a flat slate-gray into a richer navy-teal so it
+       reads as a deliberate complement to the coral primary (the classic
+       "warm coral + deep navy" pairing used across premium healthcare
+       branding) instead of a neutral filler color. */
+    --secondary: 205 45% 19%;
+    --secondary-foreground: 0 0% 100%;
+
+    /* NEW: warm amber accent for occasional highlights (award badges, star
+       ratings, "featured" flags) so the palette has a third note beyond
+       coral + navy instead of falling back to arbitrary ad-hoc colors. */
+    --accent-warm: 38 92% 55%;
+
+    --muted: 210 40% 96.1%;
+    /* FIX: was "215.4% 16.3% 46.9%" — first channel of an HSL triple must be a bare
+       degree value, not a percentage. The stray % was breaking every hsl(var(--muted-foreground))
+       call across the app (text looked wrong / invisible in places using this token). */
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 210 100% 96%;
+    /* FIX: was "222 47% 11%s" — a stray trailing "s" made this an invalid HSL value,
+       so any element using hsl(var(--accent-foreground)) silently failed to render its color. */
+    --accent-foreground: 222 47% 11%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 201 96% 40%;
+
+    --chart-1: 201 96% 40%;
+    --chart-2: 215 28% 27%;
+    --chart-3: 173 58% 39%;
+    --chart-4: 43 96% 64%;
+    --chart-5: 0 84.2% 60.2%;
+
+    --radius: 0.75rem;
+    --font-heading: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+
+    --font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    --font-display: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    --sidebar-background: 36 33% 97%;
+    --sidebar-foreground: 220 10% 26%;
+    --sidebar-primary: 202 83% 40%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 38 24% 94%;
+    --sidebar-accent-foreground: 220 26% 14%;
+    --sidebar-border: 38 22% 90%;
+    --sidebar-ring: 202 83% 40%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    /* FIX: prevents the page from ever being wider than the viewport on any device,
+       which is what causes horizontal scroll/whitespace bugs on mobile. */
+    -webkit-text-size-adjust: 100%;
+  }
+
+  html, body {
+    @apply overflow-x-hidden bg-background text-foreground font-body antialiased;
+    width: 100%;
+    max-width: 100vw;
+    /* FIX: 100vw can be wider than 100% on some mobile browsers because it includes
+       the scrollbar gutter. min-height ensures full-height layouts (like the hero)
+       never get clipped short on small-height phones/landscape. */
+    min-height: 100dvh;
+  }
+
+  img, video, svg, canvas {
+    /* FIX: sane default so any image/video dropped into the layout without explicit
+       sizing can't blow out its container width. */
+    max-width: 100%;
+    display: block;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+  }
+}
+
+/* Premium glassmorphism */
+.glass {
+  @apply bg-white/70 backdrop-blur-xl border border-white/30 shadow-xl shadow-primary/5;
+}
+
+/* FIX/UPGRADE: these background/text gradients previously used an unrelated
+   teal/blue/gold palette that didn't match the site's actual brand colors
+   (primary = warm coral/rust, secondary = deep slate, plus the #D92E46 CTA
+   red used across every button). That mismatch is part of why decorative
+   backgrounds felt disconnected from the rest of the UI. Now built from the
+   real tokens so every soft background/gradient feels like the same brand. */
+.mesh-bg {
+  background-color: hsl(var(--background));
+  background-image:
+    radial-gradient(at 0% 0%, hsl(var(--primary) / 0.07) 0px, transparent 50%),
+    radial-gradient(at 98% 2%, hsl(var(--secondary) / 0.06) 0px, transparent 50%),
+    radial-gradient(at 50% 98%, hsl(var(--primary) / 0.05) 0px, transparent 50%),
+    radial-gradient(at 80% 60%, hsl(var(--secondary) / 0.04) 0px, transparent 50%);
+}
+
+.mesh-bg-soft {
+  background-color: hsl(var(--background));
+  background-image:
+    radial-gradient(at 10% 10%, hsl(var(--primary) / 0.05) 0px, transparent 45%),
+    radial-gradient(at 90% 90%, hsl(var(--secondary) / 0.05) 0px, transparent 45%);
+}
+
+/* Premium gradient text — brand coral → deep slate, matching every CTA button */
+.gradient-text {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-primary via-[#D92E46] to-secondary;
+}
+
+/* Friendly card shadow */
+.card-shadow {
+  @apply shadow-lg shadow-primary/5;
+}
+
+.card-shadow-hover {
+  @apply hover:shadow-2xl hover:shadow-primary/10 transition-all duration-300;
+}
+
+/* NEW: a slightly-elevated "premium" card treatment — soft layered shadow that
+   lifts and warms on hover, colored with the brand instead of flat black.
+   Use on any card that should feel a step more polished than a plain border. */
+.card-premium {
+  @apply bg-white rounded-2xl border border-black/5 transition-all duration-300;
+  box-shadow: 0 1px 2px hsl(var(--foreground) / 0.04), 0 8px 24px -12px hsl(var(--primary) / 0.12);
+}
+.card-premium:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px hsl(var(--foreground) / 0.04), 0 16px 32px -12px hsl(var(--primary) / 0.2);
+}
+
+/* NEW: soft decorative blur shapes — drop one of these inside any
+   `relative overflow-hidden` container to add a bit of organic visual depth
+   behind content, without needing a custom image. Position with an extra
+   className (e.g. "-top-20 -right-20"). */
+.decor-blob {
+  @apply absolute rounded-full pointer-events-none;
+  filter: blur(60px);
+}
+.decor-blob-primary {
+  background: radial-gradient(circle, hsl(var(--primary) / 0.25), transparent 70%);
+}
+.decor-blob-secondary {
+  background: radial-gradient(circle, hsl(var(--secondary) / 0.3), transparent 70%);
+}
+.decor-blob-warm {
+  background: radial-gradient(circle, hsl(var(--accent-warm) / 0.25), transparent 70%);
+}
+
+/* NEW: a subtle dot-grid texture for section backgrounds that want a touch
+   of pattern without a photo — already used ad hoc in a couple of legal
+   pages; promoted to a reusable class. */
+.dot-grid {
+  background-image: radial-gradient(hsl(var(--foreground) / 0.08) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+.dot-grid-light {
+  background-image: radial-gradient(hsl(0 0% 100% / 0.15) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+/* NEW: consistent "lift" micro-interaction for buttons/links that don't
+   already define their own hover transform. */
+.hover-lift {
+  @apply transition-all duration-300;
+}
+.hover-lift:hover {
+  transform: translateY(-2px);
+}
+
+/* Custom scrollbar (desktop only — thin scrollbars break touch-scroll UX on mobile) */
+@media (min-width: 768px) {
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: hsl(var(--muted)); }
+  ::-webkit-scrollbar-thumb { background: hsl(var(--primary) / 0.35); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: hsl(var(--primary) / 0.6); }
+}
+
+/* Smooth selection */
+::selection { background: hsl(var(--primary) / 0.18); }
+
+/* Respect users who've asked for reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Hide Google Translate default UI */
+.goog-te-banner-frame.skiptranslate,
+.goog-te-gadget-icon,
+.goog-logo-link,
+.goog-te-gadget > span > a,
+#goog-gt-tt,
+.goog-balloon-frame,
+div.goog-te-gadget {
+  display: none !important;
+}
+body { top: 0 !important; }
+.goog-text-highlight {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+iframe.goog-te-banner-frame { display: none !important; }
+.skiptranslate iframe { display: none !important; }
