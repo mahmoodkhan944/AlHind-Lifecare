@@ -35,7 +35,7 @@ export default function PageNotFound({}) {
                     {/* Main Message */}
                     <div className="space-y-3">
                         <h2 className="text-2xl font-heading font-bold text-secondary">
-                            This page could not be found.
+                            This page took a detour
                         </h2>
                         <p className="text-muted-foreground leading-relaxed">
                             The page <span className="font-medium text-foreground">"{pageName}"</span> doesn't exist — but your care journey doesn't have to stop here.
@@ -52,7 +52,7 @@ export default function PageNotFound({}) {
                                 <div className="space-y-1">
                                     <p className="text-sm font-semibold text-secondary">Admin note</p>
                                     <p className="text-sm text-muted-foreground leading-relaxed">
-                                        This could mean the page hasn't been implemented yet.
+                                        This could mean the page hasn't been implemented yet. Ask the AI to build it in chat.
                                     </p>
                                 </div>
                             </div>
@@ -62,7 +62,7 @@ export default function PageNotFound({}) {
                     {/* Action Button */}
                     <div className="pt-6">
                         <button
-                            onClick={() => window.location.href = '/'}
+                            onClick={() => window.location.href = import.meta.env.BASE_URL}
                             className="inline-flex items-center gap-2 px-6 py-2.5 text-sm font-heading font-semibold text-white bg-primary rounded-xl hover:bg-primary/90 hover:-translate-y-0.5 active:translate-y-0 transition-all shadow-lg shadow-primary/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
                         >
                             <ArrowLeft className="w-4 h-4" />

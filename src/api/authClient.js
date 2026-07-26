@@ -30,9 +30,8 @@ export const auth = {
     return data;
   },
 
-  /** Starts Google (or any configured provider) OAuth login. Redirects the browser away. */
-  async loginWithProvider(provider, redirectPath = '/') {
-    const redirectTo = `${window.location.origin}${redirectPath}`;
+  async loginWithProvider(provider, redirectPath = '') {
+    const redirectTo = `${window.location.origin}${import.meta.env.BASE_URL}${redirectPath}`;
     const { error } = await supabase.auth.signInWithOAuth({ provider, options: { redirectTo } });
     if (error) throw new Error(error.message);
   },

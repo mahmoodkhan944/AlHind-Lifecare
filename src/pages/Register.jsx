@@ -52,7 +52,7 @@ export default function Register() {
       if (result?.access_token) {
         db.auth.setToken(result.access_token);
       }
-      window.location.href = "/";
+      window.location.href = import.meta.env.BASE_URL;
     } catch (err) {
       setError(err.message || "Invalid verification code");
     } finally {
@@ -77,7 +77,7 @@ export default function Register() {
   };
 
   const handleGoogle = () => {
-    db.auth.loginWithProvider("google", "/");
+    db.auth.loginWithProvider("google");
   };
 
   if (showOtp) {

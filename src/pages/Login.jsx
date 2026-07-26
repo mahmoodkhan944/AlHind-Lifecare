@@ -21,7 +21,7 @@ export default function Login() {
     setLoading(true);
     try {
       await db.auth.loginViaEmailPassword(email.trim(), password);
-      window.location.href = "/admin";
+      window.location.href = `${import.meta.env.BASE_URL}admin`;
     } catch (err) {
       setError(err.message || "Invalid email or password");
     } finally {
@@ -30,7 +30,7 @@ export default function Login() {
   };
 
   const handleGoogle = () => {
-    db.auth.loginWithProvider("google", "/");
+    db.auth.loginWithProvider("google");
   };
 
   return (
