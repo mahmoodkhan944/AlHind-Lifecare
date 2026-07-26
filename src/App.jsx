@@ -105,7 +105,7 @@ function App() {
   return (
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
-        <Router>
+        <Router basename="/AlHind-Lifecare">
           <ScrollToTop />
           <AuthenticatedApp />
         </Router>
