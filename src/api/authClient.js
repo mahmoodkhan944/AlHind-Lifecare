@@ -30,43 +30,38 @@ export const auth = {
     return data;
   },
 
+  /** Starts Google (or any configured provider) OAuth login. Redirects the browser away.
+   *  redirectPath should be relative to the app's base (e.g. "" for home, "admin" for
+   *  the admin dashboard) — it gets combined with BASE_URL so this still resolves
+   *  correctly when the app is served from a subfolder, like on GitHub Pages. */
   async loginWithProvider(provider, redirectPath = '') {
     const redirectTo = `${window.location.origin}${import.meta.env.BASE_URL}${redirectPath}`;
     const { error } = await supabase.auth.signInWithOAuth({ provider, options: { redirectTo } });
     if (error) throw new Error(error.message);
   },
 
-  /** Sign up with email/password. Supabase sends a 6-digit OTP code by email
-   *  (configure the "Confirm signup" template in Supabase to use {{ .Token }}). */
+  /** Sign up with email/password. Supabase's default (no-custom-SMTP) email
+   *  service only supports the link-based "Confirm signup" template — OTP
+   *  codes require custom SMTP to edit templates. emailRedirectTo points the
+   *  confirmation link back at this app (respecting the GitHub Pages
+   *  subfolder), where detectSessionInUrl automatically logs the user in. */
   async register({ email, password, full_name }) {
+    const emailRedirectTo = `${window.location.origin}${import.meta.env.BASE_URL}`;
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { full_name } },
+      options: { data: { full_name }, emailRedirectTo },
     });
     if (error) throw new Error(error.message);
     return data;
   },
 
-  /** Verifies the 6-digit signup code and completes login. */
-  async verifyOtp({ email, otpCode }) {
-    const { data, error } = await supabase.auth.verifyOtp({
-      email,
-      token: otpCode,
-      type: 'signup',
-    });
-    if (error) throw new Error(error.message);
-    return { access_token: data?.session?.access_token };
-  },
-
-  /** Resends the signup confirmation OTP code. */
-  async resendOtp(email) {
-    const { error } = await supabase.auth.resend({ type: 'signup', email });
+  /** Resends the signup confirmation email/link. */
+  async resendConfirmation(email) {
+    const emailRedirectTo = `${window.location.origin}${import.meta.env.BASE_URL}`;
+    const { error } = await supabase.auth.resend({ type: 'signup', email, options: { emailRedirectTo } });
     if (error) throw new Error(error.message);
   },
-
-  /** Not needed with Supabase — verifyOtp() already establishes the session. Kept as a no-op for API compatibility. */
-  setToken() {},
 
   /** Sends a password-reset email containing a link back to /reset-password. */
   async resetPasswordRequest(email) {

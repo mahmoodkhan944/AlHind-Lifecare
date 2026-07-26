@@ -33,19 +33,23 @@ auth, and file storage. Follow these steps once to get it running.
    newsletter_subscribers), a `profiles` table for user roles, row-level
    security policies, and a public `uploads` storage bucket.
 
-## 4. Configure email auth (signup OTP code)
+## 4. Email auth (signup confirmation)
 
-The Register page shows a 6-digit code step after signup, so Supabase's signup
-confirmation email needs to send a code instead of its default link.
+The app now uses Supabase's default link-based "Confirm signup" email — no
+template changes needed, so this works out of the box even without custom
+SMTP. After signup, the user gets an email with a confirmation link; clicking
+it redirects back into the app already signed in.
 
-1. Go to **Authentication → Email Templates → Confirm signup**.
-2. Replace the template body so it includes `{{ .Token }}` (the 6-digit code)
-   instead of `{{ .ConfirmationURL }}`. Supabase's docs have a ready-made OTP
-   template you can paste in: https://supabase.com/docs/guides/auth/auth-email-templates
-3. Go to **Authentication → Providers → Email** and make sure "Confirm email"
+1. Go to **Authentication → Providers → Email** and make sure "Confirm email"
    is turned on.
 
-Password-reset emails (Forgot Password page) use the default link-based
+If you'd rather send a 6-digit OTP code instead of a link, that requires
+custom SMTP (Supabase's default email service doesn't allow editing
+templates) — set that up under **Project Settings → Authentication → SMTP
+Settings**, then edit **Authentication → Email Templates → Confirm signup**
+to use `{{ .Token }}`, and switch the Register page back to the OTP flow.
+
+Password-reset emails (Forgot Password page) already use the default link-based
 template — no change needed there.
 
 ## 5. Enable Google login (optional)

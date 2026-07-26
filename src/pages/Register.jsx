@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { UserPlus, Mail, Lock, Loader2, Eye, EyeOff, AlertCircle } from "lucide-react";
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import AuthLayout from "@/components/AuthLayout";
 import GoogleIcon from "@/components/GoogleIcon";
 import { toast } from "@/components/ui/use-toast";
@@ -19,8 +18,7 @@ export default function Register() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [resending, setResending] = useState(false);
-  const [showOtp, setShowOtp] = useState(false);
-  const [otpCode, setOtpCode] = useState("");
+  const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -36,25 +34,9 @@ export default function Register() {
     setLoading(true);
     try {
       await db.auth.register({ email: email.trim(), password });
-      setShowOtp(true);
+      setSubmitted(true);
     } catch (err) {
       setError(err.message || "Registration failed");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleVerify = async () => {
-    setError("");
-    setLoading(true);
-    try {
-      const result = await db.auth.verifyOtp({ email, otpCode });
-      if (result?.access_token) {
-        db.auth.setToken(result.access_token);
-      }
-      window.location.href = import.meta.env.BASE_URL;
-    } catch (err) {
-      setError(err.message || "Invalid verification code");
     } finally {
       setLoading(false);
     }
@@ -64,13 +46,13 @@ export default function Register() {
     setError("");
     setResending(true);
     try {
-      await db.auth.resendOtp(email);
+      await db.auth.resendConfirmation(email);
       toast({
-        title: "Code sent",
-        description: "Check your email for the new code.",
+        title: "Email sent",
+        description: "Check your inbox for the confirmation link.",
       });
     } catch (err) {
-      setError(err.message || "Failed to resend code");
+      setError(err.message || "Failed to resend email");
     } finally {
       setResending(false);
     }
@@ -80,39 +62,22 @@ export default function Register() {
     db.auth.loginWithProvider("google");
   };
 
-  if (showOtp) {
+  if (submitted) {
     return (
-      <AuthLayout icon={Mail} title="Verify your email" subtitle={`We sent a code to ${email}`}>
+      <AuthLayout icon={Mail} title="Check your email" subtitle={`We sent a confirmation link to ${email}`}>
         {error && (
           <div className="mb-4 p-3 rounded-lg bg-destructive/10 text-destructive text-sm flex items-start gap-2">
             <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
             <span>{error}</span>
           </div>
         )}
-        <div className="flex justify-center mb-5">
-          <InputOTP maxLength={6} value={otpCode} onChange={setOtpCode} autoFocus autoComplete="one-time-code">
-            <InputOTPGroup>
-              <InputOTPSlot index={0} />
-              <InputOTPSlot index={1} />
-              <InputOTPSlot index={2} />
-              <InputOTPSlot index={3} />
-              <InputOTPSlot index={4} />
-              <InputOTPSlot index={5} />
-            </InputOTPGroup>
-          </InputOTP>
-        </div>
-        <Button className="w-full h-11 font-medium" onClick={handleVerify} disabled={loading || otpCode.length < 6}>
-          {loading ? (
-            <>
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              Verifying...
-            </>
-          ) : (
-            "Verify"
-          )}
-        </Button>
-        <p className="text-center text-sm text-muted-foreground mt-4">
-          Didn't receive the code?{" "}
+        <p className="text-sm text-muted-foreground text-center leading-relaxed">
+          Click the link in that email to confirm your account — it'll bring you
+          straight back here, signed in. If you don't see it within a minute or
+          two, check your spam folder.
+        </p>
+        <p className="text-center text-sm text-muted-foreground mt-5">
+          Didn't get the email?{" "}
           <button
             onClick={handleResend}
             disabled={resending}
