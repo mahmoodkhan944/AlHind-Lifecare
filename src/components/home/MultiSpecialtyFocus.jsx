@@ -33,14 +33,14 @@ export default function MultiSpecialtyFocus() {
   }, []);
 
   return (
-    <section className="py-10 sm:py-12 md:py-16 bg-[#eef5f7]">
+    <section className="py-10 sm:py-12 md:py-16 bg-muted">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-10">
           <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-bold tracking-wider uppercase mb-3">
             Featured Treatments
           </span>
-          <h2 className="font-heading font-extrabold text-3xl md:text-4xl text-[#333333] mb-2">Multi-Specialty Focus</h2>
-          <p className="text-[#555555] text-base md:text-lg max-w-2xl mx-auto">
+          <h2 className="font-heading font-extrabold text-3xl md:text-4xl text-foreground mb-2">Multi-Specialty Focus</h2>
+          <p className="text-muted-foreground text-base md:text-lg max-w-2xl mx-auto">
             We cover all medical needs, from hair transplants to heart transplants.
           </p>
         </div>
@@ -57,13 +57,13 @@ export default function MultiSpecialtyFocus() {
                 className="bg-white rounded-2xl shadow-sm border border-gray-50 overflow-hidden hover:shadow-lg hover:shadow-primary/5 transition-all"
               >
                 <div className="flex items-center justify-center py-4 sm:py-6">
-                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-sky-50 flex items-center justify-center">
-                    <Icon className="w-6 h-6 sm:w-7 sm:h-7 text-[#0056b3]" strokeWidth={1.8} />
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-secondary/10 flex items-center justify-center">
+                    <Icon className="w-6 h-6 sm:w-7 sm:h-7 text-secondary" strokeWidth={1.8} />
                   </div>
                 </div>
                 <Link
                   to={s.link || "/treatments"}
-                  className="flex items-center justify-between gap-1 px-3 py-2.5 sm:px-4 sm:py-3 bg-[#0056b3] hover:bg-[#004a99] transition-colors group"
+                  className="flex items-center justify-between gap-1 px-3 py-2.5 sm:px-4 sm:py-3 bg-secondary hover:bg-secondary/90 transition-colors group"
                 >
                   <span className="text-white font-heading font-semibold text-xs sm:text-sm text-center flex-1">{s.title}</span>
                   <span className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0 group-hover:bg-white/30 transition-colors">

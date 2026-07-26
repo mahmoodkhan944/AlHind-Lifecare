@@ -29,7 +29,7 @@ export default function NewsletterSection() {
   };
 
   return (
-    <section className="bg-gradient-to-b from-[#f0fdf4] to-white py-10 sm:py-12 md:py-16">
+    <section className="bg-gradient-to-b from-accent-jade/5 to-white py-10 sm:py-12 md:py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 text-center">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -38,25 +38,25 @@ export default function NewsletterSection() {
         >
           {/* Icon badge */}
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-primary/10 mb-5">
-            <Mail className="w-6 h-6 text-[#cc6600]" />
+            <Mail className="w-6 h-6 text-[hsl(var(--accent-warm))]" />
           </div>
 
-          <span className="text-sm font-semibold text-[#cc6600] uppercase tracking-wider">
+          <span className="text-sm font-semibold text-[hsl(var(--accent-warm))] uppercase tracking-wider">
             Subscribe to Newsletter
           </span>
 
-          <h2 className="font-heading font-extrabold text-2xl sm:text-3xl md:text-4xl text-[#0b132a] mt-3 mb-4 leading-tight">
+          <h2 className="font-heading font-extrabold text-2xl sm:text-3xl md:text-4xl text-secondary mt-3 mb-4 leading-tight">
             Let's Subscribe to Get Our Newsletter.
           </h2>
 
-          <p className="text-sm sm:text-base text-[#4f5f74] leading-relaxed max-w-xl mx-auto mb-8">
+          <p className="text-sm sm:text-base text-muted-foreground leading-relaxed max-w-xl mx-auto mb-8">
             At Alhind Medical Care, your health and well-being always come first. Our goal is to provide
             personalized and compassionate healthcare so that every patient receives the care, support,
             and attention they truly deserve.
           </p>
 
           {done ? (
-            <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#e2fceb] text-[#219653] font-semibold">
+            <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-accent-jade/10 text-accent-jade font-semibold">
               <CheckCircle2 className="w-5 h-5" />
               Thank you for subscribing!
             </div>
@@ -74,7 +74,7 @@ export default function NewsletterSection() {
               <button
                 type="submit"
                 disabled={loading}
-                className="flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-[#00a800] hover:bg-[#009000] text-white text-sm font-semibold whitespace-nowrap transition-colors shadow-md shadow-[#00a800]/20 disabled:opacity-60"
+                className="flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-accent-jade hover:bg-accent-jade/90 text-white text-sm font-semibold whitespace-nowrap transition-colors shadow-md shadow-accent-jade/20 disabled:opacity-60"
               >
                 {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <>Subscribe Now <ArrowRight className="w-4 h-4" /></>}
               </button>

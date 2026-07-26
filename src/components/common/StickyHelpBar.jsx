@@ -9,7 +9,7 @@ export default function StickyHelpBar() {
     <div className="fixed bottom-0 left-0 right-0 z-50 flex gap-2 p-2 md:p-3 bg-white/90 backdrop-blur-xl border-t border-border/40 shadow-lg shadow-black/5">
       <a
         href={getTelLink(s?.phone)}
-        className="flex-1 flex items-center justify-center gap-2 py-2.5 sm:py-3 rounded-xl bg-[#FF1A4D] hover:bg-[#e0154a] text-white font-heading font-bold text-xs sm:text-sm transition-colors"
+        className="flex-1 flex items-center justify-center gap-2 py-2.5 sm:py-3 rounded-xl bg-primary hover:bg-primary/90 text-white font-heading font-bold text-xs sm:text-sm transition-colors"
       >
         <HelpCircle className="w-4 h-4 sm:w-5 sm:h-5" />
         Need Assistance?

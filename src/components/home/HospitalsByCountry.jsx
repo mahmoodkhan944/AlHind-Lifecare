@@ -56,13 +56,13 @@ export default function HospitalsByCountry() {
   ];
 
   return (
-    <section className="py-10 sm:py-12 md:py-16 bg-[#ebf3fa]">
+    <section className="py-10 sm:py-12 md:py-16 bg-muted">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-8">
           <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-bold tracking-wider uppercase mb-3">
             Medical Destinations
           </span>
-          <h2 className="font-heading font-extrabold text-3xl md:text-4xl text-[#0A2540] mb-2">Hospitals by Destination</h2>
+          <h2 className="font-heading font-extrabold text-3xl md:text-4xl text-secondary mb-2">Hospitals by Destination</h2>
           <p className="text-muted-foreground text-base max-w-2xl mx-auto">
             JCI-accredited facilities with cutting-edge technology and world-class specialists
           </p>
@@ -81,7 +81,7 @@ export default function HospitalsByCountry() {
                 className={`relative bg-white rounded-3xl shadow-lg shadow-black/5 border border-gray-100 overflow-hidden`}
               >
                 {/* Badge */}
-                <div className="absolute top-4 right-4 z-10 px-3 sm:px-4 py-1.5 rounded-full bg-gradient-to-r from-[#008A9B] to-[#004F6B] text-white font-heading font-bold text-xs sm:text-sm shadow-md">
+                <div className="absolute top-4 right-4 z-10 px-3 sm:px-4 py-1.5 rounded-full bg-gradient-to-r from-secondary to-accent-jade text-white font-heading font-bold text-xs sm:text-sm shadow-md">
                   {count}
                 </div>
 
@@ -98,7 +98,7 @@ export default function HospitalsByCountry() {
                   <div>
                     <div className="flex items-baseline gap-1.5">
                       <span className="text-xs font-bold text-gray-400 tracking-wider">{cfg.code}</span>
-                      <h3 className="font-heading font-extrabold text-xl text-[#0A2540]">{sec.country}</h3>
+                      <h3 className="font-heading font-extrabold text-xl text-secondary">{sec.country}</h3>
                     </div>
                     <p className="text-xs text-gray-500 font-medium">{cfg.subtitle}</p>
                   </div>
@@ -117,9 +117,9 @@ export default function HospitalsByCountry() {
                           </div>
                         )}
                       </div>
-                      <h4 className="font-heading font-bold text-xs sm:text-sm text-[#0A2540] mt-2 line-clamp-1">{h.name}</h4>
+                      <h4 className="font-heading font-bold text-xs sm:text-sm text-secondary mt-2 line-clamp-1">{h.name}</h4>
                       <span className="flex items-center gap-1 text-xs text-gray-500 mt-0.5">
-                        <MapPin className="w-3 h-3 text-[#1E88E5]" /> {h.city}
+                        <MapPin className="w-3 h-3 text-accent-jade" /> {h.city}
                       </span>
                     </Link>
                   ))}
@@ -136,8 +136,8 @@ export default function HospitalsByCountry() {
                     to="/hospitals"
                     className="flex items-center justify-between w-full px-5 py-3 rounded-xl border border-gray-200 hover:border-primary/40 hover:bg-primary/5 transition-all group"
                   >
-                    <span className="font-heading font-semibold text-xs sm:text-sm text-[#0A2540]">View Hospitals in {sec.country}</span>
-                    <ArrowRight className="w-4 h-4 text-[#0A2540] group-hover:translate-x-1 transition-transform" />
+                    <span className="font-heading font-semibold text-xs sm:text-sm text-secondary">View Hospitals in {sec.country}</span>
+                    <ArrowRight className="w-4 h-4 text-secondary group-hover:translate-x-1 transition-transform" />
                   </Link>
                 </div>
               </motion.div>

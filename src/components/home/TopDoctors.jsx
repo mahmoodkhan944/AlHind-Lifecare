@@ -57,14 +57,14 @@ export default function TopDoctors() {
   }, []);
 
   return (
-    <section className="py-10 sm:py-12 md:py-16 bg-[#f0f4f8]">
+    <section className="py-10 sm:py-12 md:py-16 bg-muted">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         {/* Header */}
         <div className="text-center mb-4">
           <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-bold tracking-wider uppercase mb-3">
-            <Star className="w-3.5 h-3.5 fill-[#cc6600]" /> Latest Doctors
+            <Star className="w-3.5 h-3.5 fill-[hsl(var(--accent-warm))]" /> Latest Doctors
           </span>
-          <h2 className="font-heading font-extrabold text-3xl md:text-4xl text-[#1a2e1a] mb-2">
+          <h2 className="font-heading font-extrabold text-3xl md:text-4xl text-secondary mb-2">
             Meet Our Newest Specialists
           </h2>
         </div>
@@ -78,7 +78,7 @@ export default function TopDoctors() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.08 }}
-              className="bg-white rounded-2xl shadow-lg shadow-black/5 overflow-hidden hover:shadow-xl hover:shadow-[#00A600]/8 hover:-translate-y-1 transition-all duration-300"
+              className="bg-white rounded-2xl shadow-lg shadow-black/5 overflow-hidden hover:shadow-xl hover:shadow-accent-jade/10 hover:-translate-y-1 transition-all duration-300"
             >
               {/* Image with badges */}
               <div className="relative aspect-[4/4] overflow-hidden bg-gray-100">
@@ -95,12 +95,12 @@ export default function TopDoctors() {
                   </div>
                 )}
                 {/* Rating badge */}
-                <div className="absolute top-2 left-2 sm:top-3 sm:left-3 flex items-center gap-1 px-2 py-1 rounded-full bg-[#2E7D32] text-white text-xs font-bold shadow-md">
+                <div className="absolute top-2 left-2 sm:top-3 sm:left-3 flex items-center gap-1 px-2 py-1 rounded-full bg-accent-jade text-white text-xs font-bold shadow-md">
                   <Star className="w-3 h-3 fill-white" />
                   {(doc.rating || 4.5).toFixed(1)}
                 </div>
                 {/* Experience badge */}
-                <div className="absolute top-2 right-2 sm:top-3 sm:right-3 flex items-center gap-1 px-2 py-1 rounded-full bg-white text-[#2E7D32] text-xs font-bold shadow-md">
+                <div className="absolute top-2 right-2 sm:top-3 sm:right-3 flex items-center gap-1 px-2 py-1 rounded-full bg-white text-accent-jade text-xs font-bold shadow-md">
                   <Briefcase className="w-3 h-3" />
                   {doc.experience_years || 15}+
                 </div>
@@ -109,8 +109,8 @@ export default function TopDoctors() {
               {/* Info */}
               <div className="p-3 sm:p-4">
                 <h3 className="font-heading font-bold text-sm sm:text-base text-black mb-1 line-clamp-1">{doc.name}</h3>
-                <p className="text-xs font-medium text-[#00A600] mb-2 line-clamp-2 leading-snug">{doc.speciality}</p>
-                <p className="flex items-start gap-1 text-xs text-[#333333] mb-3 line-clamp-2 leading-snug">
+                <p className="text-xs font-medium text-accent-jade mb-2 line-clamp-2 leading-snug">{doc.speciality}</p>
+                <p className="flex items-start gap-1 text-xs text-foreground/70 mb-3 line-clamp-2 leading-snug">
                   <MapPin className="w-3 h-3 text-gray-400 flex-shrink-0 mt-0.5" />
                   {doc.hospital_name}
                 </p>
@@ -129,7 +129,7 @@ export default function TopDoctors() {
         <div className="text-center mt-10">
           <Link
             to="/doctors"
-            className="inline-flex items-center gap-2 px-8 py-3 rounded-full bg-[#2E7D32] hover:bg-[#256628] text-white font-heading font-semibold text-base shadow-lg shadow-[#00A600]/20 transition-all hover:shadow-xl hover:shadow-[#00A600]/30"
+            className="inline-flex items-center gap-2 px-8 py-3 rounded-full bg-accent-jade hover:bg-accent-jade/90 text-white font-heading font-semibold text-base shadow-lg shadow-accent-jade/20 transition-all hover:shadow-xl hover:shadow-accent-jade/30"
           >
             View All Doctors
             <ArrowRight className="w-4 h-4" />

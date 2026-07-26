@@ -19,7 +19,7 @@ export default function SideHelpBar() {
     <div className="fixed right-3 sm:right-4 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-2.5">
       <a
         href={getTelLink(s?.phone)}
-        className="group flex flex-col items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#FF1A4D] hover:bg-[#e0154a] text-white shadow-lg transition-all hover:scale-110"
+        className="group flex flex-col items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-primary hover:bg-primary/90 text-white shadow-lg transition-all hover:scale-110"
         title="Need Assistance?"
       >
         <HelpCircle className="w-5 h-5 sm:w-6 sm:h-6" />
