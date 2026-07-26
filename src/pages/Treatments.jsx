@@ -37,7 +37,7 @@ const categories = [
 const PAGE_SIZE = 12;
 
 const HERO_IMAGE =
-  "https://images.unsplash.com/photo-1758691461957-474a7686e388?w=1600&q=80";
+  "https://plus.unsplash.com/premium_photo-1702598479744-f0fefa59d3a2?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OTN8fHRyZWF0bWVudHN8ZW58MHx8MHx8fDA%3D";
 
 export default function Treatments() {
   const [treatments, setTreatments] = useState([]);

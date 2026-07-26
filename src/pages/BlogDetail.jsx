@@ -18,7 +18,7 @@ const parseList = (val) => {
 };
 
 const HERO_IMAGE =
-  "https://images.unsplash.com/photo-1758691461957-474a7686e388?w=1600&q=80";
+  "https://plus.unsplash.com/premium_photo-1720744786849-a7412d24ffbf?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8YmxvZyUyMGRldGFpbHN8ZW58MHx8MHx8fDA%3D";
 
 export default function BlogDetail() {
   const { id } = useParams();

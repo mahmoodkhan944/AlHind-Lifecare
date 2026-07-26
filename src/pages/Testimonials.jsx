@@ -4,7 +4,7 @@ import { Star, Quote, MessageSquareText, ChevronLeft, ChevronRight } from "lucid
 import { db } from "@/api/dataClient";
 
 const HERO_IMAGE =
-  "https://images.unsplash.com/photo-1516841273335-e39b37888115?w=1600&q=80";
+  "https://plus.unsplash.com/premium_photo-1738663458251-ab83dc049ff3?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mzd8fHRlc3RpbW9uaWFsc3xlbnwwfHwwfHx8MA%3D%3D";
 
 const PAGE_SIZE = 12;
 

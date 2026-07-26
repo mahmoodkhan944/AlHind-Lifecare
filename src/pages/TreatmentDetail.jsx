@@ -33,7 +33,7 @@ const parseList = (val) => {
 };
 
 const HERO_IMAGE =
-  "https://images.unsplash.com/photo-1758691461957-474a7686e388?w=1600&q=80";
+  "https://images.unsplash.com/photo-1551601651-2a8555f1a136?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OTZ8fHRyZWF0bWVudHxlbnwwfHwwfHx8MA%3D%3D";
 
 export default function TreatmentDetail() {
   const { id } = useParams();

@@ -10,7 +10,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { useSiteSettings, getWhatsAppLink, parseDepartments } from "@/hooks/useSiteSettings";
 
 const HERO_IMAGE =
-  "https://images.unsplash.com/photo-1758691461957-474a7686e388?w=1600&q=80";
+  "http://plus.unsplash.com/premium_photo-1669658981858-b2ae0d7581a3?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8Y29udGFjdCUyMHVzfGVufDB8fDB8fHww";
 
 export default function Contact() {
   const [searchParams] = useSearchParams();

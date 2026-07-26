@@ -31,7 +31,7 @@ const parseList = (val) => {
 };
 
 const HERO_IMAGE =
-  "https://images.unsplash.com/photo-1516841273335-e39b37888115?w=1600&q=80";
+  "https://images.unsplash.com/photo-1758691463110-697a814b2033?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTIyfHxtZWRpY2FsJTIwcHJvZmVzc2lvbmFsfGVufDB8fDB8fHww";
 
 export default function DoctorDetail() {
   const { id } = useParams();
