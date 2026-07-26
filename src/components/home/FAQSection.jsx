@@ -25,7 +25,7 @@ export default function FAQSection() {
     <section className="py-10 sm:py-12 md:py-16 bg-gradient-to-b from-background to-muted/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <SectionHeader badge="FAQ" title="Frequently Asked Questions (FAQ's)" subtitle="Everything you need to know about medical treatment abroad" />
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {faqs.map((faq, i) => (
             <div key={i} className="rounded-xl border border-primary/20 bg-white overflow-hidden hover:border-primary/40 transition-colors">
               <Accordion type="single" collapsible>

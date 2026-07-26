@@ -122,7 +122,7 @@ const SECTIONS = [
 
 function SectionBadge({ number }) {
   return (
-    <span className="inline-flex items-center justify-center px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-sm font-bold border border-emerald-200">
+    <span className="inline-flex items-center justify-center px-3 py-1 rounded-full bg-accent-jade/10 text-accent-jade text-sm font-bold border border-accent-jade/20">
       {number}
     </span>
   );
@@ -133,7 +133,7 @@ function BulletList({ items }) {
     <ul className="space-y-2.5 mt-3">
       {items.map((item, i) => (
         <li key={i} className="flex items-start gap-2.5 text-slate-600 text-sm md:text-[15px] leading-relaxed">
-          <span className="mt-[7px] w-1.5 h-1.5 rounded-full bg-emerald-500 flex-shrink-0" />
+          <span className="mt-[7px] w-1.5 h-1.5 rounded-full bg-accent-jade flex-shrink-0" />
           <span>{item}</span>
         </li>
       ))}
@@ -179,7 +179,7 @@ export default function Terms() {
       <section className="relative pt-20 sm:pt-24 md:pt-28 pb-8 sm:pb-10 md:pb-12 overflow-hidden">
         <div className="absolute inset-0">
           <img src={HERO_IMAGE} alt="" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-br from-secondary/90 via-secondary/80 to-emerald-900/85" />
+          <div className="absolute inset-0 bg-gradient-to-br from-secondary/90 via-secondary/80 to-[#0E8C7A]/85" />
         </div>
         <div
           className="absolute inset-0 opacity-[0.07]"
@@ -218,12 +218,12 @@ export default function Terms() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-emerald-50 border border-emerald-200 rounded-2xl p-5 sm:p-6 flex gap-4"
+            className="bg-accent-jade/10 border border-accent-jade/20 rounded-2xl p-5 sm:p-6 flex gap-4"
           >
-            <div className="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center flex-shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-accent-jade flex items-center justify-center flex-shrink-0">
               <FileText className="w-5 h-5 text-white" />
             </div>
-            <p className="text-sm md:text-[15px] text-emerald-800 leading-relaxed">
+            <p className="text-sm md:text-[15px] text-accent-jade leading-relaxed">
               Welcome to Alhind Medical Care. By accessing and using our website and services, you agree to be bound by these Terms &amp; Conditions. Please read them carefully before using our platform.
             </p>
           </motion.div>
@@ -273,7 +273,7 @@ export default function Terms() {
       </section>
 
       {/* Contact section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-900 py-10 sm:py-12 md:py-14">
+      <section className="relative overflow-hidden bg-gradient-to-br from-accent-jade via-[#0B6F60] to-secondary py-10 sm:py-12 md:py-14">
         <div
           className="absolute inset-0 opacity-[0.07]"
           style={{ backgroundImage: "linear-gradient(white 1px, transparent 1px), linear-gradient(90deg, white 1px, transparent 1px)", backgroundSize: "32px 32px" }}

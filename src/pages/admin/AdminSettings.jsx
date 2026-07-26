@@ -218,7 +218,7 @@ function DepartmentsManager({ value, onChange }) {
   return (
     <SettingsCard icon={Building2} title="Departments">
       <div className="flex justify-end -mt-2 mb-2">
-        <Button onClick={() => update([...items, ""])} variant="outline" size="sm" className="gap-1 text-accent-jade border-emerald-600">
+        <Button onClick={() => update([...items, ""])} variant="outline" size="sm" className="gap-1 text-accent-jade border-accent-jade">
           <Plus className="w-4 h-4" /> Add
         </Button>
       </div>

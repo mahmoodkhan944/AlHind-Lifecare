@@ -27,7 +27,7 @@ export default function Blog() {
       <section className="relative pt-20 sm:pt-24 md:pt-28 pb-8 sm:pb-10 md:pb-12 overflow-hidden">
         <div className="absolute inset-0">
           <img src={HERO_IMAGE} alt="" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-br from-secondary/90 via-secondary/80 to-emerald-900/85" />
+          <div className="absolute inset-0 bg-gradient-to-br from-secondary/90 via-secondary/80 to-[#0E8C7A]/85" />
         </div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 text-center">
           <motion.h1
@@ -69,7 +69,7 @@ export default function Blog() {
               ))}
             </div>
           ) : posts.length === 0 ? (
-            <div className="text-center py-20 text-muted-foreground">
+            <div className="text-center py-10 sm:py-12 text-muted-foreground">
               <Newspaper className="w-10 h-10 mx-auto mb-3 text-primary/40" />
               <p className="font-medium">No blog posts yet. Check back soon!</p>
             </div>

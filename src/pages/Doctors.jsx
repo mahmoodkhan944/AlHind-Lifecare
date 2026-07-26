@@ -77,11 +77,11 @@ export default function Doctors() {
   return (
     <div>
       {/* Hero */}
-      <section className="relative pt-24 sm:pt-28 md:pt-32 pb-14 sm:pb-16 md:pb-20 overflow-hidden">
+      <section className="relative pt-20 sm:pt-24 md:pt-28 pb-10 sm:pb-12 md:pb-14 overflow-hidden">
         {/* Background photo */}
         <div className="absolute inset-0">
           <img src={HERO_IMAGE} alt="" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-br from-secondary/90 via-secondary/80 to-emerald-900/85" />
+          <div className="absolute inset-0 bg-gradient-to-br from-secondary/90 via-secondary/80 to-[#0E8C7A]/85" />
         </div>
 
         <div className="relative max-w-5xl mx-auto px-4 sm:px-6 pr-16 sm:pr-20">
@@ -107,7 +107,7 @@ export default function Doctors() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-white/85 text-base sm:text-lg max-w-2xl mb-10 sm:mb-12 text-balance"
+            className="text-white/85 text-base sm:text-lg max-w-2xl mb-6 sm:mb-8 text-balance"
           >
             Browse our network of world-renowned specialists across leading hospitals in India and
             Turkey, and get matched with the right expert for your treatment.
@@ -193,7 +193,7 @@ export default function Doctors() {
               ))}
             </div>
           ) : filtered.length === 0 ? (
-            <div className="text-center py-16 sm:py-20 text-muted-foreground">
+            <div className="text-center py-10 sm:py-12 text-muted-foreground">
               <UserRound className="w-10 h-10 mx-auto mb-3 text-primary/40" />
               <p className="font-medium">No doctors found matching your criteria</p>
             </div>

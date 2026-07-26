@@ -30,7 +30,7 @@ export default function HowWeWork() {
     <section className="py-10 sm:py-12 md:py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <SectionHeader badge="Process" title="How Do We Work?" subtitle="Your journey to better health in four simple steps" />
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {steps.map((step, i) => {
             const Icon = (step.icon && Icons[step.icon]) || PhoneCallFallback;
             return (
@@ -42,7 +42,7 @@ export default function HowWeWork() {
                 transition={{ delay: i * 0.1 }}
                 className="flex items-start gap-3 sm:gap-4 p-4 sm:p-5 rounded-2xl bg-white border border-border/40 hover:shadow-lg hover:shadow-primary/5 transition-all"
               >
-                <div className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-rose-500 to-red-600 flex items-center justify-center text-white font-heading font-bold text-xs sm:text-sm shadow-lg shadow-red-500/20">
+                <div className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-primary to-[#C22E44] flex items-center justify-center text-white font-heading font-bold text-xs sm:text-sm shadow-lg shadow-primary/20">
                   {String(i + 1).padStart(2, "0")}
                 </div>
                 <div className="flex-1">

@@ -25,7 +25,7 @@ const config = {
     subtitle: "International Healthcare Destination",
     description:
       "Internationally accredited hospitals offering advanced treatments and experienced medical specialists.",
-    bgGradient: "from-orange-50/40 to-emerald-50/30",
+    bgGradient: "from-[hsl(var(--accent-warm)/0.06)] to-accent-jade/5",
   },
 
   Turkey: {
