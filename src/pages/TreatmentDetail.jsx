@@ -381,7 +381,7 @@ export default function TreatmentDetail() {
                           </span>
                         )}
                         {h.rating > 0 && (
-                          <span className="flex items-center gap-1 text-amber-500">
+                          <span className="flex items-center gap-1 text-[hsl(var(--accent-warm))]">
                             <Star className="w-3.5 h-3.5 fill-current shrink-0" />
                             {h.rating}
                           </span>

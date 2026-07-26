@@ -54,7 +54,7 @@ export default function MultiSpecialtyFocus() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.05 }}
-                className="bg-white rounded-2xl shadow-sm border border-gray-50 overflow-hidden hover:shadow-lg hover:shadow-primary/5 transition-all"
+                className="bg-white rounded-2xl shadow-sm border border-border/40 overflow-hidden hover-lift hover:shadow-lg hover:shadow-primary/5 transition-all"
               >
                 <div className="flex items-center justify-center py-4 sm:py-6">
                   <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-secondary/10 flex items-center justify-center">

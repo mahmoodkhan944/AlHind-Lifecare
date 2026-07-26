@@ -424,7 +424,7 @@ export default function About() {
                     <a
                       href={`mailto:${leader.email}`}
                       aria-label={`Email ${leader.name}`}
-                      className="flex items-center justify-center w-9 h-9 rounded-full bg-white shadow-sm text-foreground/70 hover:text-green-500 hover:shadow-md transition-all"
+                      className="flex items-center justify-center w-9 h-9 rounded-full bg-white shadow-sm text-foreground/70 hover:text-accent-jade hover:shadow-md transition-all"
                     >
                       <Mail className="w-4 h-4" />
                     </a>

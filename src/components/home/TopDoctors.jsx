@@ -78,7 +78,7 @@ export default function TopDoctors() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.08 }}
-              className="bg-white rounded-2xl shadow-lg shadow-black/5 overflow-hidden hover:shadow-xl hover:shadow-accent-jade/10 hover:-translate-y-1 transition-all duration-300"
+              className="card-premium overflow-hidden"
             >
               {/* Image with badges */}
               <div className="relative aspect-[4/4] overflow-hidden bg-gray-100">

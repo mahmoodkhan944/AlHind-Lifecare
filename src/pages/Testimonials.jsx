@@ -104,7 +104,7 @@ export default function Testimonials() {
                     {Array.from({ length: 5 }).map((_, j) => (
                       <Star
                         key={j}
-                        className={`w-4 h-4 shrink-0 ${j < (t.rating || 5) ? "text-amber-400 fill-amber-400" : "text-gray-200"}`}
+                        className={`w-4 h-4 shrink-0 ${j < (t.rating || 5) ? "text-[hsl(var(--accent-warm))] fill-[hsl(var(--accent-warm))]" : "text-muted-foreground/30"}`}
                       />
                     ))}
                   </div>

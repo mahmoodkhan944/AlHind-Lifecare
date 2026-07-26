@@ -135,7 +135,7 @@ export default function HospitalDetail() {
               </p>
               <div className="flex flex-wrap justify-center sm:justify-start gap-2 sm:gap-3">
                 {hospital.emergency_services && (
-                  <span className="flex items-center gap-1 px-3 py-1 rounded-full bg-red-500/20 text-red-300 text-xs font-medium">
+                  <span className="flex items-center gap-1 px-3 py-1 rounded-full bg-destructive/20 text-red-300 text-xs font-medium">
                     24/7 Emergency
                   </span>
                 )}

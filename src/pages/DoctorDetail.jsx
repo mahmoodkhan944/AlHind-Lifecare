@@ -146,7 +146,7 @@ export default function DoctorDetail() {
                 {doctor.name}
               </h1>
               {doctor.speciality && (
-                <p className="text-sky-300 text-base sm:text-lg font-medium mb-1">{doctor.speciality}</p>
+                <p className="text-[hsl(var(--accent-warm))] text-base sm:text-lg font-medium mb-1">{doctor.speciality}</p>
               )}
               {doctor.designation && <p className="text-white/60 mb-3 sm:mb-4 text-sm sm:text-base">{doctor.designation}</p>}
               <div className="flex flex-wrap justify-center md:justify-start gap-3 sm:gap-4 text-sm text-white/70">
@@ -163,7 +163,7 @@ export default function DoctorDetail() {
                   </span>
                 )}
                 {doctor.rating > 0 && (
-                  <span className="flex items-center gap-1 text-amber-400">
+                  <span className="flex items-center gap-1 text-[hsl(var(--accent-warm))]">
                     <Star className="w-4 h-4 fill-current shrink-0" />
                     {doctor.rating} ({doctor.reviews_count || 0} reviews)
                   </span>
@@ -258,7 +258,7 @@ export default function DoctorDetail() {
                   <ul className="space-y-2">
                     {awards.map((a, idx) => (
                       <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
-                        <Trophy className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" /> {a}
+                        <Trophy className="w-4 h-4 text-[hsl(var(--accent-warm))] flex-shrink-0 mt-0.5" /> {a}
                       </li>
                     ))}
                   </ul>
@@ -388,10 +388,10 @@ function SectionCard({ title, icon: Icon, accent, children }) {
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      className={`rounded-2xl p-5 sm:p-6 md:p-7 border ${accent ? "bg-amber-50 border-amber-200" : "bg-white border-gray-200"}`}
+      className={`rounded-2xl p-5 sm:p-6 md:p-7 border ${accent ? "bg-[hsl(var(--accent-warm)/0.08)] border-[hsl(var(--accent-warm)/0.3)]" : "bg-white border-border"}`}
     >
       <div className="flex items-center gap-2 mb-3 sm:mb-4">
-        <Icon className={`w-5 h-5 shrink-0 ${accent ? "text-amber-600" : "text-primary"}`} />
+        <Icon className={`w-5 h-5 shrink-0 ${accent ? "text-[hsl(var(--accent-warm))]" : "text-primary"}`} />
         <h2 className="font-heading font-bold text-lg sm:text-xl">{title}</h2>
       </div>
       {children}

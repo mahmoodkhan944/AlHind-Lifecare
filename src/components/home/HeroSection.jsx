@@ -81,11 +81,6 @@ export default function HeroSection() {
             transition={{ duration: 0.6 }}
             className="text-white text-center lg:text-left order-1 lg:order-1"
           >
-            {/* Trust eyebrow */}
-            <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 backdrop-blur-sm rounded-full px-3.5 py-1.5 mb-3 text-xs sm:text-sm font-semibold tracking-wide">
-              <ShieldCheck className="w-4 h-4 text-emerald-300 shrink-0" />
-              JCI &amp; NABH Accredited Partner Hospitals
-            </div>
 
             {/* Heading */}
             <h1 className="font-heading font-extrabold text-[clamp(1.75rem,6vw,3.75rem)] leading-[1.12] mb-3 drop-shadow-lg text-balance">

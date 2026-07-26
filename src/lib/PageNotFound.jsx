@@ -1,7 +1,7 @@
 import { useLocation } from 'react-router-dom';
 import { db } from '@/api/dataClient';
 import { useQuery } from '@tanstack/react-query';
-
+import { HeartPulse, ArrowLeft, Info } from 'lucide-react';
 
 export default function PageNotFound({}) {
     const location = useLocation();
@@ -18,54 +18,55 @@ export default function PageNotFound({}) {
             }
         }
     });
-    
+
     return (
-        <div className="min-h-screen flex items-center justify-center p-6 bg-slate-50">
+        <div className="min-h-screen flex items-center justify-center p-6 bg-muted mesh-bg-soft">
             <div className="max-w-md w-full">
                 <div className="text-center space-y-6">
                     {/* 404 Error Code */}
-                    <div className="space-y-2">
-                        <h1 className="text-7xl font-light text-slate-300">404</h1>
-                        <div className="h-0.5 w-16 bg-slate-200 mx-auto"></div>
+                    <div className="space-y-3">
+                        <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary/10 text-primary mb-1">
+                            <HeartPulse className="w-7 h-7" />
+                        </div>
+                        <h1 className="text-7xl font-heading font-extrabold text-secondary">404</h1>
+                        <div className="h-1 w-16 rounded-full bg-primary mx-auto"></div>
                     </div>
-                    
+
                     {/* Main Message */}
                     <div className="space-y-3">
-                        <h2 className="text-2xl font-medium text-slate-800">
-                            Page Not Found
+                        <h2 className="text-2xl font-heading font-bold text-secondary">
+                            This page could not be found.
                         </h2>
-                        <p className="text-slate-600 leading-relaxed">
-                            The page <span className="font-medium text-slate-700">"{pageName}"</span> could not be found in this application.
+                        <p className="text-muted-foreground leading-relaxed">
+                            The page <span className="font-medium text-foreground">"{pageName}"</span> doesn't exist — but your care journey doesn't have to stop here.
                         </p>
                     </div>
-                    
+
                     {/* Admin Note */}
                     {isFetched && authData.isAuthenticated && authData.user?.role === 'admin' && (
-                        <div className="mt-8 p-4 bg-slate-100 rounded-lg border border-slate-200">
-                            <div className="flex items-start space-x-3">
-                                <div className="flex-shrink-0 w-5 h-5 rounded-full bg-orange-100 flex items-center justify-center mt-0.5">
-                                    <div className="w-2 h-2 rounded-full bg-orange-400"></div>
+                        <div className="mt-8 p-4 bg-accent-jade/10 rounded-xl border border-accent-jade/20 text-left">
+                            <div className="flex items-start gap-3">
+                                <div className="flex-shrink-0 w-5 h-5 rounded-full bg-accent-jade/15 flex items-center justify-center mt-0.5">
+                                    <Info className="w-3 h-3 text-accent-jade" />
                                 </div>
-                                <div className="text-left space-y-1">
-                                    <p className="text-sm font-medium text-slate-700">Admin Note</p>
-                                    <p className="text-sm text-slate-600 leading-relaxed">
-                                        This could mean that the AI hasn't implemented this page yet. Ask it to implement it in the chat.
+                                <div className="space-y-1">
+                                    <p className="text-sm font-semibold text-secondary">Admin note</p>
+                                    <p className="text-sm text-muted-foreground leading-relaxed">
+                                        This could mean the page hasn't been implemented yet.
                                     </p>
                                 </div>
                             </div>
                         </div>
                     )}
-                    
+
                     {/* Action Button */}
                     <div className="pt-6">
-                        <button 
-                            onClick={() => window.location.href = '/'} 
-                            className="inline-flex items-center px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:border-slate-300 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500"
+                        <button
+                            onClick={() => window.location.href = '/'}
+                            className="inline-flex items-center gap-2 px-6 py-2.5 text-sm font-heading font-semibold text-white bg-primary rounded-xl hover:bg-primary/90 hover:-translate-y-0.5 active:translate-y-0 transition-all shadow-lg shadow-primary/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
                         >
-                            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                            </svg>
-                            Go Home
+                            <ArrowLeft className="w-4 h-4" />
+                            Back to home
                         </button>
                     </div>
                 </div>

@@ -78,7 +78,7 @@ export default function HospitalsByCountry() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className={`relative bg-white rounded-3xl shadow-lg shadow-black/5 border border-gray-100 overflow-hidden`}
+                className={`relative bg-white rounded-3xl shadow-lg shadow-black/5 border border-border/60 overflow-hidden`}
               >
                 {/* Badge */}
                 <div className="absolute top-4 right-4 z-10 px-3 sm:px-4 py-1.5 rounded-full bg-gradient-to-r from-secondary to-accent-jade text-white font-heading font-bold text-xs sm:text-sm shadow-md">
@@ -87,7 +87,7 @@ export default function HospitalsByCountry() {
 
                 {/* Header */}
                 <div className="flex items-center gap-3 p-4 sm:p-5 pb-3">
-                  <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-white border border-gray-200 shadow-md flex items-center justify-center">
+                  <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-white border border-border shadow-md flex items-center justify-center">
   <img
     src={cfg.flag}
     alt={`${sec.country} Flag`}
@@ -134,7 +134,7 @@ export default function HospitalsByCountry() {
                 <div className="px-4 sm:px-5 pb-4 sm:pb-5">
                   <Link
                     to="/hospitals"
-                    className="flex items-center justify-between w-full px-5 py-3 rounded-xl border border-gray-200 hover:border-primary/40 hover:bg-primary/5 transition-all group"
+                    className="flex items-center justify-between w-full px-5 py-3 rounded-xl border border-border hover:border-primary/40 hover:bg-primary/5 transition-all group"
                   >
                     <span className="font-heading font-semibold text-xs sm:text-sm text-secondary">View Hospitals in {sec.country}</span>
                     <ArrowRight className="w-4 h-4 text-secondary group-hover:translate-x-1 transition-transform" />

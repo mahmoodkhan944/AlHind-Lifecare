@@ -192,7 +192,7 @@ export default function Hospitals() {
                 >
                   <Link
                     to={`/hospitals/${h.id}`}
-                    className="group flex flex-col h-full bg-white rounded-2xl overflow-hidden border border-border/50 hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 transition-all duration-300"
+                    className="card-premium group flex flex-col h-full overflow-hidden"
                   >
                     <div className="relative h-44 sm:h-48 bg-gradient-to-br from-primary/5 to-secondary/5 overflow-hidden shrink-0">
                       {h.cover_image_url ? (
