@@ -52,7 +52,7 @@ export default function LatestTestimonials() {
   if (!loading && testimonials.length === 0) return null;
 
   return (
-    <section className="py-10 sm:py-12 md:py-16 bg-secondary/30 overflow-hidden">
+    <section className="py-5 sm:py-12 md:py-16 bg-secondary/30 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-end justify-between gap-4 mb-6 sm:mb-8">
           <div>

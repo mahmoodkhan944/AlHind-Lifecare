@@ -162,7 +162,7 @@ export default function HeroSection() {
                 bar into the page's overall graphic language. */}
             <div className="decor-blob decor-blob-primary w-64 h-64 -top-16 -right-16 -z-10" />
             {/* Accent top bar — small signature touch tying the card to the brand's coral CTA color */}
-            <div className="absolute inset-x-0 top-0 h-1.5 rounded-t-2xl bg-gradient-to-r from-primary via-[hsl(var(--accent-warm))] to-primary" />
+            <div className="absolute inset-x-0 top-0 h-1.5 rounded-t-2xl" />
 
             <h2 className="font-heading font-bold text-lg sm:text-xl text-secondary text-center mb-0.5 mt-1">
               Let Us Help You

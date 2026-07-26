@@ -57,15 +57,15 @@ export default function TopDoctors() {
   }, []);
 
   return (
-    <section className="py-10 sm:py-12 md:py-16 bg-muted">
+    <section className="sm:py-12 md:py-16 bg-muted">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         {/* Header */}
         <div className="text-center mb-4">
           <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-bold tracking-wider uppercase mb-3">
-            <Star className="w-3.5 h-3.5 fill-[hsl(var(--accent-warm))]" /> Latest Doctors
+            <Star className="w-3.5 h-3.5 fill-[hsl(var(--accent-warm))]" /> Top Doctors
           </span>
           <h2 className="font-heading font-extrabold text-3xl md:text-4xl text-secondary mb-2">
-            Meet Our Newest Specialists
+            Meet Our Highly Skilled Doctors
           </h2>
         </div>
 

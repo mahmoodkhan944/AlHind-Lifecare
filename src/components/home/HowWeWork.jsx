@@ -27,7 +27,7 @@ export default function HowWeWork() {
   }, []);
 
   return (
-    <section className="py-10 sm:py-12 md:py-16">
+    <section className="py-5 sm:py-12 md:py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <SectionHeader badge="Process" title="How Do We Work?" subtitle="Your journey to better health in four simple steps" />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

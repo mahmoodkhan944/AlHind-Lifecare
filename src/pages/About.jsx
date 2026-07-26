@@ -171,7 +171,7 @@ export default function About() {
       </section>
 
       {/* Intro / Mission — image + copy, "Your Health, Our Priority" */}
-      <section className="py-10 sm:py-12 md:py-16">
+      <section className="py-5 sm:py-12 md:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 md:gap-10 items-center">
             <motion.div
@@ -231,7 +231,7 @@ export default function About() {
       </section>
 
       {/* Our Services */}
-      <section className="py-10 sm:py-12 md:py-14 bg-secondary/30">
+      <section className="py-5 sm:py-12 md:py-14 bg-secondary/30">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 text-center">
           <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wider uppercase mb-4">
             Our Services
@@ -263,7 +263,7 @@ export default function About() {
       </section>
 
       {/* Mission & Vision */}
-      <section className="py-10 sm:py-12 md:py-14">
+      <section className="py-5 sm:py-12 md:py-14">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
             {[
@@ -297,7 +297,7 @@ export default function About() {
       </section>
 
       {/* Why patients trust us — alternating image + text rows */}
-      <section className="py-10 sm:py-12 md:py-16">
+      <section className="py-5 sm:py-12 md:py-16">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-10">
             <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wider uppercase mb-4">
@@ -338,7 +338,7 @@ export default function About() {
       </section>
 
       {/* How we help — detailed bullet groups */}
-      <section className="py-10 sm:py-12 md:py-14 bg-secondary/30">
+      <section className="py-5 sm:py-12 md:py-14 bg-secondary/30">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center max-w-2xl mx-auto mb-7 sm:mb-8">
             <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wider uppercase mb-4">
@@ -378,7 +378,7 @@ export default function About() {
       </section>
 
       {/* Leadership */}
-      <section className="py-10 sm:py-12 md:py-14">
+      <section className="py-5 sm:py-12 md:py-14">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <div className="text-center max-w-2xl mx-auto mb-7 sm:mb-8">
             <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wider uppercase mb-4">
@@ -437,7 +437,7 @@ export default function About() {
       </section>
 
       {/* Advantages of choosing us */}
-      <section className="py-10 sm:py-12 md:py-14 bg-secondary/30">
+      <section className="py-5 sm:py-12 md:py-14 bg-secondary/30">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center max-w-2xl mx-auto mb-7 sm:mb-8">
             <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wider uppercase mb-4">

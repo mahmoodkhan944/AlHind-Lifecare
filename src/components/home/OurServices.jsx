@@ -34,7 +34,7 @@ export default function OurServices() {
   }, []);
 
   return (
-    <section className="py-10 sm:py-12 md:py-16 bg-secondary/30">
+    <section className="py-1 sm:py-12 md:py-16 bg-secondary/30">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <SectionHeader badge="Our Services" title="Everything Handled, So You Don't Have To" center />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
