@@ -12,7 +12,7 @@ export default defineConfig({
   base: '/AlHind-Lifecare/',
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
+      '@': path.resolve(__dirname, '/src'),
     },
   },
   plugins: [

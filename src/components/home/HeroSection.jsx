@@ -11,7 +11,7 @@ import { COUNTRIES, getDialCode } from "@/lib/countries";
 import { useLeadModal } from "@/lib/LeadModalContext";
 import { Link } from "react-router-dom";
 
-const BG_VIDEO = "/src/public/videos/hero-video.mp4";
+const BG_VIDEO = "${import.meta.env.BASE_URL}videos/hero-video.mp4";
 // Optional poster: shows instantly while the video loads / if it fails on slow mobile connections.
 const BG_POSTER = "/src/public/videos/hero-poster.jpg";
 
