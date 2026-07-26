@@ -20,6 +20,7 @@ module.exports = {
         accent: { DEFAULT: 'hsl(var(--accent))', foreground: 'hsl(var(--accent-foreground))' },
         destructive: { DEFAULT: 'hsl(var(--destructive))', foreground: 'hsl(var(--destructive-foreground))' },
         'accent-warm': 'hsl(var(--accent-warm))',
+        'accent-jade': 'hsl(var(--accent-jade))',
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
@@ -35,10 +36,10 @@ module.exports = {
           ring: 'hsl(var(--sidebar-ring))'
         },
         medical: {
-          blue: '#0284C7',
-          teal: '#0D9488',
-          gold: '#D4A843',
-          navy: '#1E293B'
+          blue: '#0E8C7A',
+          teal: '#0E8C7A',
+          gold: '#F0A202',
+          navy: '#0B2E36'
         }
       },
       fontFamily: {
@@ -51,7 +52,7 @@ module.exports = {
         'accordion-down': { from: { height: '0' }, to: { height: 'var(--radix-accordion-content-height)' } },
         'accordion-up': { from: { height: 'var(--radix-accordion-content-height)' }, to: { height: '0' } },
         'float': { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-10px)' } },
-        'pulse-glow': { '0%, 100%': { boxShadow: '0 0 20px rgba(2,132,199,0.3)' }, '50%': { boxShadow: '0 0 40px rgba(2,132,199,0.6)' } }
+        'pulse-glow': { '0%, 100%': { boxShadow: '0 0 20px rgba(14,140,122,0.3)' }, '50%': { boxShadow: '0 0 40px rgba(14,140,122,0.6)' } }
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',

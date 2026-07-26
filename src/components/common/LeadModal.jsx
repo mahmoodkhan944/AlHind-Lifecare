@@ -126,7 +126,7 @@ export default function LeadModal() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full h-12 rounded-xl bg-[#D92E46] text-white hover:bg-[#b92539] font-heading font-bold text-sm transition-all shadow-lg shadow-[#D92E46]/25 hover:shadow-xl hover:-translate-y-0.5 flex items-center justify-center gap-2 disabled:opacity-60 disabled:translate-y-0"
+                className="w-full h-12 rounded-xl bg-primary text-white hover:bg-primary/90 font-heading font-bold text-sm transition-all shadow-lg shadow-primary/25 hover:shadow-xl hover:-translate-y-0.5 flex items-center justify-center gap-2 disabled:opacity-60 disabled:translate-y-0"
               >
                 {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> Submitting...</> : <>Submit Request <ArrowRight className="w-4 h-4" /></>}
               </button>

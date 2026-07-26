@@ -6,61 +6,65 @@
 
 @layer base {
   :root {
-    --background: 210 40% 98%;
-    /* background: navy - #092f35, teal - #087f78, mint - #dff4ed, coral - #ef7a63,
-    ink - #14363a, muted - #607579, cream - #f7f4ed; */
-    --foreground: 222 47% 11%;
+    /* PALETTE v2 — "Marine & Marigold": warm sandstone instead of a cold
+       blue-gray background, a richer vermilion primary, a deep marine
+       secondary (not a flat slate), and a marigold + jade pair so the site
+       has four real notes instead of two. Grounded in the brand: marigold
+       nods to India, deep marine nods to the Bosphorus/Turkey, vermilion is
+       the trust-building CTA red carried over from the existing brand,
+       jade reads as clinical/clean for secondary actions & success states. */
+    --background: 38 52% 96%;
+    --foreground: 191 35% 12%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card-foreground: 191 35% 12%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover-foreground: 191 35% 12%;
 
-    /* UPGRADE: --primary was a muddy orange-rust (hsl(20,96%,40%)) that didn't
-       match the #D92E46 coral-red actually used on every CTA button, badge
-       accent, and gradient across the site (hardcoded separately in dozens of
-       files). Retuned to match that established coral so the "brand color"
-       and the "token color" are finally the same thing — every mesh-bg,
-       gradient-text, badge, and icon tint that already reads var(--primary)
-       picks this up automatically, no per-file edits needed. */
-    --primary: 352 69% 52%;
+    /* Primary — Vermilion. Slightly deeper & more saturated than the old
+       #D92E46 so it reads as a considered brand red rather than a flat
+       "bootstrap danger" red. Every hardcoded hex CTA that used to bypass
+       this token (HeroSection, LeadModal, Hospitals, plus the leftover
+       ad-hoc blue/green/orange palettes in HospitalsByCountry,
+       MultiSpecialtyFocus, NewsletterSection, TopDoctors) now reads
+       bg-primary / text-secondary / bg-accent-jade / accent-warm instead,
+       so this file is the only place colors need to change going forward. */
+    --primary: 351 74% 56%;
     --primary-foreground: 0 0% 100%;
 
-    /* UPGRADE: deepened from a flat slate-gray into a richer navy-teal so it
-       reads as a deliberate complement to the coral primary (the classic
-       "warm coral + deep navy" pairing used across premium healthcare
-       branding) instead of a neutral filler color. */
-    --secondary: 205 45% 19%;
+    /* Secondary — Deep Marine. Warmer & inkier than a generic slate-navy,
+       doubles as the near-black used for dark sections/footers. */
+    --secondary: 191 66% 13%;
     --secondary-foreground: 0 0% 100%;
 
-    /* NEW: warm amber accent for occasional highlights (award badges, star
-       ratings, "featured" flags) so the palette has a third note beyond
-       coral + navy instead of falling back to arbitrary ad-hoc colors. */
-    --accent-warm: 38 92% 55%;
+    /* Accent-warm — Marigold. Pushed more saturated/golden than the old
+       amber so award badges, ratings, and "featured" flags actually pop
+       against the new warm sandstone background instead of blending in. */
+    --accent-warm: 40 98% 47%;
 
-    --muted: 210 40% 96.1%;
-    /* FIX: was "215.4% 16.3% 46.9%" — first channel of an HSL triple must be a bare
-       degree value, not a percentage. The stray % was breaking every hsl(var(--muted-foreground))
-       call across the app (text looked wrong / invisible in places using this token). */
-    --muted-foreground: 215.4 16.3% 46.9%;
+    /* NEW — Jade. Third accent for secondary buttons, success/verified
+       states, and icon tints so not everything falls back to primary red.
+       Reads as "clinical trust" next to the warmer marigold/vermilion pair. */
+    --accent-jade: 171 82% 30%;
 
-    --accent: 210 100% 96%;
-    /* FIX: was "222 47% 11%s" — a stray trailing "s" made this an invalid HSL value,
-       so any element using hsl(var(--accent-foreground)) silently failed to render its color. */
-    --accent-foreground: 222 47% 11%;
+    --muted: 40 35% 92%;
+    --muted-foreground: 195 14% 38%;
+
+    --accent: 40 55% 93%;
+    --accent-foreground: 191 35% 12%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 201 96% 40%;
+    --border: 40 22% 87%;
+    --input: 40 22% 87%;
+    --ring: 351 74% 56%;
 
-    --chart-1: 201 96% 40%;
-    --chart-2: 215 28% 27%;
-    --chart-3: 173 58% 39%;
-    --chart-4: 43 96% 64%;
+    --chart-1: 351 74% 56%;
+    --chart-2: 191 66% 13%;
+    --chart-3: 171 82% 30%;
+    --chart-4: 40 98% 47%;
     --chart-5: 0 84.2% 60.2%;
 
     --radius: 0.75rem;
@@ -69,14 +73,14 @@
     --font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
     --font-display: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-    --sidebar-background: 36 33% 97%;
-    --sidebar-foreground: 220 10% 26%;
-    --sidebar-primary: 202 83% 40%;
+    --sidebar-background: 40 35% 97%;
+    --sidebar-foreground: 191 20% 26%;
+    --sidebar-primary: 351 74% 56%;
     --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 38 24% 94%;
-    --sidebar-accent-foreground: 220 26% 14%;
-    --sidebar-border: 38 22% 90%;
-    --sidebar-ring: 202 83% 40%;
+    --sidebar-accent: 40 30% 93%;
+    --sidebar-accent-foreground: 191 35% 14%;
+    --sidebar-border: 40 22% 89%;
+    --sidebar-ring: 351 74% 56%;
   }
 }
 
@@ -119,12 +123,9 @@
   @apply bg-white/70 backdrop-blur-xl border border-white/30 shadow-xl shadow-primary/5;
 }
 
-/* FIX/UPGRADE: these background/text gradients previously used an unrelated
-   teal/blue/gold palette that didn't match the site's actual brand colors
-   (primary = warm coral/rust, secondary = deep slate, plus the #D92E46 CTA
-   red used across every button). That mismatch is part of why decorative
-   backgrounds felt disconnected from the rest of the UI. Now built from the
-   real tokens so every soft background/gradient feels like the same brand. */
+/* These background/text gradients are built entirely from the token
+   variables above, so any future palette change only needs to happen once,
+   at the top of this file. */
 .mesh-bg {
   background-color: hsl(var(--background));
   background-image:
@@ -141,9 +142,9 @@
     radial-gradient(at 90% 90%, hsl(var(--secondary) / 0.05) 0px, transparent 45%);
 }
 
-/* Premium gradient text — brand coral → deep slate, matching every CTA button */
+/* Premium gradient text — vermilion → marigold → deep marine, the full v2 trio */
 .gradient-text {
-  @apply bg-clip-text text-transparent bg-gradient-to-r from-primary via-[#D92E46] to-secondary;
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-primary via-[hsl(var(--accent-warm))] to-secondary;
 }
 
 /* Friendly card shadow */
@@ -183,6 +184,9 @@
 }
 .decor-blob-warm {
   background: radial-gradient(circle, hsl(var(--accent-warm) / 0.25), transparent 70%);
+}
+.decor-blob-jade {
+  background: radial-gradient(circle, hsl(var(--accent-jade) / 0.25), transparent 70%);
 }
 
 /* NEW: a subtle dot-grid texture for section backgrounds that want a touch

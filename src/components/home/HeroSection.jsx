@@ -140,7 +140,7 @@ export default function HeroSection() {
               <Button
                 size="lg"
                 onClick={() => openLeadModal({ title: "Get Free Consultation" })}
-                className="bg-[#D92E46] hover:bg-[#b92539] text-white rounded-xl px-8 h-12 shadow-lg shadow-black/20 hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 transition-all w-full sm:w-auto"
+                className="bg-primary hover:bg-primary/90 text-white rounded-xl px-8 h-12 shadow-lg shadow-black/20 hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 transition-all w-full sm:w-auto"
               >
                 Get Free Consultation
               </Button>
@@ -167,7 +167,7 @@ export default function HeroSection() {
                 bar into the page's overall graphic language. */}
             <div className="decor-blob decor-blob-primary w-64 h-64 -top-16 -right-16 -z-10" />
             {/* Accent top bar — small signature touch tying the card to the brand's coral CTA color */}
-            <div className="absolute inset-x-0 top-0 h-1.5 rounded-t-2xl bg-gradient-to-r from-[#D92E46] via-[#f0596c] to-[#D92E46]" />
+            <div className="absolute inset-x-0 top-0 h-1.5 rounded-t-2xl bg-gradient-to-r from-primary via-[hsl(var(--accent-warm))] to-primary" />
 
             <h2 className="font-heading font-bold text-lg sm:text-xl text-secondary text-center mb-0.5 mt-1">
               Let Us Help You
@@ -239,7 +239,7 @@ export default function HeroSection() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full h-10 rounded-xl bg-[#D92E46] text-white hover:bg-[#b92539] font-heading font-bold text-sm transition-all shadow-lg shadow-[#D92E46]/25 hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 disabled:opacity-60 disabled:translate-y-0 disabled:cursor-not-allowed"
+                className="w-full h-10 rounded-xl bg-primary text-white hover:bg-primary/90 font-heading font-bold text-sm transition-all shadow-lg shadow-primary/25 hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 disabled:opacity-60 disabled:translate-y-0 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <>
@@ -253,8 +253,8 @@ export default function HeroSection() {
               </button>
               <p className="text-[10px] text-muted-foreground text-center leading-snug">
                 By submitting the form I agree to the{" "}
-                <Link to="/terms" className="text-[#D92E46] underline underline-offset-2">Terms of Use</Link> and{" "}
-                <Link to="/privacy-policy" className="text-[#D92E46] underline underline-offset-2">Privacy Policy</Link> of Alhind Medical Care.
+                <Link to="/terms" className="text-primary underline underline-offset-2">Terms of Use</Link> and{" "}
+                <Link to="/privacy-policy" className="text-primary underline underline-offset-2">Privacy Policy</Link> of Alhind Medical Care.
               </p>
             </form>
           </motion.div>

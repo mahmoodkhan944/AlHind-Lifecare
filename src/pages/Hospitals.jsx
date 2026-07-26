@@ -126,7 +126,7 @@ export default function Hospitals() {
         {/* Side "Get Free Quote" tab */}
         <button
           onClick={() => openLeadModal({ title: "Get Free Quote" })}
-          className="absolute top-1/2 -translate-y-1/2 right-0 flex items-center justify-center px-2.5 py-6 rounded-l-xl bg-[#D92E46] hover:bg-[#b92539] text-white shadow-lg transition-colors"
+          className="absolute top-1/2 -translate-y-1/2 right-0 flex items-center justify-center px-2.5 py-6 rounded-l-xl bg-primary hover:bg-primary/90 text-white shadow-lg transition-colors"
         >
           <span
             className="font-heading font-bold text-xs sm:text-sm tracking-wide whitespace-nowrap"
