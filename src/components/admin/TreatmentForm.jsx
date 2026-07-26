@@ -98,56 +98,56 @@ export default function TreatmentForm({ initialData, onCancel, onSaved }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="min-h-screen bg-gray-50 -m-4 sm:-m-6 lg:-m-8">
+    <form onSubmit={handleSubmit} className="min-h-screen bg-muted -m-4 sm:-m-6 lg:-m-8">
       {/* Sub-header */}
-      <div className="sticky top-0 z-20 bg-white border-b border-gray-200 px-4 sm:px-6 py-3 flex items-center gap-3">
+      <div className="sticky top-0 z-20 bg-white border-b border-border px-4 sm:px-6 py-3 flex items-center gap-3">
         <button
           type="button"
           onClick={onCancel}
-          className="flex-shrink-0 w-9 h-9 rounded-lg border border-gray-200 bg-white flex items-center justify-center hover:bg-gray-50"
+          className="flex-shrink-0 w-9 h-9 rounded-lg border border-border bg-white flex items-center justify-center hover:bg-muted"
         >
-          <ArrowLeft className="w-4 h-4 text-gray-700" />
+          <ArrowLeft className="w-4 h-4 text-foreground/80" />
         </button>
         <div>
-          <h2 className="font-bold text-gray-900 text-base sm:text-lg leading-tight">
+          <h2 className="font-bold text-foreground text-base sm:text-lg leading-tight">
             {isEdit ? "Edit Treatment" : "Add New Treatment"}
           </h2>
-          <p className="text-xs text-gray-500">{isEdit ? "Update treatment details" : "Create a new treatment"}</p>
+          <p className="text-xs text-muted-foreground">{isEdit ? "Update treatment details" : "Create a new treatment"}</p>
         </div>
       </div>
 
       <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6 space-y-4 pb-28">
         {/* Basic Information */}
-        <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-5 shadow-sm">
-          <h3 className="font-bold text-gray-900 text-sm mb-4">Basic Information</h3>
+        <div className="bg-white rounded-2xl border border-border p-4 sm:p-5 shadow-sm">
+          <h3 className="font-bold text-foreground text-sm mb-4">Basic Information</h3>
           <div className="space-y-3">
             <Field label="Title" required>
-              <Input value={form.name || ""} onChange={(e) => set("name", e.target.value)} placeholder="Enter treatment title" className="h-10 rounded-lg border-gray-200" />
+              <Input value={form.name || ""} onChange={(e) => set("name", e.target.value)} placeholder="Enter treatment title" className="h-10 rounded-lg border-border" />
             </Field>
             <Field label="Slug" required>
-              <Input value={form.slug || ""} onChange={(e) => set("slug", e.target.value)} placeholder="treatment-slug" className="h-10 rounded-lg border-gray-200" />
+              <Input value={form.slug || ""} onChange={(e) => set("slug", e.target.value)} placeholder="treatment-slug" className="h-10 rounded-lg border-border" />
             </Field>
             <Field label="Category" required>
-              <Input value={form.category || ""} onChange={(e) => set("category", e.target.value)} placeholder="e.g., Cardiology, Oncology" className="h-10 rounded-lg border-gray-200" />
+              <Input value={form.category || ""} onChange={(e) => set("category", e.target.value)} placeholder="e.g., Cardiology, Oncology" className="h-10 rounded-lg border-border" />
             </Field>
             <Field label="Short Description" required>
-              <Input value={form.description || ""} onChange={(e) => set("description", e.target.value)} placeholder="Brief 1-2 sentence description" className="h-10 rounded-lg border-gray-200" />
+              <Input value={form.description || ""} onChange={(e) => set("description", e.target.value)} placeholder="Brief 1-2 sentence description" className="h-10 rounded-lg border-border" />
             </Field>
             <Field label="Description">
-              <Textarea value={form.detailed_content || ""} onChange={(e) => set("detailed_content", e.target.value)} placeholder="Full treatment description" className="rounded-lg border-gray-200 min-h-[100px]" rows={4} />
+              <Textarea value={form.detailed_content || ""} onChange={(e) => set("detailed_content", e.target.value)} placeholder="Full treatment description" className="rounded-lg border-border min-h-[100px]" rows={4} />
             </Field>
             <Field label="Treatment Image">
               <div className="flex items-center gap-3">
                 {form.image_url ? (
-                  <img src={form.image_url} alt="Treatment" className="w-16 h-16 rounded-lg object-cover border border-gray-200" />
+                  <img src={form.image_url} alt="Treatment" className="w-16 h-16 rounded-lg object-cover border border-border" />
                 ) : (
-                  <div className="w-16 h-16 rounded-lg bg-gray-50 border border-gray-200 flex items-center justify-center">
-                    <ImageIcon className="w-6 h-6 text-gray-300" />
+                  <div className="w-16 h-16 rounded-lg bg-muted border border-border flex items-center justify-center">
+                    <ImageIcon className="w-6 h-6 text-muted-foreground/50" />
                   </div>
                 )}
                 <label className="cursor-pointer">
                   <input type="file" accept="image/*" onChange={handleImage} className="hidden" />
-                  <div className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                  <div className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-border text-sm font-medium text-foreground/80 hover:bg-muted">
                     {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
                     {uploading ? "Uploading..." : "Upload Image"}
                   </div>
@@ -157,7 +157,7 @@ export default function TreatmentForm({ initialData, onCancel, onSaved }) {
             <div className="grid grid-cols-2 gap-3 pt-1">
               <Field label="Country">
                 <Select value={form.country || "Both"} onValueChange={(v) => set("country", v)}>
-                  <SelectTrigger className="h-10 rounded-lg border-gray-200"><SelectValue /></SelectTrigger>
+                  <SelectTrigger className="h-10 rounded-lg border-border"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="Both">Both</SelectItem>
                     <SelectItem value="India">India</SelectItem>
@@ -166,24 +166,24 @@ export default function TreatmentForm({ initialData, onCancel, onSaved }) {
                 </Select>
               </Field>
               <Field label="Duration">
-                <Input value={form.duration || ""} onChange={(e) => set("duration", e.target.value)} placeholder="e.g., 2-3 hours" className="h-10 rounded-lg border-gray-200" />
+                <Input value={form.duration || ""} onChange={(e) => set("duration", e.target.value)} placeholder="e.g., 2-3 hours" className="h-10 rounded-lg border-border" />
               </Field>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <Field label="Cost Range (USD)">
-                <Input value={form.cost_range_usd || ""} onChange={(e) => set("cost_range_usd", e.target.value)} placeholder="e.g., $3,000 - $8,000" className="h-10 rounded-lg border-gray-200" />
+                <Input value={form.cost_range_usd || ""} onChange={(e) => set("cost_range_usd", e.target.value)} placeholder="e.g., $3,000 - $8,000" className="h-10 rounded-lg border-border" />
               </Field>
               <Field label="Recovery Time">
-                <Input value={form.recovery_time || ""} onChange={(e) => set("recovery_time", e.target.value)} placeholder="e.g., 2-4 weeks" className="h-10 rounded-lg border-gray-200" />
+                <Input value={form.recovery_time || ""} onChange={(e) => set("recovery_time", e.target.value)} placeholder="e.g., 2-4 weeks" className="h-10 rounded-lg border-border" />
               </Field>
             </div>
             <div className="flex items-center gap-6 pt-1">
-              <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+              <label className="flex items-center gap-2 text-sm font-medium text-foreground/80">
                 <Switch checked={!!form.featured} onCheckedChange={(v) => set("featured", v)} /> Featured
               </label>
               <Field label="Status" inline>
                 <Select value={form.status || "active"} onValueChange={(v) => set("status", v)}>
-                  <SelectTrigger className="h-9 rounded-lg border-gray-200 w-32"><SelectValue /></SelectTrigger>
+                  <SelectTrigger className="h-9 rounded-lg border-border w-32"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="active">Active</SelectItem>
                     <SelectItem value="inactive">Inactive</SelectItem>
@@ -212,46 +212,46 @@ export default function TreatmentForm({ initialData, onCancel, onSaved }) {
         <DynamicListField label="Risk" placeholder="Risk / Complication" number={11} optional values={form.risks} onChange={(v) => setList("risks", v)} />
 
         {/* Success Rate - single input */}
-        <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-5 shadow-sm">
+        <div className="bg-white rounded-2xl border border-border p-4 sm:p-5 shadow-sm">
           <div className="flex items-center gap-2 mb-3">
-            <span className="flex items-center justify-center w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold">12</span>
-            <h3 className="font-bold text-gray-900 text-sm">Success Rate <span className="text-gray-400 font-normal text-xs">(optional)</span></h3>
+            <span className="flex items-center justify-center w-6 h-6 rounded-full bg-accent-jade/15 text-accent-jade text-xs font-bold">12</span>
+            <h3 className="font-bold text-foreground text-sm">Success Rate <span className="text-muted-foreground/70 font-normal text-xs">(optional)</span></h3>
           </div>
-          <Input value={form.success_rate || ""} onChange={(e) => set("success_rate", e.target.value)} placeholder="e.g., 95% success rate" className="h-10 rounded-lg border-gray-200" />
+          <Input value={form.success_rate || ""} onChange={(e) => set("success_rate", e.target.value)} placeholder="e.g., 95% success rate" className="h-10 rounded-lg border-border" />
         </div>
 
         <DynamicListField label="Summary" placeholder="Summary point" number={13} optional values={form.summary} onChange={(v) => setList("summary", v)} />
         <DynamicListField label="Why Choose India" placeholder="Reason" number={14} optional values={form.why_choose_india} onChange={(v) => setList("why_choose_india", v)} />
 
         {/* Additional textareas */}
-        <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-5 shadow-sm">
-          <h3 className="font-bold text-gray-900 text-sm mb-4">Additional Information <span className="text-gray-400 font-normal text-xs">(Optional)</span></h3>
+        <div className="bg-white rounded-2xl border border-border p-4 sm:p-5 shadow-sm">
+          <h3 className="font-bold text-foreground text-sm mb-4">Additional Information <span className="text-muted-foreground/70 font-normal text-xs">(Optional)</span></h3>
           <div className="space-y-3">
             <Field label="GVHD Information">
-              <Textarea value={form.gvhd_info || ""} onChange={(e) => set("gvhd_info", e.target.value)} placeholder="Graft versus host disease information" className="rounded-lg border-gray-200 min-h-[80px]" rows={3} />
+              <Textarea value={form.gvhd_info || ""} onChange={(e) => set("gvhd_info", e.target.value)} placeholder="Graft versus host disease information" className="rounded-lg border-border min-h-[80px]" rows={3} />
             </Field>
             <Field label="GVHD Symptoms">
-              <Textarea value={form.gvhd_symptoms || ""} onChange={(e) => set("gvhd_symptoms", e.target.value)} placeholder="GVHD symptoms" className="rounded-lg border-gray-200 min-h-[80px]" rows={3} />
+              <Textarea value={form.gvhd_symptoms || ""} onChange={(e) => set("gvhd_symptoms", e.target.value)} placeholder="GVHD symptoms" className="rounded-lg border-border min-h-[80px]" rows={3} />
             </Field>
             <Field label="Conditions">
-              <Textarea value={form.conditions_treated || ""} onChange={(e) => set("conditions_treated", e.target.value)} placeholder="Conditions treated" className="rounded-lg border-gray-200 min-h-[80px]" rows={3} />
+              <Textarea value={form.conditions_treated || ""} onChange={(e) => set("conditions_treated", e.target.value)} placeholder="Conditions treated" className="rounded-lg border-border min-h-[80px]" rows={3} />
             </Field>
             <Field label="Diagnosis">
-              <Textarea value={form.diagnosis_detail || ""} onChange={(e) => set("diagnosis_detail", e.target.value)} placeholder="Diagnosis methods" className="rounded-lg border-gray-200 min-h-[80px]" rows={3} />
+              <Textarea value={form.diagnosis_detail || ""} onChange={(e) => set("diagnosis_detail", e.target.value)} placeholder="Diagnosis methods" className="rounded-lg border-border min-h-[80px]" rows={3} />
             </Field>
             <Field label="Why India">
-              <Textarea value={form.why_india_detail || ""} onChange={(e) => set("why_india_detail", e.target.value)} placeholder="Why choose India for this treatment" className="rounded-lg border-gray-200 min-h-[80px]" rows={3} />
+              <Textarea value={form.why_india_detail || ""} onChange={(e) => set("why_india_detail", e.target.value)} placeholder="Why choose India for this treatment" className="rounded-lg border-border min-h-[80px]" rows={3} />
             </Field>
           </div>
         </div>
       </div>
 
       {/* Bottom action bar */}
-      <div className="fixed bottom-0 left-0 right-0 lg:left-64 bg-white border-t border-gray-200 px-4 sm:px-6 py-3 flex items-center justify-end gap-3 z-30">
+      <div className="fixed bottom-0 left-0 right-0 lg:left-64 bg-white border-t border-border px-4 sm:px-6 py-3 flex items-center justify-end gap-3 z-30">
         <Button type="button" variant="outline" onClick={onCancel} className="rounded-lg px-6">
           Cancel
         </Button>
-        <Button type="submit" disabled={saving} className="rounded-lg px-6 bg-emerald-600 hover:bg-emerald-700 text-white">
+        <Button type="submit" disabled={saving} className="rounded-lg px-6 bg-accent-jade hover:bg-accent-jade/90 text-white">
           {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> Saving...</> : isEdit ? "Update Treatment" : "Create Treatment"}
         </Button>
       </div>
@@ -262,8 +262,8 @@ export default function TreatmentForm({ initialData, onCancel, onSaved }) {
 function Field({ label, required, children, inline }) {
   return (
     <div className={inline ? "flex items-center gap-2" : ""}>
-      <label className={`text-sm font-medium text-gray-700 ${inline ? "whitespace-nowrap" : "block mb-1.5"}`}>
-        {label}{required && <span className="text-red-500"> *</span>}
+      <label className={`text-sm font-medium text-foreground/80 ${inline ? "whitespace-nowrap" : "block mb-1.5"}`}>
+        {label}{required && <span className="text-destructive"> *</span>}
       </label>
       {children}
     </div>

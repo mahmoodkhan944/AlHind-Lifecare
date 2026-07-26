@@ -77,20 +77,20 @@ export default function AdminNewsletter() {
     <div>
       {/* Stats */}
       <div className="grid grid-cols-2 gap-4 mb-6">
-        <div className="bg-white rounded-2xl border border-gray-200 p-5">
-          <p className="text-sm text-gray-500 mb-1">Total Subscribers</p>
-          <p className="font-heading font-bold text-2xl text-gray-900">{items.length}</p>
+        <div className="bg-white rounded-2xl border border-border p-5">
+          <p className="text-sm text-muted-foreground mb-1">Total Subscribers</p>
+          <p className="font-heading font-bold text-2xl text-foreground">{items.length}</p>
         </div>
-        <div className="bg-white rounded-2xl border border-gray-200 p-5">
-          <p className="text-sm text-gray-500 mb-1">Active Subscriptions</p>
-          <p className="font-heading font-bold text-2xl text-emerald-600">{subscribedCount}</p>
+        <div className="bg-white rounded-2xl border border-border p-5">
+          <p className="text-sm text-muted-foreground mb-1">Active Subscriptions</p>
+          <p className="font-heading font-bold text-2xl text-accent-jade">{subscribedCount}</p>
         </div>
       </div>
 
       <div className="flex items-center justify-between gap-4 mb-6 flex-wrap">
         <div className="flex items-center gap-3 flex-1 flex-wrap">
           <div className="relative flex-1 min-w-[200px] max-w-sm">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70" />
             <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search by email..." className="pl-9" />
           </div>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -107,30 +107,30 @@ export default function AdminNewsletter() {
         </Button>
       </div>
 
-      <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-2xl border border-border overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left border-b bg-gray-50">
-                <th className="p-4 font-medium text-gray-500">Email</th>
-                <th className="p-4 font-medium text-gray-500">Status</th>
-                <th className="p-4 font-medium text-gray-500">Subscribed Date</th>
-                <th className="p-4 font-medium text-gray-500 text-right">Actions</th>
+              <tr className="text-left border-b bg-muted">
+                <th className="p-4 font-medium text-muted-foreground">Email</th>
+                <th className="p-4 font-medium text-muted-foreground">Status</th>
+                <th className="p-4 font-medium text-muted-foreground">Subscribed Date</th>
+                <th className="p-4 font-medium text-muted-foreground text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y">
               {paginated.map((item) => (
-                <tr key={item.id} className="hover:bg-gray-50">
-                  <td className="p-4 font-medium text-gray-900">{item.email}</td>
+                <tr key={item.id} className="hover:bg-muted">
+                  <td className="p-4 font-medium text-foreground">{item.email}</td>
                   <td className="p-4">
                     <button
                       onClick={() => toggleStatus(item)}
-                      className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium cursor-pointer ${item.status === "subscribed" ? "bg-emerald-50 text-emerald-700" : "bg-gray-100 text-gray-500"}`}
+                      className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium cursor-pointer ${item.status === "subscribed" ? "bg-accent-jade/10 text-accent-jade" : "bg-muted text-muted-foreground"}`}
                     >
                       {item.status || "subscribed"}
                     </button>
                   </td>
-                  <td className="p-4 text-gray-500">{item.created_date ? new Date(item.created_date).toLocaleDateString() : "-"}</td>
+                  <td className="p-4 text-muted-foreground">{item.created_date ? new Date(item.created_date).toLocaleDateString() : "-"}</td>
                   <td className="p-4">
                     <div className="flex gap-1 justify-end">
                       <Button variant="ghost" size="sm" onClick={() => handleDelete(item.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>
@@ -139,7 +139,7 @@ export default function AdminNewsletter() {
                 </tr>
               ))}
               {filtered.length === 0 && (
-                <tr><td colSpan={4} className="p-8 text-center text-gray-400">No subscribers found yet.</td></tr>
+                <tr><td colSpan={4} className="p-8 text-center text-muted-foreground/70">No subscribers found yet.</td></tr>
               )}
             </tbody>
           </table>

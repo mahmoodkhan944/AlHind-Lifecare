@@ -71,47 +71,47 @@ export default function AdminHospitals() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search hospitals..." className="pl-9" />
         </div>
-        <Button onClick={openNew} className="gap-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl">
+        <Button onClick={openNew} className="gap-2 bg-accent-jade hover:bg-accent-jade/90 text-white rounded-xl">
           <Plus className="w-4 h-4" /> Add New Hospital
         </Button>
       </div>
 
-      <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-2xl border border-border overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left border-b bg-gray-50">
-                <th className="p-4 font-medium text-gray-500">Hospital</th>
-                <th className="p-4 font-medium text-gray-500">City</th>
-                <th className="p-4 font-medium text-gray-500">Country</th>
-                <th className="p-4 font-medium text-gray-500">Beds</th>
-                <th className="p-4 font-medium text-gray-500">Status</th>
-                <th className="p-4 font-medium text-gray-500 text-right">Actions</th>
+              <tr className="text-left border-b bg-muted">
+                <th className="p-4 font-medium text-muted-foreground">Hospital</th>
+                <th className="p-4 font-medium text-muted-foreground">City</th>
+                <th className="p-4 font-medium text-muted-foreground">Country</th>
+                <th className="p-4 font-medium text-muted-foreground">Beds</th>
+                <th className="p-4 font-medium text-muted-foreground">Status</th>
+                <th className="p-4 font-medium text-muted-foreground text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y">
               {paginated.map((item) => (
-                <tr key={item.id} className="hover:bg-gray-50">
+                <tr key={item.id} className="hover:bg-muted">
                   <td className="p-4">
                     <div className="flex items-center gap-3">
                       {item.cover_image_url ? (
                         <img src={item.cover_image_url} alt={item.name} className="w-10 h-10 rounded-lg object-cover" />
                       ) : (
-                        <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center text-gray-400 text-xs font-bold">
+                        <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center text-muted-foreground/70 text-xs font-bold">
                           {String(item.name || "H").charAt(0)}
                         </div>
                       )}
                       <div>
-                        <div className="font-medium text-gray-900">{item.name}</div>
-                        {item.featured && <span className="text-xs text-emerald-600 font-medium">★ Featured</span>}
+                        <div className="font-medium text-foreground">{item.name}</div>
+                        {item.featured && <span className="text-xs text-accent-jade font-medium">★ Featured</span>}
                       </div>
                     </div>
                   </td>
-                  <td className="p-4 text-gray-600">{item.city || "-"}</td>
-                  <td className="p-4 text-gray-600">{item.country || "-"}</td>
-                  <td className="p-4 text-gray-600">{item.beds_count || "-"}</td>
+                  <td className="p-4 text-muted-foreground">{item.city || "-"}</td>
+                  <td className="p-4 text-muted-foreground">{item.country || "-"}</td>
+                  <td className="p-4 text-muted-foreground">{item.beds_count || "-"}</td>
                   <td className="p-4">
-                    <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${item.status === "active" ? "bg-emerald-50 text-emerald-700" : "bg-gray-100 text-gray-500"}`}>
+                    <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${item.status === "active" ? "bg-accent-jade/10 text-accent-jade" : "bg-muted text-muted-foreground"}`}>
                       {item.status || "active"}
                     </span>
                   </td>
@@ -124,7 +124,7 @@ export default function AdminHospitals() {
                 </tr>
               ))}
               {filtered.length === 0 && (
-                <tr><td colSpan={6} className="p-8 text-center text-gray-400">No hospitals found. Click "Add New Hospital" to create one.</td></tr>
+                <tr><td colSpan={6} className="p-8 text-center text-muted-foreground/70">No hospitals found. Click "Add New Hospital" to create one.</td></tr>
               )}
             </tbody>
           </table>

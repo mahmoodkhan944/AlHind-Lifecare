@@ -95,15 +95,15 @@ export default function AdminSiteContent() {
   // Renders the icon preview if the typed name matches a real lucide-react icon.
   const IconPreview = ({ name }) => {
     const Cmp = name && Icons[name];
-    if (!Cmp) return <Info className="w-4 h-4 text-gray-300" />;
+    if (!Cmp) return <Info className="w-4 h-4 text-muted-foreground/50" />;
     return <Cmp className="w-4 h-4 text-primary" />;
   };
 
   return (
     <div>
       <div className="mb-6">
-        <h1 className="font-heading font-bold text-2xl text-gray-900">Site Content</h1>
-        <p className="text-sm text-gray-500 mt-1">
+        <h1 className="font-heading font-bold text-2xl text-foreground">Site Content</h1>
+        <p className="text-sm text-muted-foreground mt-1">
           Manage the homepage lists that used to be hardcoded in the code — specialties, services, and the
           "How Do We Work?" steps.
         </p>
@@ -117,8 +117,8 @@ export default function AdminSiteContent() {
             onClick={() => setActiveSection(s.key)}
             className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
               activeSection === s.key
-                ? "bg-emerald-600 text-white"
-                : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
+                ? "bg-accent-jade text-white"
+                : "bg-white border border-border text-muted-foreground hover:bg-muted"
             }`}
           >
             {s.label}
@@ -127,50 +127,50 @@ export default function AdminSiteContent() {
       </div>
 
       {showForm ? (
-        <div className="bg-white rounded-2xl border border-gray-200 p-5 sm:p-6 shadow-sm max-w-xl">
-          <h3 className="font-bold text-gray-900 text-base mb-4">
+        <div className="bg-white rounded-2xl border border-border p-5 sm:p-6 shadow-sm max-w-xl">
+          <h3 className="font-bold text-foreground text-base mb-4">
             {editItem ? "Edit" : "Add"} {sectionMeta.label} Item
           </h3>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="text-sm font-medium text-gray-700 block mb-1.5">
-                Title <span className="text-red-500">*</span>
+              <label className="text-sm font-medium text-foreground/80 block mb-1.5">
+                Title <span className="text-destructive">*</span>
               </label>
               <Input
                 value={form.title}
                 onChange={(e) => setForm({ ...form, title: e.target.value })}
                 placeholder="e.g. Cardiology"
-                className="h-10 rounded-lg border-gray-200"
+                className="h-10 rounded-lg border-border"
               />
             </div>
 
             {sectionMeta.hasDescription && (
               <div>
-                <label className="text-sm font-medium text-gray-700 block mb-1.5">Description</label>
+                <label className="text-sm font-medium text-foreground/80 block mb-1.5">Description</label>
                 <Textarea
                   value={form.description}
                   onChange={(e) => setForm({ ...form, description: e.target.value })}
                   placeholder="Short description for this step"
-                  className="rounded-lg border-gray-200"
+                  className="rounded-lg border-border"
                   rows={2}
                 />
               </div>
             )}
 
             <div>
-              <label className="text-sm font-medium text-gray-700 block mb-1.5">Icon name</label>
+              <label className="text-sm font-medium text-foreground/80 block mb-1.5">Icon name</label>
               <div className="flex items-center gap-2">
-                <div className="flex items-center justify-center w-10 h-10 rounded-lg border border-gray-200 bg-gray-50 shrink-0">
+                <div className="flex items-center justify-center w-10 h-10 rounded-lg border border-border bg-muted shrink-0">
                   <IconPreview name={form.icon} />
                 </div>
                 <Input
                   value={form.icon}
                   onChange={(e) => setForm({ ...form, icon: e.target.value.trim() })}
                   placeholder="e.g. HeartPulse"
-                  className="h-10 rounded-lg border-gray-200"
+                  className="h-10 rounded-lg border-border"
                 />
               </div>
-              <p className="text-xs text-gray-400 mt-1">
+              <p className="text-xs text-muted-foreground/70 mt-1">
                 Must match an exact{" "}
                 <a
                   href="https://lucide.dev/icons"
@@ -186,30 +186,30 @@ export default function AdminSiteContent() {
 
             {sectionMeta.hasLink && (
               <div>
-                <label className="text-sm font-medium text-gray-700 block mb-1.5">Link (optional)</label>
+                <label className="text-sm font-medium text-foreground/80 block mb-1.5">Link (optional)</label>
                 <Input
                   value={form.link}
                   onChange={(e) => setForm({ ...form, link: e.target.value })}
                   placeholder="/treatments"
-                  className="h-10 rounded-lg border-gray-200"
+                  className="h-10 rounded-lg border-border"
                 />
               </div>
             )}
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-medium text-gray-700 block mb-1.5">Sort Order</label>
+                <label className="text-sm font-medium text-foreground/80 block mb-1.5">Sort Order</label>
                 <Input
                   type="number"
                   value={form.sort_order}
                   onChange={(e) => setForm({ ...form, sort_order: e.target.value })}
-                  className="h-10 rounded-lg border-gray-200"
+                  className="h-10 rounded-lg border-border"
                 />
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-700 block mb-1.5">Status</label>
+                <label className="text-sm font-medium text-foreground/80 block mb-1.5">Status</label>
                 <Select value={form.status} onValueChange={(v) => setForm({ ...form, status: v })}>
-                  <SelectTrigger className="h-10 rounded-lg border-gray-200">
+                  <SelectTrigger className="h-10 rounded-lg border-border">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -224,7 +224,7 @@ export default function AdminSiteContent() {
               <Button type="button" variant="outline" onClick={closeForm} className="rounded-lg">
                 Cancel
               </Button>
-              <Button type="submit" disabled={saving} className="rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white gap-2">
+              <Button type="submit" disabled={saving} className="rounded-lg bg-accent-jade hover:bg-accent-jade/90 text-white gap-2">
                 {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
                 {editItem ? "Update" : "Create"}
               </Button>
@@ -234,7 +234,7 @@ export default function AdminSiteContent() {
       ) : (
         <>
           <div className="flex justify-end mb-4">
-            <Button onClick={openNew} className="gap-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl">
+            <Button onClick={openNew} className="gap-2 bg-accent-jade hover:bg-accent-jade/90 text-white rounded-xl">
               <Plus className="w-4 h-4" /> Add Item
             </Button>
           </div>
@@ -244,43 +244,43 @@ export default function AdminSiteContent() {
               <Loader2 className="w-7 h-7 text-primary animate-spin" />
             </div>
           ) : items.length === 0 ? (
-            <div className="bg-white rounded-2xl border border-gray-200 p-10 text-center text-gray-400">
+            <div className="bg-white rounded-2xl border border-border p-10 text-center text-muted-foreground/70">
               No items yet for "{sectionMeta.label}". Click "Add Item" to create one — or run the seed SQL to
               pre-fill this list.
             </div>
           ) : (
-            <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+            <div className="bg-white rounded-2xl border border-border overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="text-left border-b bg-gray-50">
+                    <tr className="text-left border-b bg-muted">
                       <th className="p-3 w-8"></th>
-                      <th className="p-3 font-medium text-gray-500">Icon</th>
-                      <th className="p-3 font-medium text-gray-500">Title</th>
-                      {sectionMeta.hasDescription && <th className="p-3 font-medium text-gray-500">Description</th>}
-                      <th className="p-3 font-medium text-gray-500">Status</th>
-                      <th className="p-3 font-medium text-gray-500 text-right">Actions</th>
+                      <th className="p-3 font-medium text-muted-foreground">Icon</th>
+                      <th className="p-3 font-medium text-muted-foreground">Title</th>
+                      {sectionMeta.hasDescription && <th className="p-3 font-medium text-muted-foreground">Description</th>}
+                      <th className="p-3 font-medium text-muted-foreground">Status</th>
+                      <th className="p-3 font-medium text-muted-foreground text-right">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y">
                     {items.map((item) => (
-                      <tr key={item.id} className="hover:bg-gray-50">
-                        <td className="p-3 text-gray-300">
+                      <tr key={item.id} className="hover:bg-muted">
+                        <td className="p-3 text-muted-foreground/50">
                           <GripVertical className="w-4 h-4" />
                         </td>
                         <td className="p-3">
-                          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-gray-50 border border-gray-200">
+                          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-muted border border-border">
                             <IconPreview name={item.icon} />
                           </div>
                         </td>
-                        <td className="p-3 font-medium text-gray-900">{item.title}</td>
+                        <td className="p-3 font-medium text-foreground">{item.title}</td>
                         {sectionMeta.hasDescription && (
-                          <td className="p-3 text-gray-600 max-w-[240px] truncate">{item.description || "-"}</td>
+                          <td className="p-3 text-muted-foreground max-w-[240px] truncate">{item.description || "-"}</td>
                         )}
                         <td className="p-3">
                           <span
                             className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${
-                              item.status === "active" ? "bg-emerald-50 text-emerald-700" : "bg-gray-100 text-gray-500"
+                              item.status === "active" ? "bg-accent-jade/10 text-accent-jade" : "bg-muted text-muted-foreground"
                             }`}
                           >
                             {item.status || "active"}

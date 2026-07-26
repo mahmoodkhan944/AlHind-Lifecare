@@ -178,21 +178,21 @@ export default function BlogForm({ initialData, onCancel, onSaved }) {
   const excerptLen = (form.excerpt || "").length;
 
   return (
-    <form onSubmit={handleSubmit} className="min-h-screen bg-gray-50 -m-4 sm:-m-6 lg:-m-8">
+    <form onSubmit={handleSubmit} className="min-h-screen bg-muted -m-4 sm:-m-6 lg:-m-8">
       {/* Sub-header */}
-      <div className="sticky top-0 z-20 bg-white border-b border-gray-200 px-4 sm:px-6 py-3 flex items-center gap-3">
+      <div className="sticky top-0 z-20 bg-white border-b border-border px-4 sm:px-6 py-3 flex items-center gap-3">
         <button
           type="button"
           onClick={onCancel}
-          className="flex-shrink-0 w-9 h-9 rounded-lg border border-gray-200 bg-white flex items-center justify-center hover:bg-gray-50"
+          className="flex-shrink-0 w-9 h-9 rounded-lg border border-border bg-white flex items-center justify-center hover:bg-muted"
         >
-          <ArrowLeft className="w-4 h-4 text-gray-700" />
+          <ArrowLeft className="w-4 h-4 text-foreground/80" />
         </button>
         <div>
-          <h2 className="font-bold text-gray-900 text-base sm:text-lg leading-tight">
+          <h2 className="font-bold text-foreground text-base sm:text-lg leading-tight">
             {isEdit ? "Edit Blog Post" : "Create New Blog Post"}
           </h2>
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-muted-foreground">
             {isEdit ? "Update this blog article" : "Write and publish a new blog article"}
           </p>
         </div>
@@ -200,15 +200,15 @@ export default function BlogForm({ initialData, onCancel, onSaved }) {
 
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-4 pb-28">
         {/* Basic Information */}
-        <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-5 shadow-sm">
-          <h3 className="font-bold text-gray-900 text-sm mb-4">Basic Information</h3>
+        <div className="bg-white rounded-2xl border border-border p-4 sm:p-5 shadow-sm">
+          <h3 className="font-bold text-foreground text-sm mb-4">Basic Information</h3>
           <div className="space-y-3">
             <Field label="Blog Title" required>
               <Input
                 value={form.title || ""}
                 onChange={(e) => set("title", e.target.value)}
                 placeholder="Enter your blog title"
-                className="h-10 rounded-lg border-gray-200"
+                className="h-10 rounded-lg border-border"
               />
             </Field>
 
@@ -217,9 +217,9 @@ export default function BlogForm({ initialData, onCancel, onSaved }) {
                 value={form.slug || ""}
                 onChange={(e) => set("slug", e.target.value)}
                 placeholder="Auto-generated from title"
-                className="h-10 rounded-lg border-gray-200"
+                className="h-10 rounded-lg border-border"
               />
-              <p className="text-xs text-gray-400 mt-1">Leave empty to auto-generate from title</p>
+              <p className="text-xs text-muted-foreground/70 mt-1">Leave empty to auto-generate from title</p>
             </Field>
 
             <Field label="Excerpt" required>
@@ -227,17 +227,17 @@ export default function BlogForm({ initialData, onCancel, onSaved }) {
                 value={form.excerpt || ""}
                 onChange={(e) => set("excerpt", e.target.value.slice(0, 300))}
                 placeholder="Short description for blog preview..."
-                className="rounded-lg border-gray-200 min-h-[80px]"
+                className="rounded-lg border-border min-h-[80px]"
                 rows={3}
                 maxLength={300}
               />
-              <p className="text-xs text-gray-400 mt-1">{excerptLen}/300 characters</p>
+              <p className="text-xs text-muted-foreground/70 mt-1">{excerptLen}/300 characters</p>
             </Field>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <Field label="Category" required>
                 <Select value={form.category || ""} onValueChange={(v) => set("category", v)}>
-                  <SelectTrigger className="h-10 rounded-lg border-gray-200">
+                  <SelectTrigger className="h-10 rounded-lg border-border">
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
                   <SelectContent>
@@ -254,7 +254,7 @@ export default function BlogForm({ initialData, onCancel, onSaved }) {
                   value={form.author || ""}
                   onChange={(e) => set("author", e.target.value)}
                   placeholder="Admin"
-                  className="h-10 rounded-lg border-gray-200"
+                  className="h-10 rounded-lg border-border"
                 />
               </Field>
             </div>
@@ -264,21 +264,21 @@ export default function BlogForm({ initialData, onCancel, onSaved }) {
                 type="date"
                 value={form.publication_date || ""}
                 onChange={(e) => set("publication_date", e.target.value)}
-                className="h-10 rounded-lg border-gray-200"
+                className="h-10 rounded-lg border-border"
               />
             </Field>
           </div>
         </div>
 
         {/* Content */}
-        <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-5 shadow-sm">
-          <h3 className="font-bold text-gray-900 text-sm mb-1">Content</h3>
-          <p className="text-xs text-gray-500 mb-4">
+        <div className="bg-white rounded-2xl border border-border p-4 sm:p-5 shadow-sm">
+          <h3 className="font-bold text-foreground text-sm mb-1">Content</h3>
+          <p className="text-xs text-muted-foreground mb-4">
             Use the editor below to write your blog. You can paste content directly from Microsoft Word
             or a PDF — headings, bold, lists, and other formatting will be preserved automatically.
           </p>
           <Field label="Main Content" required>
-            <div className="rounded-lg border border-gray-200 overflow-hidden bg-white">
+            <div className="rounded-lg border border-border overflow-hidden bg-white">
               <ReactQuill
                 theme="snow"
                 value={form.content || ""}
@@ -287,7 +287,7 @@ export default function BlogForm({ initialData, onCancel, onSaved }) {
                 placeholder="Start writing your blog content here. You can paste from Word or PDF..."
               />
             </div>
-            <p className="text-xs text-gray-400 mt-2">
+            <p className="text-xs text-muted-foreground/70 mt-2">
               Tip: You can paste content directly from Microsoft Word or PDF — formatting (headings, bold,
               lists) will be preserved automatically.
             </p>
@@ -307,8 +307,8 @@ export default function BlogForm({ initialData, onCancel, onSaved }) {
         />
 
         {/* Images */}
-        <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-5 shadow-sm">
-          <h3 className="font-bold text-gray-900 text-sm mb-4">Images</h3>
+        <div className="bg-white rounded-2xl border border-border p-4 sm:p-5 shadow-sm">
+          <h3 className="font-bold text-foreground text-sm mb-4">Images</h3>
           <div className="space-y-4">
             <Field label="Featured Image" required>
               {form.cover_image_url ? (
@@ -316,11 +316,11 @@ export default function BlogForm({ initialData, onCancel, onSaved }) {
                   <img
                     src={form.cover_image_url}
                     alt="Featured"
-                    className="w-full h-44 rounded-lg object-cover border border-gray-200"
+                    className="w-full h-44 rounded-lg object-cover border border-border"
                   />
                   <label className="absolute bottom-2 right-2 cursor-pointer">
                     <input type="file" accept="image/*" onChange={handleFeaturedImage} className="hidden" />
-                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/90 border border-gray-200 text-xs font-medium text-gray-700 hover:bg-white">
+                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/90 border border-border text-xs font-medium text-foreground/80 hover:bg-white">
                       {uploadingFeatured ? (
                         <Loader2 className="w-3.5 h-3.5 animate-spin" />
                       ) : (
@@ -333,22 +333,22 @@ export default function BlogForm({ initialData, onCancel, onSaved }) {
               ) : (
                 <label className="cursor-pointer block">
                   <input type="file" accept="image/*" onChange={handleFeaturedImage} className="hidden" />
-                  <div className="flex flex-col items-center justify-center gap-1.5 py-8 rounded-lg border-2 border-dashed border-gray-300 hover:bg-gray-50 transition-colors">
+                  <div className="flex flex-col items-center justify-center gap-1.5 py-8 rounded-lg border-2 border-dashed border-border hover:bg-muted transition-colors">
                     {uploadingFeatured ? (
-                      <Loader2 className="w-7 h-7 text-emerald-500 animate-spin" />
+                      <Loader2 className="w-7 h-7 text-accent-jade animate-spin" />
                     ) : (
-                      <ImageIcon className="w-7 h-7 text-gray-300" />
+                      <ImageIcon className="w-7 h-7 text-muted-foreground/50" />
                     )}
-                    <p className="text-sm font-medium text-gray-600">
+                    <p className="text-sm font-medium text-muted-foreground">
                       {uploadingFeatured ? (
                         "Uploading..."
                       ) : (
                         <>
-                          <span className="text-emerald-600">Click to upload</span> or drag and drop
+                          <span className="text-accent-jade">Click to upload</span> or drag and drop
                         </>
                       )}
                     </p>
-                    <p className="text-xs text-gray-400">PNG, JPG up to 10MB</p>
+                    <p className="text-xs text-muted-foreground/70">PNG, JPG up to 10MB</p>
                   </div>
                 </label>
               )}
@@ -357,7 +357,7 @@ export default function BlogForm({ initialData, onCancel, onSaved }) {
             <Field label="Additional Images" optional>
               <div className="flex flex-wrap gap-2 mb-2">
                 {(form.additional_images || []).map((url, idx) => (
-                  <div key={idx} className="relative w-20 h-20 rounded-lg overflow-hidden border border-gray-200">
+                  <div key={idx} className="relative w-20 h-20 rounded-lg overflow-hidden border border-border">
                     <img src={url} alt="" className="w-full h-full object-cover" />
                     <button
                       type="button"
@@ -371,7 +371,7 @@ export default function BlogForm({ initialData, onCancel, onSaved }) {
               </div>
               <label className="cursor-pointer block">
                 <input type="file" accept="image/*" onChange={handleAdditionalImage} className="hidden" />
-                <div className="flex items-center justify-center gap-1.5 py-2.5 rounded-lg border border-dashed border-gray-300 text-gray-600 text-xs font-medium hover:bg-gray-50 transition-colors">
+                <div className="flex items-center justify-center gap-1.5 py-2.5 rounded-lg border border-dashed border-border text-muted-foreground text-xs font-medium hover:bg-muted transition-colors">
                   {uploadingAdditional ? (
                     <Loader2 className="w-3.5 h-3.5 animate-spin" />
                   ) : (
@@ -385,9 +385,9 @@ export default function BlogForm({ initialData, onCancel, onSaved }) {
         </div>
 
         {/* SEO */}
-        <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-5 shadow-sm">
-          <h3 className="font-bold text-gray-900 text-sm mb-4">
-            SEO <span className="text-gray-400 font-normal text-xs">(Optional)</span>
+        <div className="bg-white rounded-2xl border border-border p-4 sm:p-5 shadow-sm">
+          <h3 className="font-bold text-foreground text-sm mb-4">
+            SEO <span className="text-muted-foreground/70 font-normal text-xs">(Optional)</span>
           </h3>
           <div className="space-y-3">
             <Field label="SEO Title" optional>
@@ -395,7 +395,7 @@ export default function BlogForm({ initialData, onCancel, onSaved }) {
                 value={form.seo_title || ""}
                 onChange={(e) => set("seo_title", e.target.value)}
                 placeholder="Custom title for search engines"
-                className="h-10 rounded-lg border-gray-200"
+                className="h-10 rounded-lg border-border"
               />
             </Field>
             <Field label="SEO Description" optional>
@@ -403,7 +403,7 @@ export default function BlogForm({ initialData, onCancel, onSaved }) {
                 value={form.seo_description || ""}
                 onChange={(e) => set("seo_description", e.target.value)}
                 placeholder="Custom description for search engines"
-                className="rounded-lg border-gray-200 min-h-[70px]"
+                className="rounded-lg border-border min-h-[70px]"
                 rows={2}
               />
             </Field>
@@ -411,12 +411,12 @@ export default function BlogForm({ initialData, onCancel, onSaved }) {
         </div>
 
         {/* Status & Settings */}
-        <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-5 shadow-sm">
-          <h3 className="font-bold text-gray-900 text-sm mb-4">Status &amp; Settings</h3>
+        <div className="bg-white rounded-2xl border border-border p-4 sm:p-5 shadow-sm">
+          <h3 className="font-bold text-foreground text-sm mb-4">Status &amp; Settings</h3>
           <div className="space-y-4">
             <Field label="Status">
               <Select value={form.status || "draft"} onValueChange={(v) => set("status", v)}>
-                <SelectTrigger className="h-10 rounded-lg border-gray-200 w-full sm:w-48">
+                <SelectTrigger className="h-10 rounded-lg border-border w-full sm:w-48">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -426,7 +426,7 @@ export default function BlogForm({ initialData, onCancel, onSaved }) {
               </Select>
             </Field>
             <div className="flex items-center justify-between">
-              <label className="text-sm font-medium text-gray-700">Featured Blog</label>
+              <label className="text-sm font-medium text-foreground/80">Featured Blog</label>
               <Switch checked={!!form.featured} onCheckedChange={(v) => set("featured", v)} />
             </div>
           </div>
@@ -434,11 +434,11 @@ export default function BlogForm({ initialData, onCancel, onSaved }) {
       </div>
 
       {/* Bottom action bar */}
-      <div className="fixed bottom-0 left-0 right-0 lg:left-64 bg-white border-t border-gray-200 px-4 sm:px-6 py-3 flex items-center justify-end gap-3 z-30">
+      <div className="fixed bottom-0 left-0 right-0 lg:left-64 bg-white border-t border-border px-4 sm:px-6 py-3 flex items-center justify-end gap-3 z-30">
         <Button type="button" variant="outline" onClick={onCancel} className="rounded-lg px-6">
           Cancel
         </Button>
-        <Button type="submit" disabled={saving} className="rounded-lg px-6 bg-emerald-600 hover:bg-emerald-700 text-white gap-2">
+        <Button type="submit" disabled={saving} className="rounded-lg px-6 bg-accent-jade hover:bg-accent-jade/90 text-white gap-2">
           {saving ? (
             <>
               <Loader2 className="w-4 h-4 animate-spin" /> Saving...
@@ -457,10 +457,10 @@ export default function BlogForm({ initialData, onCancel, onSaved }) {
 function Field({ label, required, optional, children }) {
   return (
     <div>
-      <label className="text-sm font-medium text-gray-700 block mb-1.5">
+      <label className="text-sm font-medium text-foreground/80 block mb-1.5">
         {label}
-        {required && <span className="text-red-500"> *</span>}
-        {optional && <span className="text-gray-400 font-normal text-xs ml-1">(optional)</span>}
+        {required && <span className="text-destructive"> *</span>}
+        {optional && <span className="text-muted-foreground/70 font-normal text-xs ml-1">(optional)</span>}
       </label>
       {children}
     </div>

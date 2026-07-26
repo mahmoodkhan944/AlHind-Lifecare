@@ -66,8 +66,8 @@ export default function AdminSettings() {
     <div className="max-w-3xl mx-auto space-y-6">
       {/* Header */}
       <div>
-        <h1 className="font-heading font-bold text-2xl text-gray-900">Settings</h1>
-        <p className="text-sm text-gray-500 mt-1">Manage your website settings and configurations</p>
+        <h1 className="font-heading font-bold text-2xl text-foreground">Settings</h1>
+        <p className="text-sm text-muted-foreground mt-1">Manage your website settings and configurations</p>
       </div>
 
       <SettingsCard icon={Globe} title="General Settings">
@@ -132,8 +132,8 @@ export default function AdminSettings() {
         </div>
         {form.google_maps_embed_url && (
           <div>
-            <p className="text-sm font-semibold text-gray-900 mb-2">Preview</p>
-            <div className="rounded-lg overflow-hidden border border-gray-200 aspect-video">
+            <p className="text-sm font-semibold text-foreground mb-2">Preview</p>
+            <div className="rounded-lg overflow-hidden border border-border aspect-video">
               <iframe src={form.google_maps_embed_url} className="w-full h-full" style={{ border: 0 }} loading="lazy" title="Map Preview" />
             </div>
           </div>
@@ -142,7 +142,7 @@ export default function AdminSettings() {
 
       {/* Actions */}
       <div className="flex flex-col gap-3">
-        <Button onClick={handleSave} disabled={saving} className="h-11 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold gap-2">
+        <Button onClick={handleSave} disabled={saving} className="h-11 bg-accent-jade hover:bg-accent-jade text-white font-semibold gap-2">
           {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
           Save All Settings
         </Button>
@@ -161,9 +161,9 @@ export default function AdminSettings() {
       {/* Quick Links */}
       <SettingsCard icon={ExternalLink} title="Quick Links">
         <div className="flex flex-col gap-2">
-          <a href="/" target="_blank" rel="noopener noreferrer" className="text-sm text-emerald-600 hover:underline">View Website →</a>
-          <a href="https://supabase.com/dashboard" target="_blank" rel="noopener noreferrer" className="text-sm text-emerald-600 hover:underline">Supabase Dashboard →</a>
-          <a href="/contact" className="text-sm text-emerald-600 hover:underline">Support Center →</a>
+          <a href="/" target="_blank" rel="noopener noreferrer" className="text-sm text-accent-jade hover:underline">View Website →</a>
+          <a href="https://supabase.com/dashboard" target="_blank" rel="noopener noreferrer" className="text-sm text-accent-jade hover:underline">Supabase Dashboard →</a>
+          <a href="/contact" className="text-sm text-accent-jade hover:underline">Support Center →</a>
         </div>
       </SettingsCard>
 
@@ -174,10 +174,10 @@ export default function AdminSettings() {
 
 function SettingsCard({ icon: Icon, title, children }) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5 space-y-4">
+    <div className="bg-white rounded-xl border border-border shadow-sm p-5 space-y-4">
       <div className="flex items-center gap-2">
-        <Icon className="w-5 h-5 text-gray-700" />
-        <h2 className="font-heading font-bold text-base text-gray-900">{title}</h2>
+        <Icon className="w-5 h-5 text-foreground/80" />
+        <h2 className="font-heading font-bold text-base text-foreground">{title}</h2>
       </div>
       {children}
     </div>
@@ -187,18 +187,18 @@ function SettingsCard({ icon: Icon, title, children }) {
 function Field({ label, hint, children }) {
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1.5">{label}</label>
+      <label className="block text-sm font-medium text-foreground/80 mb-1.5">{label}</label>
       {children}
-      {hint && <p className="text-xs text-gray-400 mt-1">{hint}</p>}
+      {hint && <p className="text-xs text-muted-foreground/70 mt-1">{hint}</p>}
     </div>
   );
 }
 
 function InfoRow({ label, value }) {
   return (
-    <div className="flex justify-between items-center py-2 border-b border-gray-100 last:border-0">
-      <span className="text-sm text-gray-500">{label}</span>
-      <span className="text-sm font-medium text-gray-900">{value}</span>
+    <div className="flex justify-between items-center py-2 border-b border-border/60 last:border-0">
+      <span className="text-sm text-muted-foreground">{label}</span>
+      <span className="text-sm font-medium text-foreground">{value}</span>
     </div>
   );
 }
@@ -218,12 +218,12 @@ function DepartmentsManager({ value, onChange }) {
   return (
     <SettingsCard icon={Building2} title="Departments">
       <div className="flex justify-end -mt-2 mb-2">
-        <Button onClick={() => update([...items, ""])} variant="outline" size="sm" className="gap-1 text-emerald-600 border-emerald-600">
+        <Button onClick={() => update([...items, ""])} variant="outline" size="sm" className="gap-1 text-accent-jade border-emerald-600">
           <Plus className="w-4 h-4" /> Add
         </Button>
       </div>
       {items.length === 0 ? (
-        <p className="text-center text-sm text-gray-400 py-6">No departments added yet. Click "Add" to create a department.</p>
+        <p className="text-center text-sm text-muted-foreground/70 py-6">No departments added yet. Click "Add" to create a department.</p>
       ) : (
         <div className="space-y-2">
           {items.map((dept, i) => (
@@ -299,11 +299,11 @@ function ChangeCredentials() {
         <Field label="New Password (leave blank to keep current)">
           <Input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className="h-10" placeholder="Min 8 characters" minLength={8} />
         </Field>
-        <Button type="submit" disabled={loading} className="w-full h-11 bg-emerald-400 hover:bg-emerald-500 text-white font-semibold gap-2">
+        <Button type="submit" disabled={loading} className="w-full h-11 bg-accent-jade/70 hover:bg-accent-jade text-white font-semibold gap-2">
           {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Key className="w-4 h-4" />}
           Update Credentials
         </Button>
-        <p className="text-xs text-gray-400 text-center">You must enter your current password to make any changes.</p>
+        <p className="text-xs text-muted-foreground/70 text-center">You must enter your current password to make any changes.</p>
       </form>
     </SettingsCard>
   );

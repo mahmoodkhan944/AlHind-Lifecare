@@ -13,23 +13,23 @@ import {
 } from "lucide-react";
 
 const statuses = [
-  { value: "new", label: "New", color: "bg-blue-500" },
-  { value: "contacted", label: "Contacted", color: "bg-yellow-500" },
-  { value: "follow_up", label: "Follow Up", color: "bg-orange-500" },
-  { value: "interested", label: "Interested", color: "bg-purple-500" },
-  { value: "quotation_sent", label: "Quote Sent", color: "bg-indigo-500" },
-  { value: "converted", label: "Converted", color: "bg-green-500" },
-  { value: "closed", label: "Closed", color: "bg-gray-500" },
+  { value: "new", label: "New", color: "bg-[#0B2E36]" },
+  { value: "contacted", label: "Contacted", color: "bg-[#F0A202]" },
+  { value: "follow_up", label: "Follow Up", color: "bg-[#D9662E]" },
+  { value: "interested", label: "Interested", color: "bg-[#0E8C7A]" },
+  { value: "quotation_sent", label: "Quote Sent", color: "bg-[#8B3A5C]" },
+  { value: "converted", label: "Converted", color: "bg-[#2F7D4F]" },
+  { value: "closed", label: "Closed", color: "bg-muted-foreground/60" },
 ];
 
 const statusBadge = {
-  new: "bg-blue-100 text-blue-700",
-  contacted: "bg-yellow-100 text-yellow-700",
-  follow_up: "bg-orange-100 text-orange-700",
-  interested: "bg-purple-100 text-purple-700",
-  quotation_sent: "bg-indigo-100 text-indigo-700",
-  converted: "bg-green-100 text-green-700",
-  closed: "bg-gray-100 text-gray-700",
+  new: "bg-[#0B2E36]/10 text-[#0B2E36]",
+  contacted: "bg-[#F0A202]/15 text-[#A6740A]",
+  follow_up: "bg-[#D9662E]/15 text-[#B34F1F]",
+  interested: "bg-[#0E8C7A]/12 text-[#0B6F60]",
+  quotation_sent: "bg-[#8B3A5C]/12 text-[#8B3A5C]",
+  converted: "bg-[#2F7D4F]/12 text-[#2F7D4F]",
+  closed: "bg-muted text-muted-foreground",
 };
 
 function formatDate(d) {

@@ -11,7 +11,7 @@ import AdminPagination from "@/components/admin/AdminPagination";
 const PAGE_SIZE = 15;
 
 const statuses = ["new", "contacted", "follow_up", "interested", "quotation_sent", "converted", "closed"];
-const statusColors = { new: "bg-blue-100 text-blue-700", contacted: "bg-yellow-100 text-yellow-700", follow_up: "bg-orange-100 text-orange-700", interested: "bg-purple-100 text-purple-700", quotation_sent: "bg-indigo-100 text-indigo-700", converted: "bg-green-100 text-green-700", closed: "bg-gray-100 text-gray-700" };
+const statusColors = { new: "bg-[#0B2E36]/10 text-[#0B2E36]", contacted: "bg-[#F0A202]/15 text-[#A6740A]", follow_up: "bg-[#D9662E]/15 text-[#B34F1F]", interested: "bg-[#0E8C7A]/12 text-[#0B6F60]", quotation_sent: "bg-[#8B3A5C]/12 text-[#8B3A5C]", converted: "bg-[#2F7D4F]/12 text-[#2F7D4F]", closed: "bg-muted text-muted-foreground" };
 
 export default function AdminLeads() {
   const [leads, setLeads] = useState([]);

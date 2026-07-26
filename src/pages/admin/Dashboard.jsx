@@ -34,12 +34,12 @@ export default function Dashboard() {
   }, []);
 
   const statCards = [
-    { icon: Users, label: "Total Leads", value: stats.leads, color: "from-blue-500 to-blue-600" },
-    { icon: Stethoscope, label: "Doctors", value: stats.doctors, color: "from-teal-500 to-teal-600" },
-    { icon: Building2, label: "Hospitals", value: stats.hospitals, color: "from-purple-500 to-purple-600" },
-    { icon: Heart, label: "Treatments", value: stats.treatments, color: "from-rose-500 to-rose-600" },
-    { icon: CalendarDays, label: "Appointments", value: stats.appointments, color: "from-amber-500 to-amber-600" },
-    { icon: MessageSquare, label: "Testimonials", value: stats.testimonials, color: "from-green-500 to-green-600" },
+    { icon: Users, label: "Total Leads", value: stats.leads, color: "from-[#0B2E36] to-[#14424D]" },
+    { icon: Stethoscope, label: "Doctors", value: stats.doctors, color: "from-[#0E8C7A] to-[#0B6F60]" },
+    { icon: Building2, label: "Hospitals", value: stats.hospitals, color: "from-[#8B3A5C] to-[#6E2E49]" },
+    { icon: Heart, label: "Treatments", value: stats.treatments, color: "from-[#E23A52] to-[#C22E44]" },
+    { icon: CalendarDays, label: "Appointments", value: stats.appointments, color: "from-[#F0A202] to-[#CC8802]" },
+    { icon: MessageSquare, label: "Testimonials", value: stats.testimonials, color: "from-[#2F7D4F] to-[#256640]" },
   ];
 
   if (loading) return <div className="flex justify-center py-20"><div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin" /></div>;
@@ -59,7 +59,7 @@ export default function Dashboard() {
               <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${color} flex items-center justify-center`}>
                 <Icon className="w-6 h-6 text-white" />
               </div>
-              <TrendingUp className="w-4 h-4 text-green-500" />
+              <TrendingUp className="w-4 h-4 text-accent-jade" />
             </div>
             <p className="font-heading font-bold text-3xl mb-1">{value}</p>
             <p className="text-sm text-muted-foreground">{label}</p>
@@ -90,9 +90,9 @@ export default function Dashboard() {
                     <td className="py-3 text-muted-foreground">{lead.treatment_interest || "-"}</td>
                     <td className="py-3">
                       <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${
-                        lead.status === "new" ? "bg-blue-100 text-blue-700" :
-                        lead.status === "converted" ? "bg-green-100 text-green-700" :
-                        "bg-gray-100 text-gray-700"
+                        lead.status === "new" ? "bg-[#0B2E36]/10 text-[#0B2E36]" :
+                        lead.status === "converted" ? "bg-[#2F7D4F]/12 text-[#2F7D4F]" :
+                        "bg-muted text-muted-foreground"
                       }`}>{lead.status}</span>
                     </td>
                   </tr>
