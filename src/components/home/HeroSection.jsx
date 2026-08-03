@@ -10,16 +10,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { COUNTRIES, getDialCode } from "@/lib/countries";
 import { useLeadModal } from "@/lib/LeadModalContext";
 import { Link } from "react-router-dom";
-// Video lives in /public/videos so Vite copies it as-is (no import needed for
-// large binary assets). BASE_URL is prefixed so this resolves correctly both
-// in dev (BASE_URL = "/") and on GitHub Pages, where the site is served from
-// a subfolder (BASE_URL = "/AlHind-Lifecare/") — a hardcoded "/videos/..."
-// path would 404 there since it ignores the configured base.
 const BG_VIDEO = `${import.meta.env.BASE_URL}videos/hero-video.mp4`;
-// No poster image currently exists in /public/videos — add one there (e.g.
-// hero-poster.jpg, a still frame from the video) and uncomment below if you
-// want an instant-paint placeholder while the video loads on slow connections.
-// const BG_POSTER = `${import.meta.env.BASE_URL}videos/hero-poster.jpg`;
 const patientPhotos = [
   "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop&crop=face",
   "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=face",
@@ -67,8 +58,6 @@ export default function HeroSection() {
         >
           <source src={BG_VIDEO} type="video/mp4" />
         </video>
-        {/* Dark overlay — stronger + flatter on mobile so text stays readable over busy
-            video frames; softens into a directional gradient once there's room on the left. */}
         <div className="absolute inset-0 bg-black/55 sm:bg-black/50 lg:bg-gradient-to-r lg:from-black/70 lg:via-black/45 lg:to-black/20" />
       </div>
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -81,13 +70,42 @@ export default function HeroSection() {
             className="text-white text-center lg:text-left order-1 lg:order-1"
           >
             {/* Heading */}
-            <h1 className="font-heading font-extrabold text-[clamp(1.75rem,6vw,3.75rem)] leading-[1.12] mb-3 drop-shadow-lg text-balance">
-              Better Health Knows No Borders
+            <h1 className="
+                            font-heading
+                            font-extrabold
+                            text-[20px]
+                            sm:text-[24px]
+                            md:text-[32px]
+                            lg:text-[clamp(2.8rem,4vw,3.75rem)]
+                            leading-[1.12]
+                            mb-3
+                            drop-shadow-lg
+                            whitespace-nowrap
+                            lg:whitespace-normal
+                            ">
+                              <span className="text-yellow-400">Better Health</span> Knows No Borders
             </h1>
             {/* Subtitle */}
-            <p className="text-[clamp(0.95rem,2.2vw,1.25rem)] text-white/90 font-medium max-w-xl mx-auto lg:mx-0 mb-5 text-balance">
-              Your trusted gateway to world-class healthcare — connecting you with premier doctors and top-accredited hospitals across India and Turkey.
-            </p>
+            <p
+  className="
+    text-base
+    sm:text-lg
+    lg:text-xl
+    text-white/90
+    font-medium
+    max-w-xl
+    mx-auto
+    lg:mx-0
+    mb-5
+    leading-relaxed
+    text-center
+    lg:text-left
+    text-pretty
+  "
+>
+  Your trusted gateway to world-class healthcare — connecting you with
+  premier doctors and top-accredited hospitals across India and Turkey.
+</p>
             {/* Patient Images */}
             <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 mb-4">
               <div className="flex -space-x-3 shrink-0">

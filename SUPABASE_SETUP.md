@@ -1,8 +1,5 @@
 # Supabase setup
 
-This project no longer talks to Base44. It now uses Supabase for the database,
-auth, and file storage. Follow these steps once to get it running.
-
 ## 1. Create a Supabase project
 
 1. Go to https://supabase.com/dashboard and sign in (or sign up — free tier is fine).

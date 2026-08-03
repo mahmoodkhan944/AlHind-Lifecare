@@ -105,14 +105,17 @@ function App() {
   return (
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
-        <Router basename="/AlHind-Lifecare">
+        <Router
+          basename={import.meta.env.PROD ? "/AlHind-Lifecare" : "/"}
+        >
           <ScrollToTop />
           <AuthenticatedApp />
         </Router>
+
         <Toaster />
       </QueryClientProvider>
     </AuthProvider>
-  )
+  );
 }
 
-export default App
+export default App;
