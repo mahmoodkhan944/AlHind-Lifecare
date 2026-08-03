@@ -16,8 +16,8 @@ export default function SectionHeader({ badge, title, subtitle, center = true })
         </span>
       )}
       {title && (
-        <h2 className="font-heading font-extrabold text-[clamp(1.5rem,5vw,3rem)] text-foreground mb-3 sm:mb-4 leading-tight text-balance">
-          {title}
+        <h2 className="font-heading font-extrabold text-[14px] sm:text-[28px] md:text-[36px] lg:text-[48px] whitespace-nowrap">
+        {title}
         </h2>
       )}
       {subtitle && (

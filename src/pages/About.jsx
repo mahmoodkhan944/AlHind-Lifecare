@@ -236,10 +236,10 @@ export default function About() {
           <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wider uppercase mb-4">
             Our Services
           </span>
-          <h2 className="font-heading font-bold text-[clamp(1.5rem,4vw,2.25rem)] mb-4 text-balance">
+          <h2 className="font-heading font-extrabold text-[20px] sm:text-[24px] md:text-[32px] lg:text-[clamp(2.8rem,4vw,3.75rem)] leading-[1.12] mb-4 drop-shadow-lg whitespace-nowrap lg:whitespace-normal">
             Everything You Need, Under One Roof
           </h2>
-          <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto mb-10 text-balance">
+          <p className="text-base sm:text-lg lg:text-xl text-muted-foreground max-w-xl mx-auto lg:mx-0 mb-10 leading-relaxed text-center lg:text-left text-pretty">
             We offer online consultation, medical second opinion, and top-class medical treatment at our
             partner hospitals worldwide.
           </p>
