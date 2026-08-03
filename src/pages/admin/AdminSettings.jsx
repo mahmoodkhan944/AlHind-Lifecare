@@ -8,7 +8,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { useInvalidateSettings, DEFAULT_SETTINGS, parseDepartments } from "@/hooks/useSiteSettings";
 import {
   Globe, Phone, Share2, PhoneCall, Clock, Building2, MapPin,
-  Save, RotateCcw, Plus, Trash2, Key, Loader2, ExternalLink, Info
+  Save, RotateCcw, Plus, Trash2, Key, Loader2, ExternalLink, Info, Star
 } from "lucide-react";
 
 export default function AdminSettings() {
@@ -73,6 +73,18 @@ export default function AdminSettings() {
       <SettingsCard icon={Globe} title="General Settings">
         <Field label="Site Name">
           <Input value={form.site_name} onChange={(e) => set("site_name", e.target.value)} className="h-10" />
+        </Field>
+      </SettingsCard>
+
+      <SettingsCard icon={Star} title="Homepage Hero Stats" hint="Shown at the top of the homepage — update these as your numbers grow, no code change needed.">
+        <Field label="Patients Assisted" hint="Shown as '[value] Patients Assisted'">
+          <Input value={form.patients_assisted} onChange={(e) => set("patients_assisted", e.target.value)} className="h-10" placeholder="1,00,000+" />
+        </Field>
+        <Field label="Google Rating">
+          <Input value={form.google_rating} onChange={(e) => set("google_rating", e.target.value)} className="h-10" placeholder="4.7" />
+        </Field>
+        <Field label="Trusted Since (Year)">
+          <Input value={form.trusted_since_year} onChange={(e) => set("trusted_since_year", e.target.value)} className="h-10" placeholder="2016" />
         </Field>
       </SettingsCard>
 
@@ -172,12 +184,15 @@ export default function AdminSettings() {
   );
 }
 
-function SettingsCard({ icon: Icon, title, children }) {
+function SettingsCard({ icon: Icon, title, hint, children }) {
   return (
     <div className="bg-white rounded-xl border border-border shadow-sm p-5 space-y-4">
-      <div className="flex items-center gap-2">
-        <Icon className="w-5 h-5 text-foreground/80" />
-        <h2 className="font-heading font-bold text-base text-foreground">{title}</h2>
+      <div>
+        <div className="flex items-center gap-2">
+          <Icon className="w-5 h-5 text-foreground/80" />
+          <h2 className="font-heading font-bold text-base text-foreground">{title}</h2>
+        </div>
+        {hint && <p className="text-xs text-muted-foreground mt-1 ml-7">{hint}</p>}
       </div>
       {children}
     </div>

@@ -1,43 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Search, Clock, DollarSign, TrendingUp, Stethoscope, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, Clock, DollarSign, TrendingUp, Stethoscope, ChevronLeft, ChevronRight, Award } from "lucide-react";
 import { db } from "@/api/dataClient";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { useLeadModal } from "@/lib/LeadModalContext";
 
-const categories = [
-  "Cardiology",
-  "Oncology",
-  "Neurology",
-  "Neurosurgery",
-  "Orthopedics",
-  "Spine Surgery",
-  "IVF",
-  "Fertility Treatment",
-  "Cosmetic Surgery",
-  "Plastic Surgery",
-  "Bariatric Surgery",
-  "Dental Treatment",
-  "Organ Transplant",
-  "Kidney Treatment",
-  "Liver Treatment",
-  "Urology",
-  "Ophthalmology",
-  "ENT",
-  "Gastroenterology",
-  "Pulmonology",
-  "Rheumatology",
-  "Pediatrics",
-  "Gynecology",
-];
-
 const PAGE_SIZE = 12;
 
 const HERO_IMAGE =
-  "https://plus.unsplash.com/premium_photo-1672759455907-bdaef741cd88?q=80&w=1116&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
+  "https://images.unsplash.com/photo-1666214280391-8ff5bd3c0bf0?w=1600&q=80";
 
 export default function Treatments() {
   const [treatments, setTreatments] = useState([]);
@@ -61,6 +35,14 @@ export default function Treatments() {
   useEffect(() => {
     setPage(1);
   }, [search, category]);
+
+  // Categories now come straight from the treatments themselves — whatever
+  // category value an admin sets on a Treatment automatically shows up here,
+  // in the filter dropdown, and in the hero stat count, no code change needed.
+  const categories = useMemo(() => {
+    const set = new Set(treatments.map((t) => t.category).filter(Boolean));
+    return Array.from(set).sort();
+  }, [treatments]);
 
   const filtered = treatments.filter((t) => {
     const matchSearch = !search || t.name?.toLowerCase().includes(search.toLowerCase());
@@ -128,7 +110,7 @@ export default function Treatments() {
               <p className="text-white/70 text-xs sm:text-sm mt-1">Categories</p>
             </div>
             <div>
-              <p className="font-heading font-extrabold text-3xl sm:text-4xl text-white leading-tight">10k+</p>
+              <p className="font-heading font-extrabold text-3xl sm:text-4xl text-white leading-tight">1,00,000+</p>
               <p className="text-white/70 text-xs sm:text-sm mt-1">Patients Assisted</p>
             </div>
             <div>
@@ -213,6 +195,12 @@ export default function Treatments() {
                       <div className="absolute top-3 left-3 sm:top-4 sm:left-4 px-2.5 sm:px-3 py-1 rounded-full bg-white/90 backdrop-blur-sm text-xs font-semibold text-primary">
                         {t.category}
                       </div>
+                    )}
+                    {t.featured && (
+                      <span className="absolute top-3 right-3 sm:top-4 sm:right-4 flex items-center gap-1 px-2.5 py-1 rounded-full bg-accent-jade text-white text-[11px] font-semibold shadow-sm">
+                        <Award className="w-3 h-3" />
+                        Featured
+                      </span>
                     )}
                   </Link>
                   <div className="p-5 sm:p-6 flex flex-col flex-1">

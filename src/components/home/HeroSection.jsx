@@ -66,8 +66,6 @@ export default function HeroSection() {
           <source src={BG_VIDEO} type="video/mp4" />
         </video>
 
-        {/* Dark overlay — stronger + flatter on mobile so text stays readable over busy
-            video frames; softens into a directional gradient once there's room on the left. */}
         <div className="absolute inset-0 bg-black/55 sm:bg-black/50 lg:bg-gradient-to-r lg:from-black/70 lg:via-black/45 lg:to-black/20" />
       </div>
 
@@ -187,8 +185,6 @@ export default function HeroSection() {
           >
 
             <div className="decor-blob decor-blob-primary w-64 h-64 -top-16 -right-16 -z-10" />
-
-            <div className="absolute inset-x-0 top-0 h-1.5 rounded-t-2xl bg-gradient-to-r from-primary via-[hsl(var(--accent-warm))] to-primary" />
 
             <h2 className="font-heading font-bold text-lg sm:text-xl text-secondary text-center mb-0.5 mt-1">
               Let Us Help You
