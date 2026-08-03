@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 
-export default function SectionHeader({ badge, title, subtitle, center = true }) {
+export default function SectionHeader({ badge, title, subtitle, center = true, subtitleWide = false }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -16,12 +16,12 @@ export default function SectionHeader({ badge, title, subtitle, center = true })
         </span>
       )}
       {title && (
-        <h2 className="font-heading font-extrabold text-[14px] sm:text-[28px] md:text-[36px] lg:text-[48px] whitespace-nowrap">
-        {title}
+        <h2 className="font-heading font-extrabold text-[clamp(1.5rem,5vw,3rem)] text-foreground mb-3 sm:mb-4 leading-tight text-balance">
+          {title}
         </h2>
       )}
       {subtitle && (
-        <p className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed text-balance">
+        <p className={`text-sm sm:text-base md:text-lg text-muted-foreground mx-auto leading-relaxed text-balance ${subtitleWide ? "max-w-none lg:whitespace-nowrap" : "max-w-2xl"}`}>
           {subtitle}
         </p>
       )}
