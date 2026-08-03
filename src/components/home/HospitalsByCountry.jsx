@@ -125,7 +125,7 @@ export default function HospitalsByCountry() {
           <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-bold tracking-wider uppercase mb-3">
             Medical Destinations
           </span>
-          <h2 className="font-heading font-extrabold text-3xl md:text-4xl text-secondary mb-2">
+          <h2 className="font-heading font-extrabold text-[20px] sm:text-[24px] md:text-[32px] lg:text-[clamp(2.8rem,4vw,3.75rem)] leading-[1.12] text-secondary mb-2 drop-shadow-lg whitespace-nowrap lg:whitespace-normal">
             Hospitals by Destination
           </h2>
           <p
