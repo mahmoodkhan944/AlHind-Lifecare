@@ -171,7 +171,7 @@ export default function About() {
       </section>
 
       {/* Intro / Mission — image + copy, "Your Health, Our Priority" */}
-      <section className="py-5 sm:py-12 md:py-16">
+      <section className="py-10 sm:py-12 md:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 md:gap-10 items-center">
             <motion.div
@@ -231,15 +231,15 @@ export default function About() {
       </section>
 
       {/* Our Services */}
-      <section className="py-5 sm:py-12 md:py-14 bg-secondary/30">
+      <section className="py-10 sm:py-12 md:py-14 bg-secondary/30">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 text-center">
           <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wider uppercase mb-4">
             Our Services
           </span>
-          <h2 className="font-heading font-extrabold text-[20px] sm:text-[24px] md:text-[32px] lg:text-[clamp(2.8rem,4vw,3.75rem)] leading-[1.12] mb-4 drop-shadow-lg whitespace-nowrap lg:whitespace-normal">
+          <h2 className="font-heading font-bold text-[clamp(1.5rem,4vw,2.25rem)] mb-4 text-balance">
             Everything You Need, Under One Roof
           </h2>
-          <p className="text-base sm:text-lg lg:text-xl text-muted-foreground max-w-xl mx-auto lg:mx-0 mb-10 leading-relaxed text-center lg:text-left text-pretty">
+          <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto mb-10 text-balance">
             We offer online consultation, medical second opinion, and top-class medical treatment at our
             partner hospitals worldwide.
           </p>
@@ -263,7 +263,7 @@ export default function About() {
       </section>
 
       {/* Mission & Vision */}
-      <section className="py-5 sm:py-12 md:py-14">
+      <section className="py-10 sm:py-12 md:py-14">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
             {[
@@ -297,7 +297,7 @@ export default function About() {
       </section>
 
       {/* Why patients trust us — alternating image + text rows */}
-      <section className="py-5 sm:py-12 md:py-16">
+      <section className="py-10 sm:py-12 md:py-16">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-10">
             <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wider uppercase mb-4">
@@ -338,13 +338,13 @@ export default function About() {
       </section>
 
       {/* How we help — detailed bullet groups */}
-      <section className="py-5 sm:py-12 md:py-14 bg-secondary/30">
+      <section className="py-10 sm:py-12 md:py-14 bg-secondary/30">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center max-w-2xl mx-auto mb-7 sm:mb-8">
             <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wider uppercase mb-4">
               How We Help You
             </span>
-            <h2 className="font-heading font-bold text-[clamp(1.5rem,4vw,2.25rem)] text-balance">
+            <h2 className="font-heading font-bold text-[clamp(1.05rem,4.5vw,2.25rem)] text-balance whitespace-nowrap sm:whitespace-normal">
               Support at Every Step of the Journey
             </h2>
           </div>
@@ -378,13 +378,13 @@ export default function About() {
       </section>
 
       {/* Leadership */}
-      <section className="py-5 sm:py-12 md:py-14">
+      <section className="py-10 sm:py-12 md:py-14">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <div className="text-center max-w-2xl mx-auto mb-7 sm:mb-8">
             <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wider uppercase mb-4">
               Leadership
             </span>
-            <h2 className="font-heading font-bold text-[clamp(1.5rem,4vw,2.25rem)] mb-3 text-balance">
+            <h2 className="font-heading font-bold text-[clamp(0.9rem,4.2vw,2.25rem)] mb-3 text-balance whitespace-nowrap sm:whitespace-normal">
               The People Behind Alhind Medical Care
             </h2>
             <p className="text-sm sm:text-base text-muted-foreground text-balance">
@@ -437,7 +437,7 @@ export default function About() {
       </section>
 
       {/* Advantages of choosing us */}
-      <section className="py-5 sm:py-12 md:py-14 bg-secondary/30">
+      <section className="py-10 sm:py-12 md:py-14 bg-secondary/30">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center max-w-2xl mx-auto mb-7 sm:mb-8">
             <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wider uppercase mb-4">
