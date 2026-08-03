@@ -36,9 +36,6 @@ const categories = [
 
 const PAGE_SIZE = 12;
 
-const HERO_IMAGE =
-  "https://plus.unsplash.com/premium_photo-1702598479744-f0fefa59d3a2?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OTN8fHRyZWF0bWVudHN8ZW58MHx8MHx8fDA%3D";
-
 export default function Treatments() {
   const [treatments, setTreatments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -80,28 +77,51 @@ export default function Treatments() {
   return (
     <div>
       {/* Hero */}
-      {/* FIX: pt-32 pb-16 was fixed on every screen size; now scales down on mobile. */}
-      <section className="relative pt-20 sm:pt-24 md:pt-28 pb-8 sm:pb-10 md:pb-12 overflow-hidden">
-        <div className="absolute inset-0">
-          <img src={HERO_IMAGE} alt="" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-br from-secondary/90 via-secondary/80 to-[#0E8C7A]/85" />
-        </div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 text-center">
+      <section className="relative pt-20 sm:pt-24 md:pt-28 pb-10 sm:pb-12 md:pb-14 overflow-hidden bg-gradient-to-br from-secondary via-secondary to-accent-jade">
+        {/* Soft decorative glows, echoing the dot-grid/blob language used elsewhere on the site */}
+        <div className="absolute -top-24 -right-24 w-80 h-80 rounded-full bg-accent-warm/15 blur-3xl" />
+        <div className="absolute -bottom-32 -left-16 w-96 h-96 rounded-full bg-white/5 blur-3xl" />
+        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 text-center">
+          <motion.span
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="inline-flex items-center gap-2 bg-white/10 border border-white/20 backdrop-blur-sm rounded-full px-4 py-1.5 mb-5 text-xs sm:text-sm font-semibold text-white tracking-wide"
+          >
+            <Stethoscope className="w-4 h-4 text-accent-warm" />
+            Comprehensive Healthcare Services
+          </motion.span>
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="font-heading font-bold text-[clamp(1.75rem,6vw,3rem)] text-white mb-3 text-balance"
+            className="font-heading font-extrabold text-[clamp(1.75rem,6vw,3.25rem)] text-white mb-3 text-balance"
           >
-            Medical Treatments
+            Advanced Medical Treatments
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-white/70 text-base sm:text-lg text-balance"
+            className="text-white/80 text-base sm:text-lg max-w-2xl mx-auto mb-9 text-balance"
           >
-            Explore our comprehensive range of medical treatments
+            Discover our range of specialized treatments delivered by expert doctors using cutting-edge technology and compassionate care.
           </motion.p>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="flex items-center justify-center gap-6 sm:gap-12"
+          >
+            {[
+              { value: `${categories.length}+`, label: "Treatment Categories" },
+              { value: "1,00,000+", label: "Patients Assisted" },
+              { value: "98%", label: "Success Rate" },
+            ].map((stat) => (
+              <div key={stat.label}>
+                <p className="font-heading font-extrabold text-2xl sm:text-4xl text-white">{stat.value}</p>
+                <p className="text-white/70 text-[11px] sm:text-sm mt-0.5">{stat.label}</p>
+              </div>
+            ))}
+          </motion.div>
         </div>
       </section>
 
