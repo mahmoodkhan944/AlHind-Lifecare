@@ -202,12 +202,12 @@ export default function About() {
               <h2 className="font-heading font-bold text-[clamp(1.5rem,4vw,2.25rem)] mb-4 text-balance">
                 Making World-Class Healthcare Accessible to All
               </h2>
-              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-6 text-balance">
+              <p className="text-base sm:text-lg text-foreground/75 leading-[1.75] mb-6 text-balance">
                 At Alhind Medical Care, we believe quality healthcare should be accessible to everyone,
                 everywhere. That's why we connect international patients with top hospitals and expert doctors
                 in leading medical destinations across India and Turkey.
               </p>
-              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-6 text-balance">
+              <p className="text-base sm:text-lg text-foreground/75 leading-[1.75] mb-6 text-balance">
                 With a strong network of JCI &amp; NABH accredited hospitals and clinics, we make medical
                 travel stress-free — from seamless, timely doctor appointments for a second opinion to
                 expediting your visa for treatment abroad.
@@ -236,10 +236,10 @@ export default function About() {
           <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wider uppercase mb-4">
             Our Services
           </span>
-          <h2 className="font-heading font-bold text-[clamp(1.5rem,4vw,2.25rem)] mb-4 text-balance">
+          <h2 className="font-heading font-bold text-[clamp(0.85rem,4vw,2.25rem)] mb-4 text-balance whitespace-nowrap">
             Everything You Need, Under One Roof
           </h2>
-          <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto mb-10 text-balance">
+          <p className="text-sm sm:text-base text-muted-foreground leading-relaxed max-w-2xl mx-auto mb-10 text-balance">
             We offer online consultation, medical second opinion, and top-class medical treatment at our
             partner hospitals worldwide.
           </p>
@@ -289,7 +289,7 @@ export default function About() {
                   <Icon className="w-6 h-6" />
                 </span>
                 <h3 className="font-heading font-bold text-lg sm:text-xl mb-2">{title}</h3>
-                <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">{desc}</p>
+                <p className="text-sm sm:text-base text-muted-foreground leading-relaxed text-balance">{desc}</p>
               </motion.div>
             ))}
           </div>
@@ -387,7 +387,7 @@ export default function About() {
             <h2 className="font-heading font-bold text-[clamp(0.9rem,4.2vw,2.25rem)] mb-3 text-balance whitespace-nowrap sm:whitespace-normal">
               The People Behind Alhind Medical Care
             </h2>
-            <p className="text-sm sm:text-base text-muted-foreground text-balance">
+            <p className="text-sm sm:text-base text-muted-foreground leading-relaxed text-balance">
               Experienced professionals dedicated to your health and wellbeing.
             </p>
           </div>
@@ -460,7 +460,7 @@ export default function About() {
                   <Icon className="w-5 h-5" />
                 </span>
                 <h3 className="font-heading font-bold text-base mb-2">{title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{desc}</p>
+                <p className="text-sm sm:text-base text-muted-foreground leading-relaxed text-balance">{desc}</p>
               </motion.div>
             ))}
           </div>
