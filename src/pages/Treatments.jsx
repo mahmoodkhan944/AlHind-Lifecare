@@ -110,7 +110,7 @@ export default function Treatments() {
               <p className="text-white/70 text-xs sm:text-sm mt-1">Categories</p>
             </div>
             <div>
-              <p className="font-heading font-extrabold text-3xl sm:text-4xl text-white leading-tight">1,00,000+</p>
+              <p className="font-heading font-extrabold text-3xl sm:text-4xl text-white leading-tight">10k+</p>
               <p className="text-white/70 text-xs sm:text-sm mt-1">Patients Assisted</p>
             </div>
             <div>
