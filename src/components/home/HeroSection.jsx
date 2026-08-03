@@ -10,7 +10,10 @@ import { useToast } from "@/components/ui/use-toast";
 import { COUNTRIES, getDialCode } from "@/lib/countries";
 import { useLeadModal } from "@/lib/LeadModalContext";
 import { Link } from "react-router-dom";
+import { useSiteSettings, DEFAULT_SETTINGS } from "@/hooks/useSiteSettings";
+
 const BG_VIDEO = `${import.meta.env.BASE_URL}videos/hero-video.mp4`;
+
 const patientPhotos = [
   "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop&crop=face",
   "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=face",
@@ -18,11 +21,14 @@ const patientPhotos = [
   "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&h=80&fit=crop&crop=face",
   "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80&h=80&fit=crop&crop=face",
 ];
+
 export default function HeroSection() {
   const { toast } = useToast();
   const { openLeadModal } = useLeadModal();
+  const { data: settings = DEFAULT_SETTINGS } = useSiteSettings();
   const [form, setForm] = useState({ patient_name: "", email: "", country: "Select Country", city: "", phone: "", medical_problem: "", age: "" });
   const [loading, setLoading] = useState(false);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.patient_name || !form.email || !form.phone) return;
@@ -44,6 +50,7 @@ export default function HeroSection() {
     }
     setLoading(false);
   };
+
   return (
     <section className="relative w-full min-h-[100dvh] flex items-center pt-20 sm:pt-24 lg:pt-20 pb-6 sm:pb-8 overflow-hidden">
       {/* Background Video */}
@@ -58,8 +65,12 @@ export default function HeroSection() {
         >
           <source src={BG_VIDEO} type="video/mp4" />
         </video>
+
+        {/* Dark overlay — stronger + flatter on mobile so text stays readable over busy
+            video frames; softens into a directional gradient once there's room on the left. */}
         <div className="absolute inset-0 bg-black/55 sm:bg-black/50 lg:bg-gradient-to-r lg:from-black/70 lg:via-black/45 lg:to-black/20" />
       </div>
+
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-center">
           {/* Left: text content */}
@@ -69,7 +80,8 @@ export default function HeroSection() {
             transition={{ duration: 0.6 }}
             className="text-white text-center lg:text-left order-1 lg:order-1"
           >
-            {/* Heading */}
+
+             {/* Heading */}
             <h1 className="
                             font-heading
                             font-extrabold
@@ -106,6 +118,7 @@ export default function HeroSection() {
   Your trusted gateway to world-class healthcare — connecting you with
   premier doctors and top-accredited hospitals across India and Turkey.
 </p>
+
             {/* Patient Images */}
             <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 mb-4">
               <div className="flex -space-x-3 shrink-0">
@@ -121,19 +134,21 @@ export default function HeroSection() {
                   />
                 ))}
               </div>
+
               <div className="text-center sm:text-left">
                 <p className="font-bold text-sm sm:text-base lg:text-lg leading-tight">
-                  1,00,000+ Patients Assisted
+                  {settings.patients_assisted} Patients Assisted
                 </p>
                 <p className="text-white/80 text-xs sm:text-sm leading-tight">
-                  Trusted Since 2016
+                  Trusted Since {settings.trusted_since_year}
                 </p>
               </div>
             </div>
+
             {/* Google Rating */}
             <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2 sm:gap-3 mb-5">
               <GoogleIcon className="w-6 h-6 sm:w-7 sm:h-7 shrink-0" />
-              <span className="font-bold text-lg sm:text-xl">4.7</span>
+              <span className="font-bold text-lg sm:text-xl">{settings.google_rating}</span>
               <div className="flex gap-0.5">
                 {[...Array(5)].map((_, i) => (
                   <Star key={i} className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400 fill-yellow-400" />
@@ -141,6 +156,7 @@ export default function HeroSection() {
               </div>
               <span className="text-white/70 text-xs sm:text-sm">on Google Reviews</span>
             </div>
+
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start">
               <Button
@@ -150,6 +166,7 @@ export default function HeroSection() {
               >
                 Get Free Consultation
               </Button>
+
               <Button
                 asChild
                 variant="outline"
@@ -160,6 +177,7 @@ export default function HeroSection() {
               </Button>
             </div>
           </motion.div>
+
           {/* Right: form card */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -167,17 +185,18 @@ export default function HeroSection() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="order-2 lg:order-2 relative bg-white/95 backdrop-blur-xl text-foreground rounded-2xl shadow-2xl ring-1 ring-black/5 p-4 sm:p-5 w-full max-w-sm mx-auto"
           >
-            {/* Decorative glow behind the card — ties the card's coral accent
-                bar into the page's overall graphic language. */}
+
             <div className="decor-blob decor-blob-primary w-64 h-64 -top-16 -right-16 -z-10" />
-            {/* Accent top bar — small signature touch tying the card to the brand's coral CTA color */}
+
             <div className="absolute inset-x-0 top-0 h-1.5 rounded-t-2xl bg-gradient-to-r from-primary via-[hsl(var(--accent-warm))] to-primary" />
+
             <h2 className="font-heading font-bold text-lg sm:text-xl text-secondary text-center mb-0.5 mt-1">
               Let Us Help You
             </h2>
             <p className="text-[11px] sm:text-xs text-muted-foreground text-center mb-3.5">
               Get a free quote from our medical team within 24 hours
             </p>
+
             <form onSubmit={handleSubmit} className="space-y-2">
               <Input
                 placeholder="Enter your full name"
@@ -265,6 +284,7 @@ export default function HeroSection() {
     </section>
   );
 }
+
 function GoogleIcon({ className }) {
   return (
     <svg viewBox="0 0 24 24" className={className} fill="none">

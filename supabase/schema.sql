@@ -279,6 +279,10 @@ create table public.site_settings (
   google_maps_embed_url text,
   latitude text,
   longitude text,
+  -- Homepage hero stats — editable from Admin Settings.
+  patients_assisted text default '1,00,000+',
+  google_rating text default '4.7',
+  trusted_since_year text default '2016',
   created_date timestamptz not null default now(),
   updated_date timestamptz not null default now()
 );

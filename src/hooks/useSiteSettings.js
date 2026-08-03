@@ -21,6 +21,11 @@ export const DEFAULT_SETTINGS = {
   google_maps_embed_url: "",
   latitude: "",
   longitude: "",
+  // Homepage hero stats — editable from Admin Settings so the team can update
+  // these as the business grows, without needing a code change.
+  patients_assisted: "1,00,000+",
+  google_rating: "4.7",
+  trusted_since_year: "2016",
 };
 
 export function useSiteSettings() {
