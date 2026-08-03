@@ -53,13 +53,14 @@ export default function LowestQuotes() {
   }, []);
 
   return (
-    <section className="sm:py-12 md:py-16">
+    <section className="py-10 sm:py-12 md:py-16">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <SectionHeader
           badge="Lowest Quotes"
           title="Lowest Quotes Assured"
           subtitle="We constantly negotiate better prices and alternatives without compromising treatment quality."
           center
+          subtitleWide
         />
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
           {treatments.map((t, i) => {
