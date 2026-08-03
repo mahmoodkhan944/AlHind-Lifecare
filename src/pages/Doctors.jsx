@@ -8,10 +8,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { useLeadModal } from "@/lib/LeadModalContext";
 
-const HERO_IMAGE =
-  "https://plus.unsplash.com/premium_photo-1681843126728-04eab730febe?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8ZG9jdG9ycyUyMHRlYW18ZW58MHx8MHx8fDA%3D";
-
 const PAGE_SIZE = 12;
+
+const HERO_IMAGE =
+  "https://images.unsplash.com/photo-1516841273335-e39b37888115?w=1600&q=80";
 
 const parseList = (val) => {
   if (!val) return [];
@@ -81,7 +81,7 @@ export default function Doctors() {
         {/* Background photo */}
         <div className="absolute inset-0">
           <img src={HERO_IMAGE} alt="" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-br from-secondary/90 via-secondary/80 to-[#0E8C7A]/85" />
+          <div className="absolute inset-0 bg-gradient-to-br from-secondary/90 via-secondary/85 to-accent-jade/85" />
         </div>
 
         <div className="relative max-w-5xl mx-auto px-4 sm:px-6 pr-16 sm:pr-20">
@@ -98,7 +98,7 @@ export default function Doctors() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.05 }}
-            className="font-heading font-extrabold text-[clamp(2rem,6.5vw,3.75rem)] text-white leading-[1.05] mb-5 text-balance"
+            className="font-heading font-extrabold text-[clamp(1.2rem,6vw,3.75rem)] text-white leading-[1.05] mb-5 text-balance whitespace-nowrap"
           >
             Find the Right Doctor
           </motion.h1>

@@ -36,6 +36,9 @@ const categories = [
 
 const PAGE_SIZE = 12;
 
+const HERO_IMAGE =
+  "https://images.unsplash.com/photo-1666214280391-8ff5bd3c0bf0?w=1600&q=80";
+
 export default function Treatments() {
   const [treatments, setTreatments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -77,52 +80,76 @@ export default function Treatments() {
   return (
     <div>
       {/* Hero */}
-      <section className="relative pt-20 sm:pt-24 md:pt-28 pb-10 sm:pb-12 md:pb-14 overflow-hidden bg-gradient-to-br from-secondary via-secondary to-accent-jade">
-        {/* Soft decorative glows, echoing the dot-grid/blob language used elsewhere on the site */}
-        <div className="absolute -top-24 -right-24 w-80 h-80 rounded-full bg-accent-warm/15 blur-3xl" />
-        <div className="absolute -bottom-32 -left-16 w-96 h-96 rounded-full bg-white/5 blur-3xl" />
-        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 text-center">
-          <motion.span
-            initial={{ opacity: 0, y: 10 }}
+      <section className="relative pt-20 sm:pt-24 md:pt-28 pb-10 sm:pb-12 md:pb-14 overflow-hidden">
+        {/* Background photo */}
+        <div className="absolute inset-0">
+          <img src={HERO_IMAGE} alt="" className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-br from-secondary/90 via-secondary/85 to-accent-jade/85" />
+        </div>
+
+        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 pr-16 sm:pr-20">
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-2 bg-white/10 border border-white/20 backdrop-blur-sm rounded-full px-4 py-1.5 mb-5 text-xs sm:text-sm font-semibold text-white tracking-wide"
+            className="inline-flex items-center gap-2 bg-white/10 border border-white/20 backdrop-blur-sm rounded-full px-4 py-2 mb-6 text-sm font-semibold text-white"
           >
-            <Stethoscope className="w-4 h-4 text-accent-warm" />
+            <Stethoscope className="w-4 h-4 shrink-0 text-accent-warm" />
             Comprehensive Healthcare Services
-          </motion.span>
+          </motion.div>
+
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="font-heading font-extrabold text-[clamp(1.75rem,6vw,3.25rem)] text-white mb-3 text-balance"
+            transition={{ delay: 0.05 }}
+            className="font-heading font-extrabold text-[clamp(1.1rem,6vw,3.75rem)] text-white leading-[1.05] mb-5 text-balance whitespace-nowrap"
           >
             Advanced Medical Treatments
           </motion.h1>
+
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-white/80 text-base sm:text-lg max-w-2xl mx-auto mb-9 text-balance"
+            className="text-white/85 text-base sm:text-lg max-w-2xl mb-6 sm:mb-8 text-balance"
           >
             Discover our range of specialized treatments delivered by expert doctors using cutting-edge technology and compassionate care.
           </motion.p>
+
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="flex items-center justify-center gap-6 sm:gap-12"
+            transition={{ delay: 0.15 }}
+            className="grid grid-cols-3 gap-4 sm:gap-8 max-w-xl"
           >
-            {[
-              { value: `${categories.length}+`, label: "Treatment Categories" },
-              { value: "1,00,000+", label: "Patients Assisted" },
-              { value: "98%", label: "Success Rate" },
-            ].map((stat) => (
-              <div key={stat.label}>
-                <p className="font-heading font-extrabold text-2xl sm:text-4xl text-white">{stat.value}</p>
-                <p className="text-white/70 text-[11px] sm:text-sm mt-0.5">{stat.label}</p>
-              </div>
-            ))}
+            <div>
+              <p className="font-heading font-extrabold text-3xl sm:text-4xl text-white leading-tight">
+                {categories.length}+
+              </p>
+              <p className="text-white/70 text-xs sm:text-sm mt-1">Categories</p>
+            </div>
+            <div>
+              <p className="font-heading font-extrabold text-3xl sm:text-4xl text-white leading-tight">1,00,000+</p>
+              <p className="text-white/70 text-xs sm:text-sm mt-1">Patients Assisted</p>
+            </div>
+            <div>
+              <p className="font-heading font-extrabold text-3xl sm:text-4xl text-white leading-tight">98%</p>
+              <p className="text-white/70 text-xs sm:text-sm mt-1">Success Rate</p>
+            </div>
           </motion.div>
         </div>
+
+        {/* Side "Get Free Quote" tab */}
+        <button
+          onClick={() => openLeadModal({ title: "Get Free Quote" })}
+          className="absolute top-1/2 -translate-y-1/2 right-0 flex items-center justify-center px-2.5 py-6 rounded-l-xl bg-primary hover:bg-primary/90 text-white shadow-lg transition-colors"
+        >
+          <span
+            className="font-heading font-bold text-xs sm:text-sm tracking-wide whitespace-nowrap"
+            style={{ writingMode: "vertical-rl", transform: "rotate(180deg)" }}
+          >
+            Get Free Quote
+          </span>
+        </button>
       </section>
 
       <section className="py-8 sm:py-10 md:py-12">

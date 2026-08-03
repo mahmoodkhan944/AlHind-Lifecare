@@ -4,13 +4,14 @@ import { motion } from "framer-motion";
 import { Search, MapPin, Users, Bed, Star, Building2, ChevronLeft, ChevronRight } from "lucide-react";
 import { db } from "@/api/dataClient";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useLeadModal } from "@/lib/LeadModalContext";
 
+const PAGE_SIZE = 12;
+
 const HERO_IMAGE =
   "https://images.unsplash.com/photo-1587351021355-a479a299d2f9?w=1600&q=80";
-
-const PAGE_SIZE = 12;
 
 export default function Hospitals() {
   const [hospitals, setHospitals] = useState([]);
@@ -64,7 +65,7 @@ export default function Hospitals() {
         {/* Background photo */}
         <div className="absolute inset-0">
           <img src={HERO_IMAGE} alt="" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-br from-secondary/90 via-secondary/80 to-[#0E8C7A]/85" />
+          <div className="absolute inset-0 bg-gradient-to-br from-secondary/90 via-secondary/85 to-accent-jade/85" />
         </div>
 
         <div className="relative max-w-5xl mx-auto px-4 sm:px-6 pr-16 sm:pr-20">
@@ -81,7 +82,7 @@ export default function Hospitals() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.05 }}
-            className="font-heading font-extrabold text-[clamp(2rem,6.5vw,3.75rem)] text-white leading-[1.05] mb-5 text-balance"
+            className="font-heading font-extrabold text-[clamp(1.1rem,6vw,3.75rem)] text-white leading-[1.05] mb-5 text-balance whitespace-nowrap"
           >
             Find the Right Hospital
           </motion.h1>
@@ -122,6 +123,19 @@ export default function Hospitals() {
             </div>
           </motion.div>
         </div>
+
+        {/* Side "Get Free Quote" tab */}
+        <button
+          onClick={() => openLeadModal({ title: "Get Free Quote" })}
+          className="absolute top-1/2 -translate-y-1/2 right-0 flex items-center justify-center px-2.5 py-6 rounded-l-xl bg-primary hover:bg-primary/90 text-white shadow-lg transition-colors"
+        >
+          <span
+            className="font-heading font-bold text-xs sm:text-sm tracking-wide whitespace-nowrap"
+            style={{ writingMode: "vertical-rl", transform: "rotate(180deg)" }}
+          >
+            Get Free Quote
+          </span>
+        </button>
       </section>
 
       <section className="py-8 sm:py-10 md:py-12">
@@ -177,9 +191,10 @@ export default function Hospitals() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: Math.min(i * 0.05, 0.4) }}
                 >
+                  <div className="card-premium group flex flex-col h-full overflow-hidden">
                   <Link
                     to={`/hospitals/${h.id}`}
-                    className="card-premium group flex flex-col h-full overflow-hidden"
+                    className="flex flex-col flex-1"
                   >
                     <div className="relative h-44 sm:h-48 bg-gradient-to-br from-primary/5 to-secondary/5 overflow-hidden shrink-0">
                       {h.cover_image_url ? (
@@ -195,7 +210,7 @@ export default function Hospitals() {
                         </div>
                       )}
                     </div>
-                    <div className="p-5 sm:p-6 flex flex-col flex-1">
+                    <div className="px-5 sm:px-6 pt-5 sm:pt-6 flex flex-col flex-1">
                       <h3 className="font-heading font-bold text-base sm:text-lg mb-2 group-hover:text-primary transition-colors line-clamp-1">
                         {h.name}
                       </h3>
@@ -226,6 +241,28 @@ export default function Hospitals() {
                       </div>
                     </div>
                   </Link>
+                  {/* Actions — outside the Link so "Get Quotation" can open the lead modal
+                      without triggering navigation; "View Details" still links through. */}
+                  <div className="flex gap-2 px-5 sm:px-6 pb-5 sm:pb-6 pt-3">
+                    <Link to={`/hospitals/${h.id}`} className="flex-1">
+                      <Button variant="outline" className="w-full h-9 rounded-full text-xs sm:text-sm">
+                        View Details
+                      </Button>
+                    </Link>
+                    <Button
+                      onClick={() =>
+                        openLeadModal({
+                          title: "Get a Free Quotation",
+                          description: `Get a personalized quote for treatment at ${h.name}.`,
+                          treatmentInterest: h.name,
+                        })
+                      }
+                      className="flex-1 h-9 rounded-full text-xs sm:text-sm bg-gradient-to-r from-primary to-secondary text-white"
+                    >
+                      Get Quotation
+                    </Button>
+                  </div>
+                  </div>
                 </motion.div>
               ))}
             </div>
