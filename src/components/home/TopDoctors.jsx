@@ -64,7 +64,7 @@ export default function TopDoctors() {
           <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-bold tracking-wider uppercase mb-3">
             <Star className="w-3.5 h-3.5 fill-[hsl(var(--accent-warm))]" /> Top Doctors
           </span>
-          <h2 className="font-heading font-extrabold text-3xl md:text-4xl text-secondary mb-2">
+          <h2 className="font-heading font-extrabold text-[20px] sm:text-[24px] md:text-[32px] drop-shadow-lg  whitespace-nowrap lg:whitespace-normal text-secondary mb-2">
             Meet Our Highly Skilled Doctors
           </h2>
         </div>
@@ -108,19 +108,37 @@ export default function TopDoctors() {
 
               {/* Info */}
               <div className="p-3 sm:p-4">
-                <h3 className="font-heading font-bold text-sm sm:text-base text-black mb-1 line-clamp-1">{doc.name}</h3>
-                <p className="text-xs font-medium text-accent-jade mb-2 line-clamp-2 leading-snug">{doc.speciality}</p>
-                <p className="flex items-start gap-1 text-xs text-foreground/70 mb-3 line-clamp-2 leading-snug">
-                  <MapPin className="w-3 h-3 text-gray-400 flex-shrink-0 mt-0.5" />
-                  {doc.hospital_name}
-                </p>
-                <button
-                  onClick={() => openLeadModal({ title: "Get Quotation", description: `Get a quote for a consultation with ${doc.name}.`, treatmentInterest: doc.name })}
-                  className="inline-flex items-center justify-center w-full py-2 rounded-full border border-primary text-primary text-xs font-heading font-semibold hover:bg-primary hover:text-primary-foreground transition-colors"
-                >
-                  Get Quotation
-                </button>
-              </div>
+  {/* Doctor Name */}
+  <h3 className="font-heading font-bold text-sm sm:text-base text-black text-center mb-1 line-clamp-1">
+    {doc.name}
+  </h3>
+
+  {/* Speciality */}
+  <p className="text-xs font-medium text-accent-jade text-center mb-2 line-clamp-1 whitespace-nowrap overflow-hidden text-ellipsis">
+    {doc.speciality}
+  </p>
+
+  {/* Hospital */}
+  <p className="flex items-center justify-center gap-1 text-xs text-foreground/70 mb-3 whitespace-nowrap overflow-hidden text-ellipsis">
+    <MapPin className="w-3 h-3 text-gray-400 flex-shrink-0" />
+    <span className="overflow-hidden text-ellipsis whitespace-nowrap">
+      {doc.hospital_name}
+    </span>
+  </p>
+
+  <button
+    onClick={() =>
+      openLeadModal({
+        title: "Get Quotation",
+        description: `Get a quote for a consultation with ${doc.name}.`,
+        treatmentInterest: doc.name,
+      })
+    }
+    className="inline-flex items-center justify-center w-full py-2 rounded-full border border-primary text-primary text-xs font-heading font-semibold hover:bg-primary hover:text-primary-foreground transition-colors"
+  >
+    Get Quotation
+  </button>
+</div>
             </motion.div>
           ))}
         </div>
