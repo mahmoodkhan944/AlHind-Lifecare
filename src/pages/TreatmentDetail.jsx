@@ -33,7 +33,7 @@ const parseList = (val) => {
 };
 
 const HERO_IMAGE =
-  "https://images.unsplash.com/photo-1551601651-2a8555f1a136?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OTZ8fHRyZWF0bWVudHxlbnwwfHwwfHx8MA%3D%3D";
+  "https://images.unsplash.com/photo-1758691461957-474a7686e388?w=1600&q=80";
 
 export default function TreatmentDetail() {
   const { id } = useParams();
@@ -123,61 +123,82 @@ export default function TreatmentDetail() {
   return (
     <div>
       {/* Hero */}
-      {/* FIX: pt-28 pb-20 was fixed on every screen size; now scales down on mobile. */}
-      <section className="relative pt-20 sm:pt-24 md:pt-28 pb-10 sm:pb-12 md:pb-14 overflow-hidden">
-        <div className="absolute inset-0">
-          <img src={HERO_IMAGE} alt="" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-br from-secondary/90 via-secondary/80 to-[#0E8C7A]/85" />
-        </div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
+      <section className="pt-20 sm:pt-24 md:pt-28 pb-8 sm:pb-10 md:pb-12">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <Link
             to="/treatments"
-            className="inline-flex items-center gap-2 text-white/70 hover:text-white mb-5 sm:mb-6 text-sm transition-colors"
+            className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary mb-4 sm:mb-5 text-sm transition-colors"
           >
             <ArrowLeft className="w-4 h-4" /> Back to Treatments
           </Link>
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            {treatment.category && (
-              <span className="inline-block px-3 py-1 rounded-full bg-white/20 text-white text-xs font-medium mb-4">
-                {treatment.category}
+
+          <div className="relative rounded-3xl overflow-hidden shadow-xl">
+            <div className="relative h-[26rem] sm:h-[28rem]">
+              <img
+                src={treatment.image_url || HERO_IMAGE}
+                alt={treatment.name}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/45 to-black/15" />
+
+              {treatment.category && (
+                <span className="absolute top-4 sm:top-5 left-4 sm:left-5 px-3 py-1.5 rounded-full bg-white/95 backdrop-blur-sm text-xs sm:text-sm font-semibold text-foreground shadow-sm">
+                  {treatment.category}
+                </span>
+              )}
+              {treatment.success_rate && (
+                <span className="absolute top-4 sm:top-5 right-4 sm:right-5 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent-jade text-white text-xs sm:text-sm font-bold shadow-sm">
+                  <TrendingUp className="w-3.5 h-3.5" />
+                  {treatment.success_rate} success
+                </span>
+              )}
+
+              <div className="absolute inset-x-0 bottom-0 p-5 sm:p-7 text-white">
+                <h1 className="font-heading font-extrabold text-[clamp(1.4rem,4.5vw,2.5rem)] mb-2 text-balance">
+                  {treatment.name}
+                </h1>
+                {treatment.description && (
+                  <p className="text-white/85 text-sm sm:text-base max-w-2xl mb-4 text-balance">
+                    {treatment.description}
+                  </p>
+                )}
+                {infoCards.length > 0 && (
+                  <div className="grid grid-cols-3 gap-3 sm:gap-6 pt-4 border-t border-white/20">
+                    {infoCards.slice(0, 3).map(({ icon: Icon, label, value }) => (
+                      <div key={label} className="flex items-start gap-2">
+                        <Icon className="w-4 h-4 sm:w-5 sm:h-5 shrink-0 mt-0.5 text-accent-warm" />
+                        <div>
+                          <p className="text-[11px] sm:text-xs text-white/70">{label}</p>
+                          <p className="font-heading font-bold text-sm sm:text-base">{value}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Side "Get Free Quote" tab */}
+            <button
+              onClick={() => openLeadModal({ title: "Get Free Quote", treatmentInterest: treatment.name })}
+              className="absolute top-1/2 -translate-y-1/2 right-0 flex items-center justify-center px-2.5 py-6 rounded-l-xl bg-primary hover:bg-primary/90 text-white shadow-lg transition-colors"
+            >
+              <span
+                className="font-heading font-bold text-xs sm:text-sm tracking-wide whitespace-nowrap"
+                style={{ writingMode: "vertical-rl", transform: "rotate(180deg)" }}
+              >
+                Get Free Quote
               </span>
-            )}
-            <h1 className="font-heading font-bold text-[clamp(1.6rem,5.5vw,3rem)] text-white mb-3 sm:mb-4 leading-tight text-balance">
-              {treatment.name}
-            </h1>
-            {treatment.description && (
-              <p className="text-white/70 text-sm sm:text-base md:text-lg max-w-2xl text-balance">
-                {treatment.description}
-              </p>
-            )}
-          </motion.div>
+            </button>
+          </div>
         </div>
       </section>
 
       {/* Content */}
-      <section className="py-8 sm:py-10 md:py-12">
+      <section className="pb-8 sm:pb-10 md:pb-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          {infoCards.length > 0 && (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
-              {infoCards.map(({ icon: Icon, label, value }) => (
-                <div key={label} className="bg-white rounded-2xl p-4 sm:p-6 border text-center">
-                  <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-primary mx-auto mb-2" />
-                  <p className="text-xs text-muted-foreground mb-1">{label}</p>
-                  <p className="font-heading font-bold text-base sm:text-lg">{value}</p>
-                </div>
-              ))}
-            </div>
-          )}
-
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
             <div className="lg:col-span-2 space-y-4 sm:space-y-5">
-              {treatment.image_url && (
-                <img
-                  src={treatment.image_url}
-                  alt={treatment.name}
-                  className="w-full h-52 sm:h-64 md:h-72 object-cover rounded-2xl shadow-lg"
-                />
-              )}
 
               {treatment.detailed_content && (
                 <div className="bg-white rounded-2xl p-5 sm:p-6 md:p-8 border">

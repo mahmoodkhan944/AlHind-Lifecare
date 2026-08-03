@@ -37,7 +37,7 @@ const categories = [
 const PAGE_SIZE = 12;
 
 const HERO_IMAGE =
-  "https://images.unsplash.com/photo-1666214280391-8ff5bd3c0bf0?w=1600&q=80";
+  "https://plus.unsplash.com/premium_photo-1672759455907-bdaef741cd88?q=80&w=1116&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
 
 export default function Treatments() {
   const [treatments, setTreatments] = useState([]);
@@ -128,7 +128,7 @@ export default function Treatments() {
               <p className="text-white/70 text-xs sm:text-sm mt-1">Categories</p>
             </div>
             <div>
-              <p className="font-heading font-extrabold text-3xl sm:text-4xl text-white leading-tight">1,00,000+</p>
+              <p className="font-heading font-extrabold text-3xl sm:text-4xl text-white leading-tight">10k+</p>
               <p className="text-white/70 text-xs sm:text-sm mt-1">Patients Assisted</p>
             </div>
             <div>
@@ -137,19 +137,6 @@ export default function Treatments() {
             </div>
           </motion.div>
         </div>
-
-        {/* Side "Get Free Quote" tab */}
-        <button
-          onClick={() => openLeadModal({ title: "Get Free Quote" })}
-          className="absolute top-1/2 -translate-y-1/2 right-0 flex items-center justify-center px-2.5 py-6 rounded-l-xl bg-primary hover:bg-primary/90 text-white shadow-lg transition-colors"
-        >
-          <span
-            className="font-heading font-bold text-xs sm:text-sm tracking-wide whitespace-nowrap"
-            style={{ writingMode: "vertical-rl", transform: "rotate(180deg)" }}
-          >
-            Get Free Quote
-          </span>
-        </button>
       </section>
 
       <section className="py-8 sm:py-10 md:py-12">

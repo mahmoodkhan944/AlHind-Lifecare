@@ -89,87 +89,104 @@ export default function HospitalDetail() {
   const infrastructure = parseList(hospital.infrastructure_details);
   const awards = parseList(hospital.awards);
 
-  const infoStats = [
-    { icon: Bed, label: "Beds", value: hospital.beds_count },
-    { icon: Users, label: "Doctors", value: hospital.doctors_count || doctorsList.length },
-    { icon: Award, label: "Established", value: hospital.established_year },
-    { icon: Activity, label: "Rating", value: hospital.rating ? `${hospital.rating}★` : null },
-  ].filter((s) => s.value);
-
   return (
     <div>
       {/* Hero */}
-      {/* FIX: pt-28 pb-20 was fixed on every screen size; now scales down on mobile. */}
-      <section className="relative pt-20 sm:pt-24 md:pt-28 pb-10 sm:pb-12 md:pb-14 overflow-hidden">
-        <div className="absolute inset-0">
-          <img src={HERO_IMAGE} alt="" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-br from-secondary/90 via-secondary/80 to-[#0E8C7A]/85" />
-        </div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
+      <section className="pt-20 sm:pt-24 md:pt-28 pb-8 sm:pb-10 md:pb-12">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <Link
             to="/hospitals"
-            className="inline-flex items-center gap-2 text-white/70 hover:text-white mb-5 sm:mb-6 text-sm transition-colors"
+            className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary mb-4 sm:mb-5 text-sm transition-colors"
           >
             <ArrowLeft className="w-4 h-4" /> Back to Hospitals
           </Link>
-          <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-center sm:items-start text-center sm:text-left">
-            {hospital.cover_image_url && (
+
+          <div className="relative rounded-3xl overflow-hidden shadow-xl">
+            <div className="relative h-[26rem] sm:h-[28rem]">
               <img
-                src={hospital.cover_image_url}
+                src={hospital.cover_image_url || HERO_IMAGE}
                 alt={hospital.name}
-                className="w-24 h-24 sm:w-32 sm:h-32 rounded-2xl object-cover flex-shrink-0 shadow-lg"
+                className="w-full h-full object-cover"
               />
-            )}
-            <div className="text-white">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/10" />
+
+              {/* Top badges */}
               {hospital.hospital_type && (
-                <span className="inline-block px-3 py-1 rounded-full bg-white/20 text-white text-xs font-medium mb-3">
+                <span className="absolute top-4 sm:top-5 left-4 sm:left-5 px-3 py-1.5 rounded-full bg-white/95 backdrop-blur-sm text-xs sm:text-sm font-semibold text-foreground shadow-sm">
                   {hospital.hospital_type}
                 </span>
               )}
-              <h1 className="font-heading font-bold text-[clamp(1.5rem,5vw,2.5rem)] mb-2 text-balance">
-                {hospital.name}
-              </h1>
-              <p className="flex items-center justify-center sm:justify-start gap-1 text-white/70 mb-3 text-sm sm:text-base">
-                <MapPin className="w-4 h-4 shrink-0" />
-                {hospital.address || `${hospital.city}, ${hospital.country}`}
-              </p>
-              <div className="flex flex-wrap justify-center sm:justify-start gap-2 sm:gap-3">
-                {hospital.emergency_services && (
-                  <span className="flex items-center gap-1 px-3 py-1 rounded-full bg-destructive/20 text-red-300 text-xs font-medium">
-                    24/7 Emergency
-                  </span>
-                )}
-                {hospital.parking_available && (
-                  <span className="flex items-center gap-1 px-3 py-1 rounded-full bg-white/10 text-white/80 text-xs font-medium">
-                    <Car className="w-3 h-3" /> Parking
-                  </span>
-                )}
-                {hospital.hospital_owner && (
-                  <span className="flex items-center gap-1 px-3 py-1 rounded-full bg-white/10 text-white/80 text-xs font-medium">
-                    Chairman: {hospital.hospital_owner}
-                  </span>
-                )}
+              {hospital.rating && (
+                <span className="absolute top-4 sm:top-5 right-4 sm:right-5 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/95 backdrop-blur-sm text-xs sm:text-sm font-bold text-foreground shadow-sm">
+                  {hospital.rating}
+                  <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                </span>
+              )}
+
+              {/* Bottom overlay content */}
+              <div className="absolute inset-x-0 bottom-0 p-5 sm:p-7 text-white">
+                <h1 className="font-heading font-extrabold text-[clamp(1.4rem,4.5vw,2.5rem)] mb-2 text-balance">
+                  {hospital.name}
+                </h1>
+                <p className="flex items-center gap-1.5 text-white/85 mb-4 text-sm sm:text-base">
+                  <MapPin className="w-4 h-4 shrink-0" />
+                  {hospital.address || `${hospital.city}, ${hospital.country}`}
+                </p>
+                <div className="grid grid-cols-3 gap-3 sm:gap-6 pt-4 border-t border-white/20">
+                  {hospital.established_year && (
+                    <div className="flex items-start gap-2">
+                      <Building2 className="w-4 h-4 sm:w-5 sm:h-5 shrink-0 mt-0.5 text-accent-warm" />
+                      <div>
+                        <p className="text-[11px] sm:text-xs text-white/70">Established</p>
+                        <p className="font-heading font-bold text-sm sm:text-base">{hospital.established_year}</p>
+                      </div>
+                    </div>
+                  )}
+                  {(hospital.emergency_services || hospital.parking_available) && (
+                    <div className="flex items-start gap-2">
+                      <Activity className="w-4 h-4 sm:w-5 sm:h-5 shrink-0 mt-0.5 text-accent-warm" />
+                      <div>
+                        <p className="text-[11px] sm:text-xs text-white/70">Services</p>
+                        <p className="font-heading font-bold text-sm sm:text-base leading-tight">
+                          {[hospital.emergency_services && "24/7 Emergency", hospital.parking_available && "Parking"]
+                            .filter(Boolean)
+                            .join(" | ")}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                  {hospital.beds_count > 0 && (
+                    <div className="flex items-start gap-2">
+                      <Bed className="w-4 h-4 sm:w-5 sm:h-5 shrink-0 mt-0.5 text-accent-warm" />
+                      <div>
+                        <p className="text-[11px] sm:text-xs text-white/70">Capacity</p>
+                        <p className="font-heading font-bold text-sm sm:text-base">{hospital.beds_count} beds</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
+
+            {/* Side "Get Free Quote" tab */}
+            <button
+              onClick={() => openLeadModal({ title: "Get Free Quote", treatmentInterest: hospital.name })}
+              className="absolute top-1/2 -translate-y-1/2 right-0 flex items-center justify-center px-2.5 py-6 rounded-l-xl bg-primary hover:bg-primary/90 text-white shadow-lg transition-colors"
+            >
+              <span
+                className="font-heading font-bold text-xs sm:text-sm tracking-wide whitespace-nowrap"
+                style={{ writingMode: "vertical-rl", transform: "rotate(180deg)" }}
+              >
+                Get Free Quote
+              </span>
+            </button>
           </div>
         </div>
       </section>
 
       {/* Content */}
-      <section className="py-8 sm:py-10 md:py-12">
+      <section className="pb-8 sm:pb-10 md:pb-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          {infoStats.length > 0 && (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
-              {infoStats.map(({ icon: Icon, label, value }) => (
-                <div key={label} className="bg-white rounded-2xl p-4 sm:p-6 border text-center">
-                  <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-primary mx-auto mb-2" />
-                  <p className="text-xs text-muted-foreground mb-1">{label}</p>
-                  <p className="font-heading font-bold text-base sm:text-lg">{value}</p>
-                </div>
-              ))}
-            </div>
-          )}
-
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
             <div className="lg:col-span-2 space-y-4 sm:space-y-5">
               {hospital.description && (

@@ -11,7 +11,7 @@ import { useLeadModal } from "@/lib/LeadModalContext";
 const PAGE_SIZE = 12;
 
 const HERO_IMAGE =
-  "https://images.unsplash.com/photo-1516841273335-e39b37888115?w=1600&q=80";
+  "https://plus.unsplash.com/premium_photo-1681843126728-04eab730febe?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fGRvY3RvcnxlbnwwfHwwfHx8MA%3D%3D";
 
 const parseList = (val) => {
   if (!val) return [];

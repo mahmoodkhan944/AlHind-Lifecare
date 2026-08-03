@@ -31,7 +31,7 @@ const parseList = (val) => {
 };
 
 const HERO_IMAGE =
-  "https://images.unsplash.com/photo-1758691463110-697a814b2033?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTIyfHxtZWRpY2FsJTIwcHJvZmVzc2lvbmFsfGVufDB8fDB8fHww";
+  "https://images.unsplash.com/photo-1516841273335-e39b37888115?w=1600&q=80";
 
 export default function DoctorDetail() {
   const { id } = useParams();
@@ -114,68 +114,93 @@ export default function DoctorDetail() {
   return (
     <div>
       {/* Hero */}
-      {/* FIX: pt-28 pb-20 was fixed on every screen size; now scales down on mobile. */}
-      <section className="relative pt-20 sm:pt-24 md:pt-28 pb-10 sm:pb-12 md:pb-14 overflow-hidden">
-        <div className="absolute inset-0">
-          <img src={HERO_IMAGE} alt="" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-br from-secondary/90 via-secondary/80 to-[#0E8C7A]/85" />
-        </div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
+      <section className="pt-20 sm:pt-24 md:pt-28 pb-8 sm:pb-10 md:pb-12">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <Link
             to="/doctors"
-            className="inline-flex items-center gap-2 text-white/70 hover:text-white mb-5 sm:mb-6 text-sm transition-colors"
+            className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary mb-4 sm:mb-5 text-sm transition-colors"
           >
             <ArrowLeft className="w-4 h-4" /> Back to Doctors
           </Link>
-          <div className="flex flex-col md:flex-row gap-5 sm:gap-6 md:gap-8 items-center md:items-start text-center md:text-left">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="w-28 h-28 sm:w-36 sm:h-36 md:w-52 md:h-52 rounded-2xl overflow-hidden border-4 border-white/20 shadow-xl flex-shrink-0"
-            >
-              {doctor.photo_url ? (
-                <img src={doctor.photo_url} alt={doctor.name} className="w-full h-full object-cover" />
-              ) : (
-                <div className="w-full h-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-4xl sm:text-5xl font-bold">
-                  {doctor.name?.[0]}
+
+          <div className="relative rounded-3xl overflow-hidden shadow-xl">
+            <div className="relative py-10 sm:py-12">
+              <img src={HERO_IMAGE} alt="" className="absolute inset-0 w-full h-full object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-br from-secondary/95 via-secondary/90 to-accent-jade/90" />
+
+              {/* Top badges */}
+              {doctor.rating > 0 && (
+                <span className="absolute top-4 sm:top-5 left-4 sm:left-5 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/95 backdrop-blur-sm text-xs sm:text-sm font-bold text-foreground shadow-sm z-10">
+                  {doctor.rating}
+                  <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                </span>
+              )}
+              {doctor.experience_years > 0 && (
+                <span className="absolute top-4 sm:top-5 right-4 sm:right-5 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/95 backdrop-blur-sm text-xs sm:text-sm font-bold text-foreground shadow-sm z-10">
+                  <Clock className="w-3.5 h-3.5" />
+                  {doctor.experience_years}+ yrs
+                </span>
+              )}
+
+              <div className="relative max-w-3xl mx-auto px-4 sm:px-6">
+                <div className="flex flex-col md:flex-row gap-5 sm:gap-6 md:gap-8 items-center md:items-start text-center md:text-left">
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="w-28 h-28 sm:w-36 sm:h-36 md:w-44 md:h-44 rounded-2xl overflow-hidden border-4 border-white/20 shadow-xl flex-shrink-0"
+                  >
+                    {doctor.photo_url ? (
+                      <img src={doctor.photo_url} alt={doctor.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-4xl sm:text-5xl font-bold">
+                        {doctor.name?.[0]}
+                      </div>
+                    )}
+                  </motion.div>
+                  <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-white">
+                    <h1 className="font-heading font-bold text-[clamp(1.4rem,4.5vw,2.5rem)] mb-2 text-balance">
+                      {doctor.name}
+                    </h1>
+                    {doctor.speciality && (
+                      <p className="text-[hsl(var(--accent-warm))] text-base sm:text-lg font-medium mb-1">{doctor.speciality}</p>
+                    )}
+                    {doctor.designation && <p className="text-white/60 mb-3 sm:mb-4 text-sm sm:text-base">{doctor.designation}</p>}
+                    <div className="flex flex-wrap justify-center md:justify-start gap-3 sm:gap-4 text-sm text-white/70">
+                      {doctor.city && (
+                        <span className="flex items-center gap-1">
+                          <MapPin className="w-4 h-4 shrink-0" />
+                          {doctor.city}, {doctor.country}
+                        </span>
+                      )}
+                      {doctor.reviews_count > 0 && (
+                        <span className="flex items-center gap-1">
+                          ({doctor.reviews_count} reviews)
+                        </span>
+                      )}
+                    </div>
+                  </motion.div>
                 </div>
-              )}
-            </motion.div>
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-white">
-              <h1 className="font-heading font-bold text-[clamp(1.5rem,5vw,2.5rem)] mb-2 text-balance">
-                {doctor.name}
-              </h1>
-              {doctor.speciality && (
-                <p className="text-[hsl(var(--accent-warm))] text-base sm:text-lg font-medium mb-1">{doctor.speciality}</p>
-              )}
-              {doctor.designation && <p className="text-white/60 mb-3 sm:mb-4 text-sm sm:text-base">{doctor.designation}</p>}
-              <div className="flex flex-wrap justify-center md:justify-start gap-3 sm:gap-4 text-sm text-white/70">
-                {doctor.city && (
-                  <span className="flex items-center gap-1">
-                    <MapPin className="w-4 h-4 shrink-0" />
-                    {doctor.city}, {doctor.country}
-                  </span>
-                )}
-                {doctor.experience_years > 0 && (
-                  <span className="flex items-center gap-1">
-                    <Clock className="w-4 h-4 shrink-0" />
-                    {doctor.experience_years}+ Years Experience
-                  </span>
-                )}
-                {doctor.rating > 0 && (
-                  <span className="flex items-center gap-1 text-[hsl(var(--accent-warm))]">
-                    <Star className="w-4 h-4 fill-current shrink-0" />
-                    {doctor.rating} ({doctor.reviews_count || 0} reviews)
-                  </span>
-                )}
               </div>
-            </motion.div>
+            </div>
+
+            {/* Side "Get Free Quote" tab */}
+            <button
+              onClick={() => openLeadModal({ title: "Book Appointment", treatmentInterest: doctor.name })}
+              className="absolute top-1/2 -translate-y-1/2 right-0 flex items-center justify-center px-2.5 py-6 rounded-l-xl bg-primary hover:bg-primary/90 text-white shadow-lg transition-colors"
+            >
+              <span
+                className="font-heading font-bold text-xs sm:text-sm tracking-wide whitespace-nowrap"
+                style={{ writingMode: "vertical-rl", transform: "rotate(180deg)" }}
+              >
+                Get Free Quote
+              </span>
+            </button>
           </div>
         </div>
       </section>
 
       {/* Content */}
-      <section className="py-8 sm:py-10 md:py-12">
+      <section className="pb-8 sm:pb-10 md:pb-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
             <div className="lg:col-span-2 space-y-4 sm:space-y-5">
