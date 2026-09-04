@@ -65,7 +65,7 @@ export default function TopDoctors() {
             <Star className="w-3.5 h-3.5 fill-[hsl(var(--accent-warm))]" /> Top Doctors
           </span>
           <h2 className="font-heading font-extrabold text-[20px] sm:text-[24px] md:text-[32px] drop-shadow-lg  whitespace-nowrap lg:whitespace-normal text-secondary mb-2">
-            Meet Our Highly Skilled Doctors
+            Meet Our Expert Doctors
           </h2>
         </div>
 

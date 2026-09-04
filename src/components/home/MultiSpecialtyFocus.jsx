@@ -39,7 +39,7 @@ export default function MultiSpecialtyFocus() {
           <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-bold tracking-wider uppercase mb-3">
             Featured Treatments
           </span>
-          <h2 className="font-heading font-extrabold text-3xl md:text-4xl text-foreground mb-2">Multi-Specialty Focus</h2>
+          <h2 className="font-heading font-extrabold text-3xl md:text-4xl text-foreground mb-2">Multi-Specialty Healthcare Services</h2>
           <p className="text-muted-foreground text-base md:text-lg max-w-2xl mx-auto">
             We cover all medical needs, from hair transplants to heart transplants.
           </p>

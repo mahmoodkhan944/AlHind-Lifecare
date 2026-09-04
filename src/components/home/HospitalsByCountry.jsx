@@ -62,7 +62,7 @@ export default function HospitalsByCountry() {
           <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-bold tracking-wider uppercase mb-3">
             Medical Destinations
           </span>
-          <h2 className="font-heading font-extrabold text-xl sm:text-3xl md:text-4xl text-secondary mb-2 whitespace-nowrap">Hospitals by Destination</h2>
+          <h2 className="font-heading font-extrabold text-xl sm:text-3xl md:text-4xl text-secondary mb-2 whitespace-nowrap">Global Healthcare Destinations</h2>
           <p className="text-muted-foreground text-base max-w-3xl mx-auto lg:whitespace-nowrap">
             JCI-accredited facilities with cutting-edge technology and world-class specialists
           </p>
