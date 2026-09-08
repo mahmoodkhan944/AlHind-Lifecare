@@ -62,9 +62,9 @@ export default function HospitalsByCountry() {
   ];
 
   return (
-    <section className="py-10 sm:py-12 md:py-16 bg-muted">
+    <section className="py-6 sm:py-8 md:py-10 bg-muted">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="text-center mb-8">
+        <div className="text-center mb-6">
           <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-bold tracking-wider uppercase mb-3">
             {header.badge}
           </span>

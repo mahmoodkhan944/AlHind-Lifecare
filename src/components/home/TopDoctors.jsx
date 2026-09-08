@@ -63,7 +63,7 @@ export default function TopDoctors() {
   }, []);
 
   return (
-    <section className="sm:py-12 md:py-16 bg-muted">
+    <section className="py-6 sm:py-8 md:py-10 bg-muted">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         {/* Header */}
         <div className="text-center mb-4">
@@ -150,7 +150,7 @@ export default function TopDoctors() {
         </div>
 
         {/* View All */}
-        <div className="text-center mt-10">
+        <div className="text-center mt-6">
           <Link
             to="/doctors"
             className="inline-flex items-center gap-2 px-8 py-3 rounded-full bg-accent-jade hover:bg-accent-jade/90 text-white font-heading font-semibold text-base shadow-lg shadow-accent-jade/20 transition-all hover:shadow-xl hover:shadow-accent-jade/30"

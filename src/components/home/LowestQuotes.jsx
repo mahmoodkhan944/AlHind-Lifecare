@@ -59,7 +59,7 @@ export default function LowestQuotes() {
   }, []);
 
   return (
-    <section className="py-10 sm:py-12 md:py-16">
+    <section className="py-6 sm:py-8 md:py-10">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <SectionHeader
           badge={header.badge}

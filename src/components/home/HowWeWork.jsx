@@ -33,7 +33,7 @@ export default function HowWeWork() {
   }, []);
 
   return (
-    <section className="py-5 sm:py-12 md:py-16">
+    <section className="py-4 sm:py-8 md:py-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <SectionHeader badge={header.badge} title={header.heading} subtitle={header.subtitle} />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

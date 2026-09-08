@@ -7,7 +7,7 @@ export default function SectionHeader({ badge, title, subtitle, center = true, s
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      className={`mb-8 sm:mb-10 md:mb-12 ${center ? "text-center" : ""}`}
+      className={`mb-5 sm:mb-6 md:mb-8 ${center ? "text-center" : ""}`}
     >
       {badge && (
         <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-gradient-to-r from-primary/10 to-secondary/10 text-primary text-xs font-bold tracking-wider uppercase mb-3 sm:mb-4 border border-primary/10">

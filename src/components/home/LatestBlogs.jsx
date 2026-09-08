@@ -28,9 +28,9 @@ export default function LatestBlog() {
   if (!loading && posts.length === 0) return null;
 
   return (
-    <section className="py-5 sm:py-12 md:py-16">
+    <section className="py-4 sm:py-8 md:py-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="flex items-end justify-between gap-4 mb-6 sm:mb-8">
+        <div className="flex items-end justify-between gap-4 mb-4 sm:mb-5">
           <div>
             <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wider uppercase mb-3">
               {header.badge}

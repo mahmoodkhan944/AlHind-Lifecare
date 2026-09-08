@@ -28,7 +28,7 @@ export default function FAQSection() {
   }, []);
 
   return (
-    <section className="py-5 sm:py-12 md:py-16 bg-gradient-to-b from-background to-muted/20">
+    <section className="py-4 sm:py-8 md:py-10 bg-gradient-to-b from-background to-muted/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <SectionHeader badge={header.badge} title={header.heading} subtitle={header.subtitle} />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

@@ -39,9 +39,9 @@ export default function MultiSpecialtyFocus() {
   }, []);
 
   return (
-    <section className="py-5 sm:py-12 md:py-16 bg-muted">
+    <section className="py-4 sm:py-8 md:py-10 bg-muted">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="text-center mb-10">
+        <div className="text-center mb-6">
           <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-bold tracking-wider uppercase mb-3">
             {header.badge}
           </span>
@@ -62,8 +62,8 @@ export default function MultiSpecialtyFocus() {
                 className="bg-white rounded-2xl shadow-sm border border-border/40 overflow-hidden hover-lift hover:shadow-lg hover:shadow-primary/5 transition-all"
               >
                 <div className="flex items-center justify-center py-4 sm:py-6">
-                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-secondary/10 flex items-center justify-center">
-                    <IconOrImage value={s.icon} fallback={StethoscopeFallback} className="w-6 h-6 sm:w-7 sm:h-7 text-secondary" strokeWidth={1.8} />
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-secondary/10 flex items-center justify-center overflow-hidden">
+                    <IconOrImage value={s.icon} fallback={StethoscopeFallback} className="w-10 h-10 sm:w-12 sm:h-12 text-secondary" strokeWidth={1.8} fill />
                   </div>
                 </div>
                 <Link

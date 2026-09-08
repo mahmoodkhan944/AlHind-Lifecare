@@ -31,7 +31,7 @@ export default function AboutUs() {
   }, []);
 
   return (
-    <section className="relative py-5 sm:py-12 md:py-16 bg-secondary/30 overflow-hidden">
+    <section className="relative py-4 sm:py-8 md:py-10 bg-secondary/30 overflow-hidden">
       {/* Decorative graphics — subtle coral + navy glows for visual depth */}
       <div className="decor-blob decor-blob-primary w-80 h-80 -top-24 -left-24" />
       <div className="decor-blob decor-blob-secondary w-72 h-72 -bottom-20 -right-20" />
