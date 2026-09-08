@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { db } from "@/api/dataClient";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import SectionHeader from "@/components/common/SectionHeader";
+import { useSectionContent } from "@/hooks/useSectionContent";
 
 const defaultFaqs = [
   { question: "What is medical tourism, and why do people travel abroad for medical treatments?", answer: "Medical tourism is the practice of traveling to another country for medical care. People choose it for cost savings, access to advanced treatments, shorter wait times, and world-class specialists not available locally." },
@@ -14,6 +15,11 @@ const defaultFaqs = [
 
 export default function FAQSection() {
   const [faqs, setFaqs] = useState(defaultFaqs);
+  const header = useSectionContent("home_faq_header", {
+    badge: "FAQ",
+    heading: "Frequently Asked Questions (FAQ's)",
+    subtitle: "Everything you need to know about medical treatment abroad",
+  });
 
   useEffect(() => {
     db.entities.FAQ.filter({ status: "active" }, "order", 10)
@@ -24,7 +30,7 @@ export default function FAQSection() {
   return (
     <section className="py-5 sm:py-12 md:py-16 bg-gradient-to-b from-background to-muted/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <SectionHeader badge="FAQ" title="Frequently Asked Questions (FAQ's)" subtitle="Everything you need to know about medical treatment abroad" />
+        <SectionHeader badge={header.badge} title={header.heading} subtitle={header.subtitle} />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {faqs.map((faq, i) => (
             <div key={i} className="rounded-xl border border-primary/20 bg-white overflow-hidden hover:border-primary/40 transition-colors">

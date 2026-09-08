@@ -4,6 +4,7 @@ import * as Icons from "lucide-react";
 import { PhoneCall as PhoneCallFallback } from "lucide-react";
 import { db } from "@/api/dataClient";
 import SectionHeader from "@/components/common/SectionHeader";
+import { useSectionContent } from "@/hooks/useSectionContent";
 
 // Fallback shown only if no admin-managed items exist yet for this section
 // (e.g. before the site_content_migration.sql seed has been run).
@@ -16,9 +17,14 @@ const fallbackSteps = [
 
 export default function HowWeWork() {
   const [steps, setSteps] = useState(fallbackSteps);
+  const header = useSectionContent("home_how_we_work_header", {
+    badge: "Process",
+    heading: "How Do We Work?",
+    subtitle: "Your journey to better health in four simple steps",
+  });
 
   useEffect(() => {
-    // Admin-editable via /admin/site-content → "How Do We Work? (Steps)".
+    // Admin-editable via /admin/home-content → "How Do We Work? (Steps List)".
     db.entities.SiteContent.filter({ section: "process_steps", status: "active" }, "sort_order", 50)
       .then((data) => {
         if (data.length > 0) setSteps(data);
@@ -29,7 +35,7 @@ export default function HowWeWork() {
   return (
     <section className="py-5 sm:py-12 md:py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <SectionHeader badge="Process" title="How Do We Work?" subtitle="Your journey to better health in four simple steps" />
+        <SectionHeader badge={header.badge} title={header.heading} subtitle={header.subtitle} />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {steps.map((step, i) => {
             const Icon = (step.icon && Icons[step.icon]) || PhoneCallFallback;

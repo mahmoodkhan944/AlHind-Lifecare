@@ -4,12 +4,18 @@ import { motion } from "framer-motion";
 import { Calendar, User, ArrowRight, ArrowUpRight } from "lucide-react";
 import { db } from "@/api/dataClient";
 import moment from "moment";
+import { useSectionContent } from "@/hooks/useSectionContent";
 
 const LIMIT = 4;
 
 export default function LatestBlog() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const header = useSectionContent("home_blogs_header", {
+    badge: "From the Blog",
+    heading: "Latest Health & Wellness Insights",
+    subtitle: "",
+  });
 
   useEffect(() => {
     // "-created_date" = newest first, so the latest posts lead the section.
@@ -27,10 +33,10 @@ export default function LatestBlog() {
         <div className="flex items-end justify-between gap-4 mb-6 sm:mb-8">
           <div>
             <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wider uppercase mb-3">
-              From the Blog
+              {header.badge}
             </span>
             <h2 className="font-heading font-bold text-[clamp(1.4rem,3.6vw,2rem)] text-foreground text-balance">
-              Latest Health &amp; Wellness Insights
+              {header.heading}
             </h2>
           </div>
           <Link

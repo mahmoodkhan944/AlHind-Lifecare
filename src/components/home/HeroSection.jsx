@@ -11,6 +11,7 @@ import { COUNTRIES, getDialCode } from "@/lib/countries";
 import { useLeadModal } from "@/lib/LeadModalContext";
 import { Link } from "react-router-dom";
 import { useSiteSettings, DEFAULT_SETTINGS } from "@/hooks/useSiteSettings";
+import { useSectionContent } from "@/hooks/useSectionContent";
 
 const BG_VIDEO = `${import.meta.env.BASE_URL}videos/hero-video.mp4`;
 
@@ -26,6 +27,17 @@ export default function HeroSection() {
   const { toast } = useToast();
   const { openLeadModal } = useLeadModal();
   const { data: settings = DEFAULT_SETTINGS } = useSiteSettings();
+  const hero = useSectionContent("home_hero", {
+    badge: "Knows No Borders",
+    heading: "Better Health",
+    subtitle:
+      "Your trusted gateway to world-class healthcare — connecting you with premier doctors and top-accredited hospitals across India and Turkey.",
+  });
+  const heroForm = useSectionContent("home_hero_form", {
+    badge: "",
+    heading: "Let Us Help You",
+    subtitle: "Get a free quote from our medical team within 24 hours",
+  });
   const [form, setForm] = useState({ patient_name: "", email: "", country: "Select Country", city: "", phone: "", medical_problem: "", age: "" });
   const [loading, setLoading] = useState(false);
 
@@ -93,7 +105,7 @@ export default function HeroSection() {
                             whitespace-nowrap
                             lg:whitespace-normal
                             ">
-                              <span className="text-yellow-400">Better Health</span> Knows No Borders
+                              <span className="text-yellow-400">{hero.heading}</span> {hero.badge}
             </h1>
             {/* Subtitle */}
             <p
@@ -113,8 +125,7 @@ export default function HeroSection() {
     text-pretty
   "
 >
-  Your trusted gateway to world-class healthcare — connecting you with
-  premier doctors and top-accredited hospitals across India and Turkey.
+  {hero.subtitle}
 </p>
 
             {/* Patient Images */}
@@ -187,10 +198,10 @@ export default function HeroSection() {
             <div className="decor-blob decor-blob-primary w-64 h-64 -top-16 -right-16 -z-10" />
 
             <h2 className="font-heading font-bold text-lg sm:text-xl text-secondary text-center mb-0.5 mt-1">
-              Let Us Help You
+              {heroForm.heading}
             </h2>
             <p className="text-[11px] sm:text-xs text-muted-foreground text-center mb-3.5">
-              Get a free quote from our medical team within 24 hours
+              {heroForm.subtitle}
             </p>
 
             <form onSubmit={handleSubmit} className="space-y-2">

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Star, Quote, ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
 import { db } from "@/api/dataClient";
+import { useSectionContent } from "@/hooks/useSectionContent";
 
 const LIMIT = 10;
 const AUTO_ADVANCE_MS = 5000;
@@ -10,6 +11,11 @@ const AUTO_ADVANCE_MS = 5000;
 export default function LatestTestimonials() {
   const [testimonials, setTestimonials] = useState([]);
   const [loading, setLoading] = useState(true);
+  const header = useSectionContent("home_testimonials_header", {
+    badge: "Latest Testimonials",
+    heading: "What Our Patients Are Saying",
+    subtitle: "",
+  });
   const trackRef = useRef(null);
   const autoplayRef = useRef(null);
 
@@ -57,10 +63,10 @@ export default function LatestTestimonials() {
         <div className="flex items-end justify-between gap-4 mb-6 sm:mb-8">
           <div>
             <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wider uppercase mb-3">
-              Latest Testimonials
+              {header.badge}
             </span>
             <h2 className="font-heading font-bold text-[clamp(1.4rem,3.6vw,2rem)] text-foreground text-balance">
-              What Our Patients Are Saying
+              {header.heading}
             </h2>
           </div>
           {/* Prev/Next controls — hidden on mobile where swipe is the natural gesture */}

@@ -4,6 +4,7 @@ import { Bone, Heart, Brain, Activity, Stethoscope, Ribbon, Wind, Smile, Droplet
 import SectionHeader from "@/components/common/SectionHeader";
 import { db } from "@/api/dataClient";
 import { useLeadModal } from "@/lib/LeadModalContext";
+import { useSectionContent } from "@/hooks/useSectionContent";
 
 const iconMap = {
   "knee": Bone,
@@ -45,6 +46,11 @@ const fallback = [
 export default function LowestQuotes() {
   const [treatments, setTreatments] = useState(fallback);
   const { openLeadModal } = useLeadModal();
+  const header = useSectionContent("home_lowest_quotes_header", {
+    badge: "Lowest Quotes",
+    heading: "Lowest Quotes Assured",
+    subtitle: "We constantly negotiate better prices and alternatives without compromising treatment quality.",
+  });
 
   useEffect(() => {
     db.entities.Treatment.filter({ status: "active", featured: true }, "-created_date", 12)
@@ -56,9 +62,9 @@ export default function LowestQuotes() {
     <section className="py-10 sm:py-12 md:py-16">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <SectionHeader
-          badge="Lowest Quotes"
-          title="Lowest Quotes Assured"
-          subtitle="We constantly negotiate better prices and alternatives without compromising treatment quality."
+          badge={header.badge}
+          title={header.heading}
+          subtitle={header.subtitle}
           center
           subtitleWide
         />

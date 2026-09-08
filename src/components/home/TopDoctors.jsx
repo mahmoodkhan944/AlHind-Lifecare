@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { MapPin, Star, Briefcase, ArrowRight } from "lucide-react";
 import { db } from "@/api/dataClient";
 import { useLeadModal } from "@/lib/LeadModalContext";
+import { useSectionContent } from "@/hooks/useSectionContent";
 
 const fallbackDoctors = [
   {
@@ -46,6 +47,11 @@ const fallbackDoctors = [
 
 export default function TopDoctors() {
   const [doctors, setDoctors] = useState(fallbackDoctors);
+  const header = useSectionContent("home_doctors_header", {
+    badge: "Top Doctors",
+    heading: "Meet Our Expert Doctors",
+    subtitle: "",
+  });
   const { openLeadModal } = useLeadModal();
 
   useEffect(() => {
@@ -62,10 +68,10 @@ export default function TopDoctors() {
         {/* Header */}
         <div className="text-center mb-4">
           <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-bold tracking-wider uppercase mb-3">
-            <Star className="w-3.5 h-3.5 fill-[hsl(var(--accent-warm))]" /> Top Doctors
+            <Star className="w-3.5 h-3.5 fill-[hsl(var(--accent-warm))]" /> {header.badge}
           </span>
           <h2 className="font-heading font-extrabold text-[20px] sm:text-[24px] md:text-[32px] drop-shadow-lg  whitespace-nowrap lg:whitespace-normal text-secondary mb-2">
-            Meet Our Expert Doctors
+            {header.heading}
           </h2>
         </div>
 

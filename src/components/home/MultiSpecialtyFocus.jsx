@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import * as Icons from "lucide-react";
 import { Plus, Stethoscope as StethoscopeFallback } from "lucide-react";
 import { db } from "@/api/dataClient";
+import { useSectionContent } from "@/hooks/useSectionContent";
 
 // Fallback shown only if no admin-managed items exist yet for this section
 // (e.g. before the site_content_migration.sql seed has been run).
@@ -22,9 +23,14 @@ const fallbackSpecialties = [
 
 export default function MultiSpecialtyFocus() {
   const [specialties, setSpecialties] = useState(fallbackSpecialties);
+  const header = useSectionContent("home_specialty_header", {
+    badge: "Featured Treatments",
+    heading: "Multi-Specialty Healthcare Services",
+    subtitle: "We cover all medical needs, from hair transplants to heart transplants.",
+  });
 
   useEffect(() => {
-    // Admin-editable via /admin/site-content → "Multi-Specialty Focus".
+    // Admin-editable via /admin/home-content → "Multi-Specialty Focus (List)".
     db.entities.SiteContent.filter({ section: "specialties", status: "active" }, "sort_order", 50)
       .then((data) => {
         if (data.length > 0) setSpecialties(data);
@@ -37,11 +43,11 @@ export default function MultiSpecialtyFocus() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-10">
           <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-bold tracking-wider uppercase mb-3">
-            Featured Treatments
+            {header.badge}
           </span>
-          <h2 className="font-heading font-extrabold text-3xl md:text-4xl text-foreground mb-2">Multi-Specialty Healthcare Services</h2>
+          <h2 className="font-heading font-extrabold text-3xl md:text-4xl text-foreground mb-2">{header.heading}</h2>
           <p className="text-muted-foreground text-base md:text-lg max-w-2xl mx-auto">
-            We cover all medical needs, from hair transplants to heart transplants.
+            {header.subtitle}
           </p>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3 sm:gap-4">

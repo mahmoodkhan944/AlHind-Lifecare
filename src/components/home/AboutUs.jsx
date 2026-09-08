@@ -1,10 +1,35 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import SectionHeader from "@/components/common/SectionHeader";
+import { db } from "@/api/dataClient";
+
+const fallbackContent = {
+  badge: "About Us",
+  heading: "Leading Medical Tourism Services for World-Class Healthcare in India",
+  paragraph:
+    "At Alhind Medical Care, our mission is to connect international patients with world-class hospitals and renowned doctors in India and Turkey. We provide end-to-end assistance — from medical opinion and cost estimates to travel arrangements, hospital coordination, and post-treatment follow-up — ensuring a seamless and stress-free healthcare journey for every patient.",
+};
 
 export default function AboutUs() {
+  const [content, setContent] = useState(fallbackContent);
+
+  useEffect(() => {
+    db.entities.SiteContent.filter({ section: "home_about", status: "active" }, "sort_order", 1)
+      .then((data) => {
+        if (data.length > 0) {
+          const d = data[0];
+          setContent({
+            badge: d.link || fallbackContent.badge,
+            heading: d.title,
+            paragraph: d.description || "",
+          });
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   return (
     <section className="relative py-5 sm:py-12 md:py-16 bg-secondary/30 overflow-hidden">
       {/* Decorative graphics — subtle coral + navy glows for visual depth */}
@@ -17,15 +42,12 @@ export default function AboutUs() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
         >
-          <SectionHeader badge="About Us" center />
+          <SectionHeader badge={content.badge} center />
           <h3 className="font-heading font-bold text-lg md:text-xl text-foreground mb-2 leading-snug">
-            Leading Medical Tourism Services for World-Class Healthcare in India
+            {content.heading}
           </h3>
           <p className="text-sm md:text-base text-muted-foreground leading-relaxed mb-8">
-            At Alhind Medical Care, our mission is to connect international patients with world-class hospitals
-            and renowned doctors in India and Turkey. We provide end-to-end assistance — from medical opinion
-            and cost estimates to travel arrangements, hospital coordination, and post-treatment follow-up —
-            ensuring a seamless and stress-free healthcare journey for every patient.
+            {content.paragraph}
           </p>
           <Link
             to="/about"

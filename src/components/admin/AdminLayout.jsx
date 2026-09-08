@@ -16,7 +16,7 @@ const navItems = [
   { icon: FileText, label: "Blog Posts", path: "/admin/blog" },
   { icon: MessageSquare, label: "Testimonials", path: "/admin/testimonials" },
   { icon: HelpCircle, label: "FAQs", path: "/admin/faqs" },
-  { icon: LayoutList, label: "Site Content", path: "/admin/site-content" },
+  { icon: LayoutList, label: "Homepage", path: "/admin/home-content" },
   { icon: Info, label: "About Page", path: "/admin/about-content" },
   { icon: Mail, label: "Newsletter", path: "/admin/newsletter" },
   { icon: Settings, label: "Settings", path: "/admin/settings" },

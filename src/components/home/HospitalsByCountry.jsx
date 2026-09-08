@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { MapPin, ArrowRight, Building2 } from "lucide-react";
 import { db } from "@/api/dataClient";
+import { useSectionContent } from "@/hooks/useSectionContent";
 
 const fallback = {
   India: [
@@ -40,6 +41,11 @@ const config = {
 
 export default function HospitalsByCountry() {
   const [hospitals, setHospitals] = useState(fallback);
+  const header = useSectionContent("home_hospitals_header", {
+    badge: "Medical Destinations",
+    heading: "Global Healthcare Destinations",
+    subtitle: "JCI-accredited facilities with cutting-edge technology and world-class specialists",
+  });
 
   useEffect(() => {
     db.entities.Hospital.filter({ status: "active", country: "India" }, "-created_date", 4)
@@ -60,11 +66,11 @@ export default function HospitalsByCountry() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-8">
           <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-bold tracking-wider uppercase mb-3">
-            Medical Destinations
+            {header.badge}
           </span>
-          <h2 className="font-heading font-extrabold text-xl sm:text-3xl md:text-4xl text-secondary mb-2 whitespace-nowrap">Global Healthcare Destinations</h2>
+          <h2 className="font-heading font-extrabold text-xl sm:text-3xl md:text-4xl text-secondary mb-2 whitespace-nowrap">{header.heading}</h2>
           <p className="text-muted-foreground text-base max-w-3xl mx-auto lg:whitespace-nowrap">
-            JCI-accredited facilities with cutting-edge technology and world-class specialists
+            {header.subtitle}
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

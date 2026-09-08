@@ -4,6 +4,7 @@ import * as Icons from "lucide-react";
 import { HeartPulse as HeartPulseFallback } from "lucide-react";
 import { db } from "@/api/dataClient";
 import SectionHeader from "@/components/common/SectionHeader";
+import { useSectionContent } from "@/hooks/useSectionContent";
 
 // Fallback shown only if no admin-managed items exist yet for this section
 // (e.g. before the site_content_migration.sql seed has been run).
@@ -23,9 +24,14 @@ const fallbackServices = [
 
 export default function OurServices() {
   const [services, setServices] = useState(fallbackServices);
+  const header = useSectionContent("home_services_header", {
+    badge: "Our Services",
+    heading: "Everything Handled, So You Don't Have To",
+    subtitle: "",
+  });
 
   useEffect(() => {
-    // Admin-editable via /admin/site-content → "Our Services".
+    // Admin-editable via /admin/home-content → "Our Services (List)".
     db.entities.SiteContent.filter({ section: "services", status: "active" }, "sort_order", 50)
       .then((data) => {
         if (data.length > 0) setServices(data);
@@ -37,8 +43,8 @@ export default function OurServices() {
     <section className="py-1 sm:py-12 md:py-16 bg-secondary/30">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <SectionHeader
-  badge="Our Services"
-  title="Everything Handled, So You Don't Have To"
+  badge={header.badge}
+  title={header.heading}
   center
   noWrap
 />
