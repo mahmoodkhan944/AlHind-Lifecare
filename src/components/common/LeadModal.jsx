@@ -9,7 +9,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { COUNTRIES, getDialCode } from "@/lib/countries";
 import { useLeadModal } from "@/lib/LeadModalContext";
 
-const emptyForm = { patient_name: "", email: "", country: "Select Country", phone: "", message: "" };
+const emptyForm = { patient_name: "", country: "Select Country", phone: "", message: "" };
 
 export default function LeadModal() {
   const { open, context, closeLeadModal } = useLeadModal();
@@ -32,12 +32,12 @@ export default function LeadModal() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.patient_name || !form.email || !form.phone) return;
+    if (!form.patient_name || !form.phone) return;
     setLoading(true);
     try {
       await db.entities.Lead.create({
         patient_name: form.patient_name,
-        email: form.email,
+        email: "",
         phone: `${getDialCode(form.country)} ${form.phone}`,
         country: form.country,
         treatment_interest: treatmentInterest || undefined,
@@ -75,14 +75,6 @@ export default function LeadModal() {
                 placeholder="Enter your full name"
                 value={form.patient_name}
                 onChange={(e) => setForm({ ...form, patient_name: e.target.value })}
-                className="h-11 rounded-lg text-sm"
-                required
-              />
-              <Input
-                type="email"
-                placeholder="Enter your email"
-                value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
                 className="h-11 rounded-lg text-sm"
                 required
               />

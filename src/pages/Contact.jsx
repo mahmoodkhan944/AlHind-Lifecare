@@ -19,7 +19,6 @@ export default function Contact() {
   const { data: s } = useSiteSettings();
   const [form, setForm] = useState({
     patient_name: "",
-    email: "",
     phone: "",
     country: "",
     treatment_interest: searchParams.get("treatment") || searchParams.get("doctor") || searchParams.get("hospital") || "",
@@ -30,9 +29,9 @@ export default function Contact() {
     e.preventDefault();
     setSubmitting(true);
     try {
-      await db.entities.Lead.create({ ...form, source: "website" });
+      await db.entities.Lead.create({ ...form, email: "", source: "website" });
       toast({ title: "Thank you!", description: "We'll get back to you within 24 hours." });
-      setForm({ patient_name: "", email: "", phone: "", country: "", treatment_interest: "", message: "" });
+      setForm({ patient_name: "", phone: "", country: "", treatment_interest: "", message: "" });
     } catch {
       toast({ title: "Error", description: "Something went wrong. Please try again.", variant: "destructive" });
     } finally {
@@ -87,17 +86,6 @@ export default function Contact() {
                         value={form.patient_name}
                         onChange={(e) => setForm({ ...form, patient_name: e.target.value })}
                         placeholder="Your full name"
-                        className="h-11 rounded-xl"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium mb-1.5 block">Email *</label>
-                      <Input
-                        required
-                        type="email"
-                        value={form.email}
-                        onChange={(e) => setForm({ ...form, email: e.target.value })}
-                        placeholder="your@email.com"
                         className="h-11 rounded-xl"
                       />
                     </div>

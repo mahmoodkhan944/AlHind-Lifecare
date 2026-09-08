@@ -38,17 +38,17 @@ export default function HeroSection() {
     heading: "Let Us Help You",
     subtitle: "Get a free quote from our medical team within 24 hours",
   });
-  const [form, setForm] = useState({ patient_name: "", email: "", country: "Select Country", city: "", phone: "", medical_problem: "", age: "" });
+  const [form, setForm] = useState({ patient_name: "", country: "Select Country", city: "", phone: "", medical_problem: "", age: "" });
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.patient_name || !form.email || !form.phone) return;
+    if (!form.patient_name || !form.phone) return;
     setLoading(true);
     try {
       await db.entities.Lead.create({
         patient_name: form.patient_name,
-        email: form.email,
+        email: "",
         phone: `${getDialCode(form.country)} ${form.phone}`,
         country: form.country,
         message: `City: ${form.city || "N/A"} | Age/DOB: ${form.age || "N/A"} | Problem: ${form.medical_problem}`,
@@ -56,7 +56,7 @@ export default function HeroSection() {
         status: "new",
       });
       toast({ title: "Thank you! Our team will contact you shortly." });
-      setForm({ patient_name: "", email: "", country: "Select Country", city: "", phone: "", medical_problem: "", age: "" });
+      setForm({ patient_name: "", country: "Select Country", city: "", phone: "", medical_problem: "", age: "" });
     } catch {
       toast({ title: "Something went wrong. Please try again.", variant: "destructive" });
     }
@@ -209,14 +209,6 @@ export default function HeroSection() {
                 placeholder="Enter your full name"
                 value={form.patient_name}
                 onChange={(e) => setForm({ ...form, patient_name: e.target.value })}
-                className="h-9 rounded-lg text-sm"
-                required
-              />
-              <Input
-                type="email"
-                placeholder="Enter your email"
-                value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
                 className="h-9 rounded-lg text-sm"
                 required
               />
