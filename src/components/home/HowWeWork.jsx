@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import * as Icons from "lucide-react";
 import { PhoneCall as PhoneCallFallback } from "lucide-react";
 import { db } from "@/api/dataClient";
 import SectionHeader from "@/components/common/SectionHeader";
 import { useSectionContent } from "@/hooks/useSectionContent";
+import IconOrImage from "@/components/common/IconOrImage";
 
 // Fallback shown only if no admin-managed items exist yet for this section
 // (e.g. before the site_content_migration.sql seed has been run).
@@ -38,7 +38,6 @@ export default function HowWeWork() {
         <SectionHeader badge={header.badge} title={header.heading} subtitle={header.subtitle} />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {steps.map((step, i) => {
-            const Icon = (step.icon && Icons[step.icon]) || PhoneCallFallback;
             return (
               <motion.div
                 key={step.id || step.title}
@@ -53,7 +52,7 @@ export default function HowWeWork() {
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
-                    <Icon className="w-5 h-5 text-primary" />
+                    <IconOrImage value={step.icon} fallback={PhoneCallFallback} className="w-5 h-5 text-primary" />
                     <h3 className="font-heading font-bold text-base text-foreground">{step.title}</h3>
                   </div>
                   <p className="text-sm text-muted-foreground leading-relaxed">{step.description}</p>

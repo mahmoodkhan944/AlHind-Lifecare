@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import * as Icons from "lucide-react";
 import { Plus, Stethoscope as StethoscopeFallback } from "lucide-react";
 import { db } from "@/api/dataClient";
 import { useSectionContent } from "@/hooks/useSectionContent";
+import IconOrImage from "@/components/common/IconOrImage";
 
 // Fallback shown only if no admin-managed items exist yet for this section
 // (e.g. before the site_content_migration.sql seed has been run).
@@ -52,7 +52,6 @@ export default function MultiSpecialtyFocus() {
         </div>
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3 sm:gap-4">
           {specialties.map((s, i) => {
-            const Icon = (s.icon && Icons[s.icon]) || StethoscopeFallback;
             return (
               <motion.div
                 key={s.id || s.title}
@@ -64,7 +63,7 @@ export default function MultiSpecialtyFocus() {
               >
                 <div className="flex items-center justify-center py-4 sm:py-6">
                   <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-secondary/10 flex items-center justify-center">
-                    <Icon className="w-6 h-6 sm:w-7 sm:h-7 text-secondary" strokeWidth={1.8} />
+                    <IconOrImage value={s.icon} fallback={StethoscopeFallback} className="w-6 h-6 sm:w-7 sm:h-7 text-secondary" strokeWidth={1.8} />
                   </div>
                 </div>
                 <Link

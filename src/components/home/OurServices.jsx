@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import * as Icons from "lucide-react";
 import { HeartPulse as HeartPulseFallback } from "lucide-react";
 import { db } from "@/api/dataClient";
 import SectionHeader from "@/components/common/SectionHeader";
 import { useSectionContent } from "@/hooks/useSectionContent";
+import IconOrImage from "@/components/common/IconOrImage";
 
 // Fallback shown only if no admin-managed items exist yet for this section
 // (e.g. before the site_content_migration.sql seed has been run).
@@ -50,7 +50,6 @@ export default function OurServices() {
 />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
           {services.map((s, i) => {
-            const Icon = (s.icon && Icons[s.icon]) || HeartPulseFallback;
             return (
               <motion.div
                 key={s.id || s.title}
@@ -61,7 +60,7 @@ export default function OurServices() {
                 className="flex items-start gap-3 bg-white rounded-2xl border border-border/40 p-4 hover:shadow-lg hover:shadow-primary/5 hover:border-primary/20 transition-all"
               >
                 <div className="flex-shrink-0 w-11 h-11 rounded-full bg-secondary flex items-center justify-center">
-                  <Icon className="w-5 h-5 text-primary" strokeWidth={1.8} />
+                  <IconOrImage value={s.icon} fallback={HeartPulseFallback} className="w-5 h-5 text-primary" strokeWidth={1.8} />
                 </div>
                 <p className="font-heading font-semibold text-sm text-foreground leading-snug pt-1.5">{s.title}</p>
               </motion.div>

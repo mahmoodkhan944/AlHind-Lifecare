@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { db } from "@/api/dataClient";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
-import { Plus, Pencil, Trash2, Loader2, GripVertical, Info } from "lucide-react";
+import { Plus, Pencil, Trash2, Loader2, GripVertical, Info, Upload, X } from "lucide-react";
 import * as Icons from "lucide-react";
+import IconOrImage from "@/components/common/IconOrImage";
 
 const emptyForm = { title: "", description: "", icon: "", link: "", image_url: "", sort_order: 0, status: "active" };
 
@@ -24,6 +25,8 @@ export default function SiteContentManager({ title, description, sections }) {
   const [editItem, setEditItem] = useState(null);
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
+  const [uploadingIcon, setUploadingIcon] = useState(false);
+  const iconFileInputRef = useRef(null);
   const { toast } = useToast();
 
   const sectionMeta = sections.find((s) => s.key === activeSection);
@@ -93,9 +96,28 @@ export default function SiteContentManager({ title, description, sections }) {
     setSaving(false);
   };
 
-  // Renders the icon preview if the typed name matches a real lucide-react icon.
+  const handleIconUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingIcon(true);
+    try {
+      const { file_url } = await db.integrations.Core.UploadFile({ file });
+      setForm((f) => ({ ...f, icon: file_url }));
+    } catch (err) {
+      toast({ title: "Icon upload failed", description: err?.message, variant: "destructive" });
+    }
+    setUploadingIcon(false);
+    if (iconFileInputRef.current) iconFileInputRef.current.value = "";
+  };
+
+  // Renders the icon preview: an uploaded image, a matching lucide-react
+  // icon name, or a neutral placeholder if neither matches.
   const IconPreview = ({ name }) => {
-    const Cmp = name && Icons[name];
+    if (!name) return <Info className="w-4 h-4 text-muted-foreground/50" />;
+    if (/^https?:\/\//i.test(name) || name.startsWith("data:")) {
+      return <img src={name} alt="" className="w-full h-full object-contain rounded" />;
+    }
+    const Cmp = Icons[name];
     if (!Cmp) return <Info className="w-4 h-4 text-muted-foreground/50" />;
     return <Cmp className="w-4 h-4 text-primary" />;
   };
@@ -181,20 +203,49 @@ export default function SiteContentManager({ title, description, sections }) {
             )}
 
             <div>
-              <label className="text-sm font-medium text-foreground/80 block mb-1.5">Icon name</label>
+              <label className="text-sm font-medium text-foreground/80 block mb-1.5">Icon</label>
               <div className="flex items-center gap-2">
-                <div className="flex items-center justify-center w-10 h-10 rounded-lg border border-border bg-muted shrink-0">
+                <div className="flex items-center justify-center w-10 h-10 rounded-lg border border-border bg-muted shrink-0 overflow-hidden">
                   <IconPreview name={form.icon} />
                 </div>
                 <Input
                   value={form.icon}
                   onChange={(e) => setForm({ ...form, icon: e.target.value.trim() })}
-                  placeholder="e.g. HeartPulse"
-                  className="h-10 rounded-lg border-border"
+                  placeholder="e.g. HeartPulse, or upload an image"
+                  className="h-10 rounded-lg border-border flex-1"
                 />
+                <input
+                  ref={iconFileInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleIconUpload}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="h-10 rounded-lg shrink-0 gap-1.5"
+                  disabled={uploadingIcon}
+                  onClick={() => iconFileInputRef.current?.click()}
+                >
+                  {uploadingIcon ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                  Upload
+                </Button>
+                {form.icon && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="h-10 w-10 p-0 shrink-0 text-muted-foreground"
+                    onClick={() => setForm({ ...form, icon: "" })}
+                    aria-label="Remove icon"
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                )}
               </div>
               <p className="text-xs text-muted-foreground/70 mt-1">
-                Must match an exact{" "}
+                Either type an exact{" "}
                 <a
                   href="https://lucide.dev/icons"
                   target="_blank"
@@ -203,7 +254,7 @@ export default function SiteContentManager({ title, description, sections }) {
                 >
                   lucide-react
                 </a>{" "}
-                icon name (case-sensitive, e.g. "HeartPulse", "Stethoscope").
+                icon name (case-sensitive, e.g. "HeartPulse", "Stethoscope") or upload your own icon image.
               </p>
             </div>
 
@@ -292,7 +343,7 @@ export default function SiteContentManager({ title, description, sections }) {
                           <GripVertical className="w-4 h-4" />
                         </td>
                         <td className="p-3">
-                          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-muted border border-border">
+                          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-muted border border-border overflow-hidden">
                             <IconPreview name={item.icon} />
                           </div>
                         </td>

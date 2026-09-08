@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import * as Icons from "lucide-react";
 import {
   Shield,
   Globe,
@@ -22,10 +21,7 @@ import {
   Mail,
 } from "lucide-react";
 import { db } from "@/api/dataClient";
-
-// Looks up a lucide-react icon by name (as stored by the admin panel);
-// falls back to a sensible default if the name is missing or mistyped.
-const iconFor = (name, fallback) => (name && Icons[name]) || fallback;
+import IconOrImage from "@/components/common/IconOrImage";
 
 const fallbackServices = [
   { icon: Stethoscope, label: "Medical Treatment" },
@@ -247,17 +243,17 @@ export default function About() {
 
     db.entities.SiteContent.filter({ section: "about_intro_features", status: "active" }, "sort_order", 8)
       .then((data) => {
-        if (data.length > 0) setIntroFeatures(data.map((d) => ({ icon: iconFor(d.icon, Shield), label: d.title })));
+        if (data.length > 0) setIntroFeatures(data.map((d) => ({ icon: d.icon, label: d.title })));
       })
       .catch(() => {});
 
     db.entities.SiteContent.filter({ section: "about_mission_vision", status: "active" }, "sort_order", 8)
       .then((data) => {
         if (data.length > 0)
-          setMissionVision(data.map((d) => ({ icon: iconFor(d.icon, Target), title: d.title, desc: d.description || "" })));
+          setMissionVision(data.map((d) => ({ icon: d.icon, title: d.title, desc: d.description || "" })));
       })
       .catch(() => {});
-    // All admin-editable via /admin/site-content → the "About:" sections.
+    // All admin-editable via /admin/about-content → the "About:" sections.
     // Each fetch maps the generic {title, description, icon, image_url, link}
     // row shape into whatever field names this page's JSX already expects,
     // so only the data source changes — falls back to the defaults above
@@ -265,7 +261,7 @@ export default function About() {
     db.entities.SiteContent.filter({ section: "about_services", status: "active" }, "sort_order", 20)
       .then((data) => {
         if (data.length > 0) {
-          setServices(data.map((d) => ({ icon: iconFor(d.icon, Stethoscope), label: d.title })));
+          setServices(data.map((d) => ({ icon: d.icon, label: d.title })));
         }
       })
       .catch(() => {});
@@ -283,7 +279,7 @@ export default function About() {
         if (data.length > 0) {
           setHelpGroups(
             data.map((d) => ({
-              icon: iconFor(d.icon, Stethoscope),
+              icon: d.icon,
               title: d.title,
               points: (d.description || "").split("\n").map((p) => p.trim()).filter(Boolean),
             }))
@@ -295,7 +291,7 @@ export default function About() {
     db.entities.SiteContent.filter({ section: "about_advantages", status: "active" }, "sort_order", 20)
       .then((data) => {
         if (data.length > 0) {
-          setAdvantages(data.map((d) => ({ icon: iconFor(d.icon, PlaneTakeoff), title: d.title, desc: d.description })));
+          setAdvantages(data.map((d) => ({ icon: d.icon, title: d.title, desc: d.description })));
         }
       })
       .catch(() => {});
@@ -382,9 +378,9 @@ export default function About() {
                 </p>
               ))}
               <div className="grid grid-cols-2 gap-3 sm:gap-4">
-                {introFeatures.map(({ icon: Icon, label }) => (
+                {introFeatures.map(({ icon, label }) => (
                   <div key={label} className="flex items-center gap-2 text-xs sm:text-sm">
-                    <Icon className="w-5 h-5 text-primary shrink-0" />
+                    <IconOrImage value={icon} fallback={Shield} className="w-5 h-5 text-primary shrink-0" />
                     <span className="font-medium">{label}</span>
                   </div>
                 ))}
@@ -407,7 +403,7 @@ export default function About() {
             {servicesHeader.desc}
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
-            {services.map(({ icon: Icon, label }) => (
+            {services.map(({ icon, label }) => (
               <motion.div
                 key={label}
                 initial={{ opacity: 0, y: 16 }}
@@ -416,7 +412,7 @@ export default function About() {
                 className="flex flex-col items-center gap-3 bg-white rounded-2xl p-6 sm:p-8 shadow-lg shadow-primary/5 ring-1 ring-black/5"
               >
                 <span className="flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 text-primary">
-                  <Icon className="w-6 h-6" />
+                  <IconOrImage value={icon} fallback={Stethoscope} className="w-6 h-6" />
                 </span>
                 <p className="font-heading font-semibold text-base sm:text-lg">{label}</p>
               </motion.div>
@@ -429,7 +425,7 @@ export default function About() {
       <section className="py-10 sm:py-12 md:py-14">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
-            {missionVision.map(({ icon: Icon, title, desc }) => (
+            {missionVision.map(({ icon, title, desc }) => (
               <motion.div
                 key={title}
                 initial={{ opacity: 0, y: 20 }}
@@ -438,7 +434,7 @@ export default function About() {
                 className="bg-white rounded-2xl p-6 sm:p-8 shadow-lg shadow-primary/5 ring-1 ring-black/5"
               >
                 <span className="flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 text-primary mb-4">
-                  <Icon className="w-6 h-6" />
+                  <IconOrImage value={icon} fallback={Target} className="w-6 h-6" />
                 </span>
                 <h3 className="font-heading font-bold text-lg sm:text-xl mb-2">{title}</h3>
                 <p className="text-sm sm:text-base text-muted-foreground leading-relaxed text-balance">{desc}</p>
@@ -501,7 +497,7 @@ export default function About() {
             </h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
-            {helpGroups.map(({ icon: Icon, title, points }) => (
+            {helpGroups.map(({ icon, title, points }) => (
               <motion.div
                 key={title}
                 initial={{ opacity: 0, y: 20 }}
@@ -511,7 +507,7 @@ export default function About() {
               >
                 <div className="flex items-center gap-3 mb-4">
                   <span className="flex items-center justify-center w-11 h-11 rounded-xl bg-primary/10 text-primary shrink-0">
-                    <Icon className="w-5 h-5" />
+                    <IconOrImage value={icon} fallback={Stethoscope} className="w-5 h-5" />
                   </span>
                   <h3 className="font-heading font-bold text-base sm:text-lg">{title}</h3>
                 </div>
@@ -602,7 +598,7 @@ export default function About() {
             </h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
-            {advantages.map(({ icon: Icon, title, desc }) => (
+            {advantages.map(({ icon, title, desc }) => (
               <motion.div
                 key={title}
                 initial={{ opacity: 0, y: 20 }}
@@ -611,7 +607,7 @@ export default function About() {
                 className="bg-white rounded-2xl p-6 shadow-lg shadow-primary/5 ring-1 ring-black/5 text-center sm:text-left"
               >
                 <span className="inline-flex items-center justify-center w-11 h-11 rounded-xl bg-primary/10 text-primary mb-4">
-                  <Icon className="w-5 h-5" />
+                  <IconOrImage value={icon} fallback={PlaneTakeoff} className="w-5 h-5" />
                 </span>
                 <h3 className="font-heading font-bold text-base mb-2">{title}</h3>
                 <p className="text-sm sm:text-base text-muted-foreground leading-relaxed text-balance">{desc}</p>
