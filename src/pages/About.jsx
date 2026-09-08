@@ -138,14 +138,125 @@ const fallbackLeaders = [
 const HERO_IMAGE =
   "https://media.istockphoto.com/id/1325204361/photo/fragile-brain-care.webp?a=1&b=1&s=612x612&w=0&k=20&c=P-hTSqeMMhWH2OukmCthDubibw-cY2-MubXSsSeXpwU=";
 
+const fallbackHero = {
+  title: "About Alhind Medical Care",
+  subtitle: "Your trusted bridge to world-class healthcare in India and Turkey",
+  image: HERO_IMAGE,
+};
+
+const fallbackIntro = {
+  badge: "Your Health, Our Priority",
+  heading: "Making World-Class Healthcare Accessible to All",
+  paragraphs: [
+    "At Alhind Medical Care, we believe quality healthcare should be accessible to everyone, everywhere. That's why we connect international patients with top hospitals and expert doctors in leading medical destinations across India and Turkey.",
+    "With a strong network of JCI & NABH accredited hospitals and clinics, we make medical travel stress-free — from seamless, timely doctor appointments for a second opinion to expediting your visa for treatment abroad.",
+  ],
+  image:
+    "https://plus.unsplash.com/premium_photo-1723489337127-10940e9dc593?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTAxfHxoZWFsdGglMjBjYXJlfGVufDB8fDB8fHww",
+};
+
+const fallbackIntroFeatures = [
+  { icon: Shield, label: "JCI Accredited Partners" },
+  { icon: Clock, label: "24/7 Support" },
+  { icon: Globe, label: "Multilingual Team" },
+  { icon: HeartPulse, label: "Personalized Care" },
+];
+
+const fallbackMissionVision = [
+  {
+    icon: Target,
+    title: "Our Mission",
+    desc: "To ensure every patient receives quality healthcare that is timely, accessible, affordable, and transparent — with no barriers along the way.",
+  },
+  {
+    icon: Eye,
+    title: "Our Vision",
+    desc: "To be a one-stop solution for international patients seeking world-class treatment, delivered on time and with genuine care.",
+  },
+];
+
+const fallbackServicesHeader = {
+  badge: "Our Services",
+  heading: "Everything You Need, Under One Roof",
+  desc: "We offer online consultation, medical second opinion, and top-class medical treatment at our partner hospitals worldwide.",
+};
+const fallbackTrustHeader = { badge: "Why Patients Trust Us", heading: "Care That Follows You Home" };
+const fallbackHelpHeader = { badge: "How We Help You", heading: "Support at Every Step of the Journey" };
+const fallbackLeadershipHeader = {
+  badge: "Leadership",
+  heading: "The People Behind Alhind Medical Care",
+  desc: "Experienced professionals dedicated to your health and wellbeing.",
+};
+const fallbackAdvantagesHeader = { badge: "Advantages", heading: "Advantages of Choosing Us" };
+
 export default function About() {
+  const [hero, setHero] = useState(fallbackHero);
+  const [intro, setIntro] = useState(fallbackIntro);
+  const [introFeatures, setIntroFeatures] = useState(fallbackIntroFeatures);
+  const [missionVision, setMissionVision] = useState(fallbackMissionVision);
   const [services, setServices] = useState(fallbackServices);
   const [trustRows, setTrustRows] = useState(fallbackTrustRows);
   const [helpGroups, setHelpGroups] = useState(fallbackHelpGroups);
   const [advantages, setAdvantages] = useState(fallbackAdvantages);
   const [leaders, setLeaders] = useState(fallbackLeaders);
+  const [servicesHeader, setServicesHeader] = useState(fallbackServicesHeader);
+  const [trustHeader, setTrustHeader] = useState(fallbackTrustHeader);
+  const [helpHeader, setHelpHeader] = useState(fallbackHelpHeader);
+  const [leadershipHeader, setLeadershipHeader] = useState(fallbackLeadershipHeader);
+  const [advantagesHeader, setAdvantagesHeader] = useState(fallbackAdvantagesHeader);
 
   useEffect(() => {
+    // Singleton sections (one row each, picked via sort_order): hero,
+    // intro copy, and every section's badge/heading/subtext.
+    const loadSingleton = (section, apply) => {
+      db.entities.SiteContent.filter({ section, status: "active" }, "sort_order", 1)
+        .then((data) => {
+          if (data.length > 0) apply(data[0]);
+        })
+        .catch(() => {});
+    };
+
+    loadSingleton("about_hero", (d) =>
+      setHero({ title: d.title, subtitle: d.description || fallbackHero.subtitle, image: d.image_url || fallbackHero.image })
+    );
+
+    loadSingleton("about_intro", (d) =>
+      setIntro({
+        badge: d.link || fallbackIntro.badge,
+        heading: d.title,
+        paragraphs: (d.description || "").split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean),
+        image: d.image_url || fallbackIntro.image,
+      })
+    );
+
+    loadSingleton("about_services_header", (d) =>
+      setServicesHeader({ badge: d.link || fallbackServicesHeader.badge, heading: d.title, desc: d.description || "" })
+    );
+    loadSingleton("about_trust_header", (d) =>
+      setTrustHeader({ badge: d.link || fallbackTrustHeader.badge, heading: d.title })
+    );
+    loadSingleton("about_help_header", (d) =>
+      setHelpHeader({ badge: d.link || fallbackHelpHeader.badge, heading: d.title })
+    );
+    loadSingleton("about_leadership_header", (d) =>
+      setLeadershipHeader({ badge: d.link || fallbackLeadershipHeader.badge, heading: d.title, desc: d.description || "" })
+    );
+    loadSingleton("about_advantages_header", (d) =>
+      setAdvantagesHeader({ badge: d.link || fallbackAdvantagesHeader.badge, heading: d.title })
+    );
+
+    db.entities.SiteContent.filter({ section: "about_intro_features", status: "active" }, "sort_order", 8)
+      .then((data) => {
+        if (data.length > 0) setIntroFeatures(data.map((d) => ({ icon: iconFor(d.icon, Shield), label: d.title })));
+      })
+      .catch(() => {});
+
+    db.entities.SiteContent.filter({ section: "about_mission_vision", status: "active" }, "sort_order", 8)
+      .then((data) => {
+        if (data.length > 0)
+          setMissionVision(data.map((d) => ({ icon: iconFor(d.icon, Target), title: d.title, desc: d.description || "" })));
+      })
+      .catch(() => {});
     // All admin-editable via /admin/site-content → the "About:" sections.
     // Each fetch maps the generic {title, description, icon, image_url, link}
     // row shape into whatever field names this page's JSX already expects,
@@ -211,7 +322,7 @@ export default function About() {
       {/* Hero */}
       <section className="relative pt-20 sm:pt-24 md:pt-28 pb-10 sm:pb-12 md:pb-14 overflow-hidden">
         <div className="absolute inset-0">
-          <img src={HERO_IMAGE} alt="" className="w-full h-full object-cover" />
+          <img src={hero.image} alt="" className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-br from-secondary/90 via-secondary/80 to-[#0E8C7A]/85" />
         </div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 text-center">
@@ -220,7 +331,7 @@ export default function About() {
             animate={{ opacity: 1, y: 0 }}
             className="font-heading font-bold text-[clamp(1.75rem,6vw,3rem)] text-white mb-4 text-balance"
           >
-            About Alhind Medical Care
+            {hero.title}
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -228,7 +339,7 @@ export default function About() {
             transition={{ delay: 0.1 }}
             className="text-white/70 text-base sm:text-lg max-w-2xl mx-auto text-balance"
           >
-            Your trusted bridge to world-class healthcare in India and Turkey
+            {hero.subtitle}
           </motion.p>
         </div>
       </section>
@@ -245,7 +356,7 @@ export default function About() {
             >
               <div className="relative">
                 <img
-                  src="https://plus.unsplash.com/premium_photo-1723489337127-10940e9dc593?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTAxfHxoZWFsdGglMjBjYXJlfGVufDB8fDB8fHww"
+                  src={intro.image}
                   alt="Alhind Medical Care team"
                   loading="lazy"
                   className="w-full rounded-2xl shadow-xl ring-1 ring-black/5 aspect-[4/3] object-cover"
@@ -260,28 +371,18 @@ export default function About() {
               className="text-center md:text-left"
             >
               <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wider uppercase mb-4">
-                Your Health, Our Priority
+                {intro.badge}
               </span>
               <h2 className="font-heading font-bold text-[clamp(1.5rem,4vw,2.25rem)] mb-4 text-balance">
-                Making World-Class Healthcare Accessible to All
+                {intro.heading}
               </h2>
-              <p className="text-base sm:text-lg text-foreground/75 leading-[1.75] mb-6 text-balance">
-                At Alhind Medical Care, we believe quality healthcare should be accessible to everyone,
-                everywhere. That's why we connect international patients with top hospitals and expert doctors
-                in leading medical destinations across India and Turkey.
-              </p>
-              <p className="text-base sm:text-lg text-foreground/75 leading-[1.75] mb-6 text-balance">
-                With a strong network of JCI &amp; NABH accredited hospitals and clinics, we make medical
-                travel stress-free — from seamless, timely doctor appointments for a second opinion to
-                expediting your visa for treatment abroad.
-              </p>
+              {intro.paragraphs.map((p) => (
+                <p key={p} className="text-base sm:text-lg text-foreground/75 leading-[1.75] mb-6 text-balance">
+                  {p}
+                </p>
+              ))}
               <div className="grid grid-cols-2 gap-3 sm:gap-4">
-                {[
-                  { icon: Shield, label: "JCI Accredited Partners" },
-                  { icon: Clock, label: "24/7 Support" },
-                  { icon: Globe, label: "Multilingual Team" },
-                  { icon: HeartPulse, label: "Personalized Care" },
-                ].map(({ icon: Icon, label }) => (
+                {introFeatures.map(({ icon: Icon, label }) => (
                   <div key={label} className="flex items-center gap-2 text-xs sm:text-sm">
                     <Icon className="w-5 h-5 text-primary shrink-0" />
                     <span className="font-medium">{label}</span>
@@ -297,14 +398,13 @@ export default function About() {
       <section className="py-10 sm:py-12 md:py-14 bg-secondary/30">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 text-center">
           <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wider uppercase mb-4">
-            Our Services
+            {servicesHeader.badge}
           </span>
           <h2 className="font-heading font-bold text-[clamp(0.85rem,4vw,2.25rem)] mb-4 text-balance whitespace-nowrap">
-            Everything You Need, Under One Roof
+            {servicesHeader.heading}
           </h2>
           <p className="text-sm sm:text-base text-muted-foreground leading-relaxed max-w-2xl mx-auto mb-10 text-balance">
-            We offer online consultation, medical second opinion, and top-class medical treatment at our
-            partner hospitals worldwide.
+            {servicesHeader.desc}
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
             {services.map(({ icon: Icon, label }) => (
@@ -329,18 +429,7 @@ export default function About() {
       <section className="py-10 sm:py-12 md:py-14">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
-            {[
-              {
-                icon: Target,
-                title: "Our Mission",
-                desc: "To ensure every patient receives quality healthcare that is timely, accessible, affordable, and transparent — with no barriers along the way.",
-              },
-              {
-                icon: Eye,
-                title: "Our Vision",
-                desc: "To be a one-stop solution for international patients seeking world-class treatment, delivered on time and with genuine care.",
-              },
-            ].map(({ icon: Icon, title, desc }) => (
+            {missionVision.map(({ icon: Icon, title, desc }) => (
               <motion.div
                 key={title}
                 initial={{ opacity: 0, y: 20 }}
@@ -364,10 +453,10 @@ export default function About() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-10">
             <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wider uppercase mb-4">
-              Why Patients Trust Us
+              {trustHeader.badge}
             </span>
             <h2 className="font-heading font-bold text-[clamp(1.5rem,4vw,2.25rem)] text-balance">
-              Care That Follows You Home
+              {trustHeader.heading}
             </h2>
           </div>
 
@@ -405,10 +494,10 @@ export default function About() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center max-w-2xl mx-auto mb-7 sm:mb-8">
             <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wider uppercase mb-4">
-              How We Help You
+              {helpHeader.badge}
             </span>
             <h2 className="font-heading font-bold text-[clamp(1.05rem,4.5vw,2.25rem)] text-balance whitespace-nowrap sm:whitespace-normal">
-              Support at Every Step of the Journey
+              {helpHeader.heading}
             </h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
@@ -445,13 +534,13 @@ export default function About() {
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <div className="text-center max-w-2xl mx-auto mb-7 sm:mb-8">
             <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wider uppercase mb-4">
-              Leadership
+              {leadershipHeader.badge}
             </span>
             <h2 className="font-heading font-bold text-[clamp(0.9rem,4.2vw,2.25rem)] mb-3 text-balance whitespace-nowrap sm:whitespace-normal">
-              The People Behind Alhind Medical Care
+              {leadershipHeader.heading}
             </h2>
             <p className="text-sm sm:text-base text-muted-foreground leading-relaxed text-balance">
-              Experienced professionals dedicated to your health and wellbeing.
+              {leadershipHeader.desc}
             </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
@@ -506,10 +595,10 @@ export default function About() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center max-w-2xl mx-auto mb-7 sm:mb-8">
             <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wider uppercase mb-4">
-              Advantages
+              {advantagesHeader.badge}
             </span>
             <h2 className="font-heading font-bold text-[clamp(1.5rem,4vw,2.25rem)] text-balance">
-              Advantages of Choosing Us
+              {advantagesHeader.heading}
             </h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">

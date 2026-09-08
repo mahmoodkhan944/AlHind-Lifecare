@@ -43,6 +43,7 @@ import AdminTestimonials from '@/pages/admin/AdminTestimonials';
 import AdminAppointments from '@/pages/admin/AdminAppointments';
 import AdminFAQs from '@/pages/admin/AdminFAQs';
 import AdminSiteContent from '@/pages/admin/AdminSiteContent';
+import AdminAboutContent from '@/pages/admin/AdminAboutContent';
 import AdminNewsletter from '@/pages/admin/AdminNewsletter';
 import AdminSettings from '@/pages/admin/AdminSettings';
 
@@ -91,6 +92,7 @@ const AuthenticatedApp = () => {
           <Route path="/admin/appointments" element={<AdminAppointments />} />
           <Route path="/admin/faqs" element={<AdminFAQs />} />
           <Route path="/admin/site-content" element={<AdminSiteContent />} />
+          <Route path="/admin/about-content" element={<AdminAboutContent />} />
           <Route path="/admin/newsletter" element={<AdminNewsletter />} />
           <Route path="/admin/settings" element={<AdminSettings />} />
         </Route>
@@ -106,7 +108,7 @@ function App() {
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
         <Router
-          basename={import.meta.env.PROD ? "/AlHind-Lifecare" : "/"}
+          basename={import.meta.env.BASE_URL}
         >
           <ScrollToTop />
           <AuthenticatedApp />
