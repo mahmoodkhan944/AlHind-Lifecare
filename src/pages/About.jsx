@@ -1,10 +1,9 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import * as Icons from "lucide-react";
 import {
   Shield,
   Globe,
-  Users,
-  Award,
   HeartPulse,
   Clock,
   Target,
@@ -22,23 +21,20 @@ import {
   Linkedin,
   Mail,
 } from "lucide-react";
-import StatCard from "@/components/common/StatCard";
+import { db } from "@/api/dataClient";
 
-const stats = [
-  { icon: Users, value: "50,000+", label: "Happy Patients" },
-  { icon: Globe, value: "70+", label: "Countries Served" },
-  { icon: Award, value: "500+", label: "Expert Doctors" },
-  { icon: HeartPulse, value: "98%", label: "Success Rate" },
-];
+// Looks up a lucide-react icon by name (as stored by the admin panel);
+// falls back to a sensible default if the name is missing or mistyped.
+const iconFor = (name, fallback) => (name && Icons[name]) || fallback;
 
-const services = [
+const fallbackServices = [
   { icon: Stethoscope, label: "Medical Treatment" },
   { icon: Video, label: "Online Consultation" },
   { icon: MessageSquareHeart, label: "Second Opinion" },
 ];
 
 // Alternating image + text rows
-const trustRows = [
+const fallbackTrustRows = [
   {
     image: "https://plus.unsplash.com/premium_photo-1661423762612-e8fae810cb4b?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NDV8fEhvc3BpdGFsaXNhdGlvbiUyMCUyNiUyMFBvc3QtVHJlYXRtZW50JTIwQ2FyZXxlbnwwfHwwfHx8MA%3D%3D",
     title: "Hospitalisation & Post-Treatment Care",
@@ -57,7 +53,7 @@ const trustRows = [
 ];
 
 // Detailed "how we help"
-const helpGroups = [
+const fallbackHelpGroups = [
   {
     icon: Stethoscope,
     title: "Treatment Assistance",
@@ -92,7 +88,7 @@ const helpGroups = [
   },
 ];
 
-const advantages = [
+const fallbackAdvantages = [
   {
     icon: PlaneTakeoff,
     title: "Travel & Visa",
@@ -115,7 +111,7 @@ const advantages = [
   },
 ];
 
-const leaders = [
+const fallbackLeaders = [
   {
     photo: "https://scontent.fdel18-1.fna.fbcdn.net/v/t39.30808-1/400434253_3640507126180107_5636551770658110022_n.jpg?stp=dst-jpg_tt6&cstp=mx379x378&ctp=s200x200&_nc_cat=103&ccb=1-7&_nc_sid=e99d92&_nc_ohc=3oAbSgJ0c9oQ7kNvwFJ2hD0&_nc_oc=AdqOKsUoNTdF0uouCUghbGHhLPFvaQ8BczZhHT03my0HQJy5k80GlqBccdiebzadXAY&_nc_zt=24&_nc_ht=scontent.fdel18-1.fna&_nc_gid=0QWoaodqWeS9NpKMyvc9nQ&_nc_ss=7b2a8&oh=00_AQDpAu8C3bOBlsjXuyXiGJj0HfNBfiVIbt73iv8Uyruk-g&oe=6A6BC830",
     name: "Abu Hamza Khan",
@@ -143,6 +139,73 @@ const HERO_IMAGE =
   "https://media.istockphoto.com/id/1325204361/photo/fragile-brain-care.webp?a=1&b=1&s=612x612&w=0&k=20&c=P-hTSqeMMhWH2OukmCthDubibw-cY2-MubXSsSeXpwU=";
 
 export default function About() {
+  const [services, setServices] = useState(fallbackServices);
+  const [trustRows, setTrustRows] = useState(fallbackTrustRows);
+  const [helpGroups, setHelpGroups] = useState(fallbackHelpGroups);
+  const [advantages, setAdvantages] = useState(fallbackAdvantages);
+  const [leaders, setLeaders] = useState(fallbackLeaders);
+
+  useEffect(() => {
+    // All admin-editable via /admin/site-content → the "About:" sections.
+    // Each fetch maps the generic {title, description, icon, image_url, link}
+    // row shape into whatever field names this page's JSX already expects,
+    // so only the data source changes — falls back to the defaults above
+    // if nothing has been added in the admin panel yet.
+    db.entities.SiteContent.filter({ section: "about_services", status: "active" }, "sort_order", 20)
+      .then((data) => {
+        if (data.length > 0) {
+          setServices(data.map((d) => ({ icon: iconFor(d.icon, Stethoscope), label: d.title })));
+        }
+      })
+      .catch(() => {});
+
+    db.entities.SiteContent.filter({ section: "about_trust_rows", status: "active" }, "sort_order", 20)
+      .then((data) => {
+        if (data.length > 0) {
+          setTrustRows(data.map((d) => ({ image: d.image_url, title: d.title, desc: d.description })));
+        }
+      })
+      .catch(() => {});
+
+    db.entities.SiteContent.filter({ section: "about_help_groups", status: "active" }, "sort_order", 20)
+      .then((data) => {
+        if (data.length > 0) {
+          setHelpGroups(
+            data.map((d) => ({
+              icon: iconFor(d.icon, Stethoscope),
+              title: d.title,
+              points: (d.description || "").split("\n").map((p) => p.trim()).filter(Boolean),
+            }))
+          );
+        }
+      })
+      .catch(() => {});
+
+    db.entities.SiteContent.filter({ section: "about_advantages", status: "active" }, "sort_order", 20)
+      .then((data) => {
+        if (data.length > 0) {
+          setAdvantages(data.map((d) => ({ icon: iconFor(d.icon, PlaneTakeoff), title: d.title, desc: d.description })));
+        }
+      })
+      .catch(() => {});
+
+    db.entities.SiteContent.filter({ section: "about_team", status: "active" }, "sort_order", 20)
+      .then((data) => {
+        if (data.length > 0) {
+          setLeaders(
+            data.map((d) => ({
+              photo: d.image_url,
+              name: d.title,
+              role: d.description,
+              linkedin: d.link || "#",
+              email: "",
+            }))
+          );
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   return (
     <div>
       {/* Hero */}
@@ -421,6 +484,7 @@ export default function About() {
                     >
                       <Linkedin className="w-4 h-4" />
                     </a>
+                    {leader.email && (
                     <a
                       href={`mailto:${leader.email}`}
                       aria-label={`Email ${leader.name}`}
@@ -428,6 +492,7 @@ export default function About() {
                     >
                       <Mail className="w-4 h-4" />
                     </a>
+                    )}
                   </div>
                 </div>
               </motion.div>

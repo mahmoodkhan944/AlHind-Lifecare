@@ -12,9 +12,15 @@ const SECTIONS = [
   { key: "specialties", label: "Multi-Specialty Focus", hasDescription: false, hasLink: true },
   { key: "services", label: "Our Services", hasDescription: false, hasLink: false },
   { key: "process_steps", label: "How Do We Work? (Steps)", hasDescription: true, hasLink: false },
+  { key: "about_stats", label: "About: Stats", hasDescription: true, hasLink: false, descLabel: "Label (e.g. Happy Patients)", titleLabel: "Value (e.g. 50,000+)" },
+  { key: "about_services", label: "About: What We Offer", hasDescription: false, hasLink: false },
+  { key: "about_trust_rows", label: "About: Why Patients Trust Us", hasDescription: true, hasLink: false, hasImage: true },
+  { key: "about_help_groups", label: "About: How We Help (Groups)", hasDescription: true, hasLink: false, descLabel: "Points (one per line)" },
+  { key: "about_advantages", label: "About: Advantages", hasDescription: true, hasLink: false },
+  { key: "about_team", label: "About: Leadership Team", hasDescription: true, hasLink: true, hasImage: true, descLabel: "Role / Title", titleLabel: "Name", linkLabel: "LinkedIn URL" },
 ];
 
-const emptyForm = { title: "", description: "", icon: "", link: "", sort_order: 0, status: "active" };
+const emptyForm = { title: "", description: "", icon: "", link: "", image_url: "", sort_order: 0, status: "active" };
 
 export default function AdminSiteContent() {
   const [activeSection, setActiveSection] = useState("specialties");
@@ -73,6 +79,7 @@ export default function AdminSiteContent() {
       description: sectionMeta.hasDescription ? form.description || "" : null,
       icon: form.icon || "",
       link: sectionMeta.hasLink ? form.link || "" : null,
+      image_url: sectionMeta.hasImage ? form.image_url || "" : null,
       sort_order: Number(form.sort_order) || 0,
       status: form.status || "active",
     };
@@ -104,8 +111,8 @@ export default function AdminSiteContent() {
       <div className="mb-6">
         <h1 className="font-heading font-bold text-2xl text-foreground">Site Content</h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Manage the homepage lists that used to be hardcoded in the code — specialties, services, and the
-          "How Do We Work?" steps.
+          Manage the homepage and About page lists that used to be hardcoded in the code — specialties, services,
+          process steps, team members, stats, and more.
         </p>
       </div>
 
@@ -134,7 +141,7 @@ export default function AdminSiteContent() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="text-sm font-medium text-foreground/80 block mb-1.5">
-                Title <span className="text-destructive">*</span>
+                {sectionMeta.titleLabel || "Title"} <span className="text-destructive">*</span>
               </label>
               <Input
                 value={form.title}
@@ -146,14 +153,29 @@ export default function AdminSiteContent() {
 
             {sectionMeta.hasDescription && (
               <div>
-                <label className="text-sm font-medium text-foreground/80 block mb-1.5">Description</label>
+                <label className="text-sm font-medium text-foreground/80 block mb-1.5">{sectionMeta.descLabel || "Description"}</label>
                 <Textarea
                   value={form.description}
                   onChange={(e) => setForm({ ...form, description: e.target.value })}
                   placeholder="Short description for this step"
                   className="rounded-lg border-border"
-                  rows={2}
+                  rows={sectionMeta.descLabel?.includes("one per line") ? 5 : 2}
                 />
+              </div>
+            )}
+
+            {sectionMeta.hasImage && (
+              <div>
+                <label className="text-sm font-medium text-foreground/80 block mb-1.5">Image URL</label>
+                <Input
+                  value={form.image_url}
+                  onChange={(e) => setForm({ ...form, image_url: e.target.value })}
+                  placeholder="https://..."
+                  className="h-10 rounded-lg border-border"
+                />
+                {form.image_url && (
+                  <img src={form.image_url} alt="" className="mt-2 w-16 h-16 rounded-lg object-cover border border-border" />
+                )}
               </div>
             )}
 
@@ -186,7 +208,7 @@ export default function AdminSiteContent() {
 
             {sectionMeta.hasLink && (
               <div>
-                <label className="text-sm font-medium text-foreground/80 block mb-1.5">Link (optional)</label>
+                <label className="text-sm font-medium text-foreground/80 block mb-1.5">{sectionMeta.linkLabel || "Link (optional)"}</label>
                 <Input
                   value={form.link}
                   onChange={(e) => setForm({ ...form, link: e.target.value })}
