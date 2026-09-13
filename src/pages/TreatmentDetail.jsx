@@ -811,32 +811,32 @@ function ClassicPage({ treatment, relatedDoctors, relatedHospitals, openLeadModa
 
               {treatment.gvhd_info && (
                 <SectionCard title="GVHD Information" icon={Activity}>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{treatment.gvhd_info}</p>
+                  <TextAsList text={treatment.gvhd_info} />
                 </SectionCard>
               )}
               {treatment.gvhd_symptoms && (
                 <SectionCard title="GVHD Symptoms" icon={AlertTriangle}>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{treatment.gvhd_symptoms}</p>
+                  <TextAsList text={treatment.gvhd_symptoms} />
                 </SectionCard>
               )}
               {treatment.conditions_treated && (
                 <SectionCard title="Conditions Treated" icon={Heart}>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{treatment.conditions_treated}</p>
+                  <TextAsList text={treatment.conditions_treated} />
                 </SectionCard>
               )}
               {treatment.diagnosis_detail && (
                 <SectionCard title="Diagnosis Details" icon={Activity}>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{treatment.diagnosis_detail}</p>
+                  <TextAsList text={treatment.diagnosis_detail} />
                 </SectionCard>
               )}
               {treatment.why_india_detail && (
                 <SectionCard title="Why Choose India" icon={Heart}>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{treatment.why_india_detail}</p>
+                  <TextAsList text={treatment.why_india_detail} />
                 </SectionCard>
               )}
               {treatment.why_turkey_detail && (
                 <SectionCard title="Why Choose Turkey" icon={Heart}>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{treatment.why_turkey_detail}</p>
+                  <TextAsList text={treatment.why_turkey_detail} />
                 </SectionCard>
               )}
             </div>
@@ -867,6 +867,34 @@ function ClassicPage({ treatment, relatedDoctors, relatedHospitals, openLeadModa
         </div>
       </section>
     </div>
+  );
+}
+
+// These fields (Conditions Treated, Diagnosis Details, Why Choose
+// India/Turkey, etc.) are stored as a single text block, with each item
+// typically entered on its own line in the admin form. Rendered as a plain
+// <p>, those line breaks collapse and everything runs together in one
+// paragraph — this renders each line as its own bulleted item instead,
+// falling back to a plain paragraph if there's genuinely just one line.
+function TextAsList({ text }) {
+  const lines = String(text || "")
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean);
+
+  if (lines.length <= 1) {
+    return <p className="text-sm text-muted-foreground leading-relaxed">{text}</p>;
+  }
+
+  return (
+    <ul className="space-y-2">
+      {lines.map((line, idx) => (
+        <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
+          <CheckCircle2 className="w-4 h-4 text-secondary flex-shrink-0 mt-0.5" />
+          {line}
+        </li>
+      ))}
+    </ul>
   );
 }
 
