@@ -86,12 +86,12 @@ export default function AdminTreatments() {
 
   return (
     <div>
-      <div className="flex items-center justify-between gap-4 mb-6">
-        <div className="relative flex-1 max-w-sm">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-6">
+        <div className="relative w-full sm:flex-1 sm:max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search treatments..." className="pl-9" />
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <BulkUploadDialog
             entityLabel="Treatments"
             entity={db.entities.Treatment}
