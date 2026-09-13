@@ -17,8 +17,28 @@ export const AuthProvider = ({ children }) => {
       setUser(currentUser);
       setIsAuthenticated(true);
     } catch (error) {
-      setUser(null);
-      setIsAuthenticated(false);
+      // A silent (background) check runs on routine events like a tab
+      // regaining focus. If it fails — a transient network blip, a brief
+      // hiccup fetching the profile row — that does NOT mean the person
+      // actually got signed out, so we leave the existing session alone
+      // rather than booting them. Only a non-silent check (the initial page
+      // load, or a real SIGNED_OUT event) is trusted to clear the session —
+      // and even then, we retry once first, since the very first check right
+      // after a fresh login is exactly when a one-off timing hiccup (the
+      // session not fully persisted yet, a brief network stall) is most
+      // likely, and getting it wrong here is what sends someone straight
+      // back out of /admin.
+      if (!silent) {
+        try {
+          await new Promise((r) => setTimeout(r, 600));
+          const retryUser = await auth.me();
+          setUser(retryUser);
+          setIsAuthenticated(true);
+        } catch (retryError) {
+          setUser(null);
+          setIsAuthenticated(false);
+        }
+      }
     } finally {
       if (!silent) setIsLoadingAuth(false);
       setAuthChecked(true);

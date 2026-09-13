@@ -1,19 +1,21 @@
 import { supabase } from '@/lib/supabaseClient';
 
 async function getProfile(userId) {
-  const { data } = await supabase.from('profiles').select('*').eq('id', userId).maybeSingle();
+  const { data, error } = await supabase.from('profiles').select('*').eq('id', userId).maybeSingle();
+  if (error) throw error;
   return data;
 }
 
 export const auth = {
   /** Returns the current user (with role merged in), or throws if not logged in. */
   async me() {
-    const { data: { user }, error } = await supabase.auth.getUser();
-    if (error || !user) {
+    const { data: { session }, error } = await supabase.auth.getSession();
+    if (error || !session?.user) {
       const e = new Error('Not authenticated');
       e.status = 401;
       throw e;
     }
+    const user = session.user;
     const profile = await getProfile(user.id);
     return {
       id: user.id,

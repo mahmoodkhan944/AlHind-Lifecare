@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { db } from "@/api/dataClient";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,8 +7,11 @@ import { Label } from "@/components/ui/label";
 import { LogIn, Mail, Lock, Loader2, Eye, EyeOff, AlertCircle } from "lucide-react";
 import AuthLayout from "@/components/AuthLayout";
 import GoogleIcon from "@/components/GoogleIcon";
+import { useAuth } from "@/lib/AuthContext";
 
 export default function Login() {
+  const navigate = useNavigate();
+  const { checkUserAuth } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -21,7 +24,13 @@ export default function Login() {
     setLoading(true);
     try {
       await db.auth.loginViaEmailPassword(email.trim(), password);
-      window.location.href = `${import.meta.env.BASE_URL}admin`;
+      // Refresh the in-memory auth state directly (no page reload) before
+      // navigating — a full page reload here used to race against Supabase
+      // finishing the write of the new session to localStorage, so the
+      // fresh page load would sometimes see no session yet and bounce
+      // straight back to /login.
+      await checkUserAuth();
+      navigate("/admin", { replace: true });
     } catch (err) {
       setError(err.message || "Invalid email or password");
     } finally {
