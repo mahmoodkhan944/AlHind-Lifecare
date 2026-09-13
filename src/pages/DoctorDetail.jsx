@@ -10,10 +10,10 @@ import {
   ArrowLeft,
   Calendar,
   CheckCircle2,
-  Activity,
   Trophy,
   BookOpen,
-  Stethoscope,
+  Info,
+  Medal,
 } from "lucide-react";
 import { db } from "@/api/dataClient";
 import { Button } from "@/components/ui/button";
@@ -120,14 +120,6 @@ export default function DoctorDetail() {
   const awards = parseList(doctor.awards_achievements);
   const whyChoose = parseList(doctor.why_choose_doctor);
 
-  const sections = [
-    { title: "Qualifications", icon: BookOpen, items: qualificationsList },
-    { title: "Clinical Focus", icon: Activity, items: clinicalFocus },
-    { title: "Additional Information", icon: CheckCircle2, items: additionalInfo },
-    { title: "Research & Publications", icon: BookOpen, items: researchPubs },
-    { title: "Why Choose This Doctor", icon: CheckCircle2, items: whyChoose },
-  ].filter((s) => s.items.length > 0);
-
   return (
     <div>
       {/* Hero */}
@@ -209,15 +201,13 @@ export default function DoctorDetail() {
           <div ref={contentTopRef} className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
             <div className="lg:col-span-2 space-y-4 sm:space-y-5">
               {doctor.overview && (
-                <SectionCard title="Overview" icon={Activity}>
-                  <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">{doctor.overview}</p>
+                <SectionCard title="Overview">
+                  <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-3">{doctor.overview}</p>
                   {overviewPoints.length > 0 && (
-                    <ul className="mt-4 space-y-2">
+                    <ul className="space-y-2">
                       {overviewPoints.map((p, idx) => (
                         <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
-                          <span className="flex items-center justify-center w-5 h-5 rounded-full bg-primary/10 text-primary text-xs font-bold flex-shrink-0 mt-0.5">
-                            {idx + 1}
-                          </span>
+                          <CheckCircle2 className="w-4 h-4 text-secondary flex-shrink-0 mt-0.5" />
                           {p}
                         </li>
                       ))}
@@ -226,13 +216,45 @@ export default function DoctorDetail() {
                 </SectionCard>
               )}
 
+              {treatmentsList.length > 0 && (
+                <div>
+                  <h2 className="font-heading font-bold text-lg sm:text-xl mb-3">List of Treatments</h2>
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    {treatmentsList.map((t, idx) => (
+                      <div
+                        key={idx}
+                        className="flex items-center gap-2 text-sm text-muted-foreground bg-secondary/5 border border-secondary/15 rounded-xl px-3.5 py-3"
+                      >
+                        <CheckCircle2 className="w-4 h-4 text-secondary flex-shrink-0" /> {t}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {specializations.length > 0 && (
+                <div>
+                  <h2 className="font-heading font-bold text-lg sm:text-xl mb-3">Specializations</h2>
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    {specializations.map((s, idx) => (
+                      <div
+                        key={idx}
+                        className="flex items-center gap-2 text-sm text-muted-foreground bg-secondary/5 border border-secondary/15 rounded-xl px-3.5 py-3"
+                      >
+                        <CheckCircle2 className="w-4 h-4 text-secondary flex-shrink-0" /> {s}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {doctor.detailed_experience && (
-                <SectionCard title="Detailed Experience" icon={Clock}>
-                  <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+                <SectionCard title="Detailed Experience">
+                  <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-3">
                     {doctor.detailed_experience}
                   </p>
                   {experienceDetails.length > 0 && (
-                    <ul className="mt-4 space-y-2">
+                    <ul className="space-y-2">
                       {experienceDetails.map((d, idx) => (
                         <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
                           <CheckCircle2 className="w-4 h-4 text-secondary flex-shrink-0 mt-0.5" /> {d}
@@ -243,51 +265,74 @@ export default function DoctorDetail() {
                 </SectionCard>
               )}
 
-              {specializations.length > 0 && (
-                <SectionCard title="Specializations" icon={Stethoscope}>
-                  <div className="flex flex-wrap gap-2">
-                    {specializations.map((s, idx) => (
-                      <span key={idx} className="px-3 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium">
-                        {s}
-                      </span>
-                    ))}
-                  </div>
-                </SectionCard>
-              )}
-
-              {treatmentsList.length > 0 && (
-                <SectionCard title="Treatments Offered" icon={Activity}>
-                  <ul className="grid sm:grid-cols-2 gap-2">
-                    {treatmentsList.map((t, idx) => (
-                      <li
-                        key={idx}
-                        className="flex items-center gap-2 text-sm text-muted-foreground bg-muted/30 rounded-lg px-3 py-2"
-                      >
-                        <CheckCircle2 className="w-4 h-4 text-secondary flex-shrink-0" /> {t}
-                      </li>
-                    ))}
-                  </ul>
-                </SectionCard>
-              )}
-
-              {sections.map((section) => (
-                <SectionCard key={section.title} title={section.title} icon={section.icon}>
+              {qualificationsList.length > 0 && (
+                <SectionCard title="Qualifications">
                   <ul className="space-y-2">
-                    {section.items.map((item, idx) => (
+                    {qualificationsList.map((item, idx) => (
                       <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
                         <CheckCircle2 className="w-4 h-4 text-secondary flex-shrink-0 mt-0.5" /> {item}
                       </li>
                     ))}
                   </ul>
                 </SectionCard>
-              ))}
+              )}
+
+              {clinicalFocus.length > 0 && (
+                <SectionCard title="Clinical Focus">
+                  <ul className="space-y-2">
+                    {clinicalFocus.map((item, idx) => (
+                      <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
+                        <CheckCircle2 className="w-4 h-4 text-secondary flex-shrink-0 mt-0.5" /> {item}
+                      </li>
+                    ))}
+                  </ul>
+                </SectionCard>
+              )}
+
+              {additionalInfo.length > 0 && (
+                <SectionCard title="Additional Information">
+                  <ul className="space-y-3">
+                    {additionalInfo.map((item, idx) => (
+                      <li key={idx} className="flex items-start gap-2.5 text-sm text-muted-foreground">
+                        <Info className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" /> {item}
+                      </li>
+                    ))}
+                  </ul>
+                </SectionCard>
+              )}
+
+              {researchPubs.length > 0 && (
+                <SectionCard title="Research & Publications">
+                  <ul className="space-y-2">
+                    {researchPubs.map((item, idx) => (
+                      <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
+                        <BookOpen className="w-4 h-4 text-secondary flex-shrink-0 mt-0.5" /> {item}
+                      </li>
+                    ))}
+                  </ul>
+                </SectionCard>
+              )}
 
               {awards.length > 0 && (
-                <SectionCard title="Awards & Achievements" icon={Trophy} accent>
-                  <ul className="space-y-2">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  className="bg-amber-50 border border-amber-200 rounded-2xl p-5 sm:p-6"
+                >
+                  <div className="flex items-center gap-2.5 mb-4">
+                    <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-[hsl(var(--accent-warm))] text-white shrink-0">
+                      <Trophy className="w-4.5 h-4.5" />
+                    </span>
+                    <h2 className="font-heading font-bold text-lg sm:text-xl">Awards & Achievements</h2>
+                  </div>
+                  <ul className="space-y-2.5">
                     {awards.map((a, idx) => (
-                      <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
-                        <Trophy className="w-4 h-4 text-[hsl(var(--accent-warm))] flex-shrink-0 mt-0.5" /> {a}
+                      <li key={idx} className="flex items-start gap-2.5 text-sm text-muted-foreground bg-white/70 rounded-lg px-3.5 py-3">
+                        <span className="flex items-center justify-center w-6 h-6 rounded-full bg-[hsl(var(--accent-warm)/0.15)] text-[hsl(var(--accent-warm))] shrink-0">
+                          <Medal className="w-3.5 h-3.5" />
+                        </span>
+                        {a}
                       </li>
                     ))}
                   </ul>
@@ -301,11 +346,33 @@ export default function DoctorDetail() {
                       <Award className="w-4 h-4" /> View Certificate/Document
                     </a>
                   )}
-                </SectionCard>
+                  <p className="flex items-center gap-1.5 justify-center mt-4 pt-4 border-t border-amber-200/70 text-xs font-medium text-[hsl(var(--accent-warm))]">
+                    <Trophy className="w-3.5 h-3.5" /> {awards.length} Professional Achievement{awards.length !== 1 ? "s" : ""}
+                  </p>
+                </motion.div>
+              )}
+
+              {whyChoose.length > 0 && (
+                <div>
+                  <h2 className="font-heading font-bold text-lg sm:text-xl mb-3">Why Choose Dr.?</h2>
+                  <div className="space-y-2.5">
+                    {whyChoose.map((item, idx) => (
+                      <div
+                        key={idx}
+                        className="flex items-start gap-2.5 text-sm text-muted-foreground bg-white border border-border rounded-xl px-4 py-3.5"
+                      >
+                        <span className="flex items-center justify-center w-5 h-5 rounded-full bg-accent-jade/15 text-accent-jade shrink-0 mt-0.5">
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                        </span>
+                        {item}
+                      </div>
+                    ))}
+                  </div>
+                </div>
               )}
 
               {doctor.bio && (
-                <SectionCard title="About" icon={BookOpen}>
+                <SectionCard title="About">
                   <p className="text-sm sm:text-base text-muted-foreground leading-relaxed whitespace-pre-line">
                     {doctor.bio}
                   </p>
@@ -317,7 +384,8 @@ export default function DoctorDetail() {
                 just a spacer reserving the column width; the actual visible
                 card is the fixed panel below (position: sticky was
                 unreliable on this site, so it uses the same fixed-panel
-                approach as the Navbar). */}
+                approach as the Navbar). No lead-capture form here on
+                purpose — just the two action buttons. */}
             <div className="lg:hidden">
               <DoctorSidebarCard doctor={doctor} openLeadModal={openLeadModal} />
             </div>
@@ -328,40 +396,75 @@ export default function DoctorDetail() {
               doctor's own details. */}
           {relatedDoctors.length > 0 && (
             <div className="mt-8 sm:mt-10">
-              <h2 className="font-heading font-bold text-xl sm:text-2xl mb-5 sm:mb-6">Related Doctors</h2>
+              <div className="text-center mb-6">
+                <h2 className="font-heading font-bold text-xl sm:text-2xl">Related Doctors</h2>
+                <p className="text-sm text-muted-foreground mt-1">Explore other specialists in our network</p>
+              </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                 {relatedDoctors.map((doc) => (
-                  <Link
+                  <div
                     key={doc.id}
-                    to={`/doctors/${doc.id}`}
-                    className="group flex flex-col items-center text-center bg-white rounded-2xl border border-border/50 shadow-sm hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 transition-all duration-300 p-5 sm:p-6"
+                    className="group bg-white rounded-2xl border border-border/50 shadow-sm hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 transition-all duration-300 overflow-hidden"
                   >
-                    <div className="relative w-20 h-20 sm:w-24 sm:h-24 mb-3">
-                      <div className="w-full h-full rounded-full overflow-hidden bg-gradient-to-br from-primary/10 to-secondary/10 ring-4 ring-white shadow-md">
+                    <Link to={`/doctors/${doc.id}`} className="block">
+                      <div className="relative aspect-[4/3] bg-gradient-to-br from-primary/5 to-secondary/5">
                         {doc.photo_url ? (
                           <img src={doc.photo_url} alt={doc.name} loading="lazy" className="w-full h-full object-cover" />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
-                            <span className="text-2xl font-bold text-primary/25">{doc.name?.[0]}</span>
+                            <span className="text-3xl font-bold text-primary/25">{doc.name?.[0]}</span>
                           </div>
                         )}
+                        {doc.rating > 0 && (
+                          <span className="absolute top-2.5 left-2.5 flex items-center gap-1 px-2 py-1 rounded-full bg-accent-jade text-white text-[11px] font-bold shadow-sm">
+                            <Star className="w-2.5 h-2.5 fill-current" />
+                            {doc.rating}
+                          </span>
+                        )}
+                        {doc.experience_years > 0 && (
+                          <span className="absolute top-2.5 right-2.5 px-2 py-1 rounded-full bg-white/95 text-foreground text-[11px] font-bold shadow-sm">
+                            {doc.experience_years}+
+                          </span>
+                        )}
                       </div>
-                      {doc.rating > 0 && (
-                        <span className="absolute -top-1 -left-1 flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold shadow-md">
-                          <Star className="w-2.5 h-2.5 fill-current" />
-                          {doc.rating}
-                        </span>
-                      )}
+                      <div className="p-4">
+                        <h3 className="font-heading font-bold text-sm sm:text-base text-foreground group-hover:text-primary transition-colors line-clamp-1">
+                          {doc.name}
+                        </h3>
+                        <p className="text-primary text-xs sm:text-sm font-semibold line-clamp-1 mt-0.5">
+                          {doc.designation || doc.speciality}
+                        </p>
+                        {doc.hospital_name && (
+                          <p className="flex items-center gap-1 text-xs text-muted-foreground mt-1.5 line-clamp-1">
+                            <MapPin className="w-3 h-3 shrink-0" /> {doc.hospital_name}
+                          </p>
+                        )}
+                      </div>
+                    </Link>
+                    <div className="px-4 pb-4">
+                      <Button
+                        variant="outline"
+                        onClick={() =>
+                          openLeadModal({
+                            title: "Book Appointment",
+                            description: `Book a consultation with ${doc.name}.`,
+                            treatmentInterest: doc.name,
+                          })
+                        }
+                        className="w-full h-9 rounded-lg text-sm border-accent-jade text-accent-jade hover:bg-accent-jade/5"
+                      >
+                        Book Appointment
+                      </Button>
                     </div>
-                    <h3 className="font-heading font-bold text-sm sm:text-base text-foreground group-hover:text-primary transition-colors line-clamp-1">
-                      {doc.name}
-                    </h3>
-                    <p className="text-primary text-xs sm:text-sm font-semibold line-clamp-1">{doc.speciality}</p>
-                    {doc.hospital_name && (
-                      <p className="text-xs text-muted-foreground mt-1 line-clamp-1">{doc.hospital_name}</p>
-                    )}
-                  </Link>
+                  </div>
                 ))}
+              </div>
+              <div className="text-center mt-6">
+                <Link to="/doctors">
+                  <Button className="bg-accent-jade hover:bg-accent-jade/90 text-white rounded-xl px-6">
+                    View All Doctors
+                  </Button>
+                </Link>
               </div>
             </div>
           )}
@@ -436,18 +539,15 @@ function DoctorSidebarCard({ doctor, openLeadModal }) {
   );
 }
 
-function SectionCard({ title, icon: Icon, accent, children }) {
+function SectionCard({ title, children }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      className={`rounded-2xl p-5 sm:p-6 md:p-7 border ${accent ? "bg-[hsl(var(--accent-warm)/0.08)] border-[hsl(var(--accent-warm)/0.3)]" : "bg-white border-border"}`}
+      className="bg-secondary/5 rounded-xl p-5 sm:p-6 border-l-4 border-secondary"
     >
-      <div className="flex items-center gap-2 mb-3 sm:mb-4">
-        <Icon className={`w-5 h-5 shrink-0 ${accent ? "text-[hsl(var(--accent-warm))]" : "text-primary"}`} />
-        <h2 className="font-heading font-bold text-lg sm:text-xl">{title}</h2>
-      </div>
+      <h2 className="font-heading font-bold text-lg sm:text-xl mb-3 sm:mb-4">{title}</h2>
       {children}
     </motion.div>
   );
