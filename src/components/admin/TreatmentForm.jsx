@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ArrowLeft, Loader2, Upload, ImageIcon } from "lucide-react";
+import { ArrowLeft, Loader2, Upload, ImageIcon, EyeOff } from "lucide-react";
 import { db } from "@/api/dataClient";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -114,30 +114,69 @@ export default function TreatmentForm({ initialData, onCancel, onSaved }) {
           <h2 className="font-bold text-foreground text-base sm:text-lg leading-tight">
             {isEdit ? "Edit Treatment" : "Add New Treatment"}
           </h2>
-          <p className="text-xs text-muted-foreground">{isEdit ? "Update treatment details" : "Create a new treatment"}</p>
+          <p className="text-xs text-muted-foreground">
+            Fields below are in the same order they appear on the View Details page.
+          </p>
         </div>
       </div>
 
       <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6 space-y-4 pb-28">
-        {/* Basic Information */}
+
+        {/* ==================================================================
+            1. BASIC INFO — identity fields, not part of the page's visual
+            flow but needed to create the record.
+            ================================================================== */}
         <div className="bg-white rounded-2xl border border-border p-4 sm:p-5 shadow-sm">
-          <h3 className="font-bold text-foreground text-sm mb-4">Basic Information</h3>
+          <h3 className="font-bold text-foreground text-sm mb-4">Basic Info</h3>
           <div className="space-y-3">
             <Field label="Title" required>
               <Input value={form.name || ""} onChange={(e) => set("name", e.target.value)} placeholder="Enter treatment title" className="h-10 rounded-lg border-border" />
             </Field>
-            <Field label="Slug" required>
+            <Field label="Slug" required hint="Used in the page URL, e.g. /treatments/knee-replacement">
               <Input value={form.slug || ""} onChange={(e) => set("slug", e.target.value)} placeholder="treatment-slug" className="h-10 rounded-lg border-border" />
             </Field>
             <Field label="Category" required>
               <Input value={form.category || ""} onChange={(e) => set("category", e.target.value)} placeholder="e.g., Cardiology, Oncology" className="h-10 rounded-lg border-border" />
             </Field>
-            <Field label="Short Description" required>
-              <Input value={form.description || ""} onChange={(e) => set("description", e.target.value)} placeholder="Brief 1-2 sentence description" className="h-10 rounded-lg border-border" />
-            </Field>
-            <Field label="Description">
-              <Textarea value={form.detailed_content || ""} onChange={(e) => set("detailed_content", e.target.value)} placeholder="Full treatment description" className="rounded-lg border-border min-h-[100px]" rows={4} />
-            </Field>
+            <div className="grid grid-cols-2 gap-3">
+              <Field label="Country">
+                <Select value={form.country || "Both"} onValueChange={(v) => set("country", v)}>
+                  <SelectTrigger className="h-10 rounded-lg border-border"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Both">Both</SelectItem>
+                    <SelectItem value="India">India</SelectItem>
+                    <SelectItem value="Turkey">Turkey</SelectItem>
+                  </SelectContent>
+                </Select>
+              </Field>
+              <Field label="Status" inline>
+                <Select value={form.status || "active"} onValueChange={(v) => set("status", v)}>
+                  <SelectTrigger className="h-10 rounded-lg border-border"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="active">Active</SelectItem>
+                    <SelectItem value="inactive">Inactive</SelectItem>
+                  </SelectContent>
+                </Select>
+              </Field>
+            </div>
+            <div className="flex items-center gap-6 pt-1 flex-wrap">
+              <label className="flex items-center gap-2 text-sm font-medium text-foreground/80">
+                <Switch checked={!!form.featured} onCheckedChange={(v) => set("featured", v)} /> Featured
+              </label>
+              <label className="flex items-center gap-2 text-sm font-medium text-foreground/80" title="Shows the full marketing landing-page design (hero pitch, lead form, why-us grid, FAQ) instead of the classic detail page">
+                <Switch checked={!!form.landing_page_enabled} onCheckedChange={(v) => set("landing_page_enabled", v)} /> Show as Landing Page
+              </label>
+            </div>
+          </div>
+        </div>
+
+        {/* ==================================================================
+            2. HERO — the very top of the View Details page: image, quick
+            description, and the cost/duration/success-rate/recovery badges.
+            ================================================================== */}
+        <SectionLabel step="Top of page" title="Hero" desc="Image, short blurb, and the quick-glance info badges" />
+        <div className="bg-white rounded-2xl border border-border p-4 sm:p-5 shadow-sm">
+          <div className="space-y-3">
             <Field label="Treatment Image">
               <div className="flex items-center gap-3">
                 {form.image_url ? (
@@ -156,82 +195,83 @@ export default function TreatmentForm({ initialData, onCancel, onSaved }) {
                 </label>
               </div>
             </Field>
-            <div className="grid grid-cols-2 gap-3 pt-1">
-              <Field label="Country">
-                <Select value={form.country || "Both"} onValueChange={(v) => set("country", v)}>
-                  <SelectTrigger className="h-10 rounded-lg border-border"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Both">Both</SelectItem>
-                    <SelectItem value="India">India</SelectItem>
-                    <SelectItem value="Turkey">Turkey</SelectItem>
-                  </SelectContent>
-                </Select>
+            <Field label="Short Description" required hint="The blurb shown right under the image">
+              <Input value={form.description || ""} onChange={(e) => set("description", e.target.value)} placeholder="Brief 1-2 sentence description" className="h-10 rounded-lg border-border" />
+            </Field>
+            <div className="grid grid-cols-2 gap-3">
+              <Field label="Cost Range (USD)">
+                <Input value={form.cost_range_usd || ""} onChange={(e) => set("cost_range_usd", e.target.value)} placeholder="e.g., $3,000 - $8,000" className="h-10 rounded-lg border-border" />
               </Field>
               <Field label="Duration">
                 <Input value={form.duration || ""} onChange={(e) => set("duration", e.target.value)} placeholder="e.g., 2-3 hours" className="h-10 rounded-lg border-border" />
               </Field>
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <Field label="Cost Range (USD)">
-                <Input value={form.cost_range_usd || ""} onChange={(e) => set("cost_range_usd", e.target.value)} placeholder="e.g., $3,000 - $8,000" className="h-10 rounded-lg border-border" />
+              <Field label="Success Rate">
+                <Input value={form.success_rate || ""} onChange={(e) => set("success_rate", e.target.value)} placeholder="e.g., 95% success rate" className="h-10 rounded-lg border-border" />
               </Field>
               <Field label="Recovery Time">
                 <Input value={form.recovery_time || ""} onChange={(e) => set("recovery_time", e.target.value)} placeholder="e.g., 2-4 weeks" className="h-10 rounded-lg border-border" />
               </Field>
             </div>
-            <div className="flex items-center gap-6 pt-1 flex-wrap">
-              <label className="flex items-center gap-2 text-sm font-medium text-foreground/80">
-                <Switch checked={!!form.featured} onCheckedChange={(v) => set("featured", v)} /> Featured
-              </label>
-              <label className="flex items-center gap-2 text-sm font-medium text-foreground/80" title="Shows the full marketing landing-page design (hero pitch, lead form, why-us grid, FAQ) instead of the classic detail page">
-                <Switch checked={!!form.landing_page_enabled} onCheckedChange={(v) => set("landing_page_enabled", v)} /> Show as Landing Page
-              </label>
-              <Field label="Status" inline>
-                <Select value={form.status || "active"} onValueChange={(v) => set("status", v)}>
-                  <SelectTrigger className="h-9 rounded-lg border-border w-32"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="inactive">Inactive</SelectItem>
-                  </SelectContent>
-                </Select>
-              </Field>
-            </div>
           </div>
         </div>
 
-        {/* Unnumbered dynamic sections */}
+        {/* ==================================================================
+            3. ABOUT THIS TREATMENT — the longer "About {name}" paragraph
+            right below the hero.
+            ================================================================== */}
+        <SectionLabel step="Next" title="About This Treatment" desc="The full description paragraph below the hero" />
+        <div className="bg-white rounded-2xl border border-border p-4 sm:p-5 shadow-sm">
+          <Field label="Description">
+            <Textarea value={form.detailed_content || ""} onChange={(e) => set("detailed_content", e.target.value)} placeholder="Full treatment description" className="rounded-lg border-border min-h-[100px]" rows={4} />
+          </Field>
+        </div>
+
+        {/* ==================================================================
+            4. KEY BENEFITS
+            ================================================================== */}
+        <SectionLabel step="Next" title="Key Benefits" desc="Checklist shown right after the description" />
         <DynamicListField label="Key Benefits" placeholder="Benefit" optional values={form.key_benefits} onChange={(v) => setList("key_benefits", v)} />
-        <DynamicListField label="Treatment Procedures" placeholder="Procedure step" optional values={form.treatment_procedures} onChange={(v) => setList("treatment_procedures", v)} />
 
-        {/* Numbered dynamic sections */}
+        {/* ==================================================================
+            5. DETAILED SECTIONS — rendered on the page in exactly this
+            order, each as its own numbered card.
+            ================================================================== */}
+        <SectionLabel step="Next" title="Detailed Sections" desc="Each of these becomes its own section, in this order" />
         <DynamicListField label="Overview" placeholder="Overview point" number={1} required values={form.overview} onChange={(v) => setList("overview", v)} />
-        <DynamicListField label="Additional Information" placeholder="Additional info" number={2} optional values={form.additional_information} onChange={(v) => setList("additional_information", v)} />
-        <DynamicListField label="Signs and Symptoms" placeholder="Sign / Symptom" number={3} optional values={form.signs_symptoms} onChange={(v) => setList("signs_symptoms", v)} />
-        <DynamicListField label="Condition" placeholder="Condition" number={4} optional values={form.related_conditions} onChange={(v) => setList("related_conditions", v)} />
-        <DynamicListField label="Diagnosis" placeholder="Diagnosis point" number={5} optional values={form.diagnosis} onChange={(v) => setList("diagnosis", v)} />
-        <DynamicListField label="Types of Treatments" placeholder="Treatment type" number={6} optional values={form.treatment_types} onChange={(v) => setList("treatment_types", v)} />
-        <DynamicListField label="Types of Surgery" placeholder="Surgery type" number={7} optional values={form.surgery_types} onChange={(v) => setList("surgery_types", v)} />
-        <DynamicListField label="How It's Done" placeholder="Step" number={8} optional values={form.how_its_done} onChange={(v) => setList("how_its_done", v)} />
-        <DynamicListField label="Purpose" placeholder="Purpose point" number={9} optional values={form.purpose} onChange={(v) => setList("purpose", v)} />
-        <DynamicListField label="Recovery" placeholder="Recovery detail" number={10} optional values={form.recovery_details} onChange={(v) => setList("recovery_details", v)} />
-        <DynamicListField label="Risk" placeholder="Risk / Complication" number={11} optional values={form.risks} onChange={(v) => setList("risks", v)} />
+        <DynamicListField label="Signs and Symptoms" placeholder="Sign / Symptom" number={2} optional values={form.signs_symptoms} onChange={(v) => setList("signs_symptoms", v)} />
+        <DynamicListField label="Condition" placeholder="Condition" number={3} optional values={form.related_conditions} onChange={(v) => setList("related_conditions", v)} />
+        <DynamicListField label="Diagnosis" placeholder="Diagnosis point" number={4} optional values={form.diagnosis} onChange={(v) => setList("diagnosis", v)} />
+        <DynamicListField label="Types of Treatments" placeholder="Treatment type" number={5} optional values={form.treatment_types} onChange={(v) => setList("treatment_types", v)} />
+        <DynamicListField label="Types of Surgery" placeholder="Surgery type" number={6} optional values={form.surgery_types} onChange={(v) => setList("surgery_types", v)} />
+        <DynamicListField label="How It's Done" placeholder="Step" number={7} optional values={form.how_its_done} onChange={(v) => setList("how_its_done", v)} />
+        <DynamicListField label="Purpose" placeholder="Purpose point" number={8} optional values={form.purpose} onChange={(v) => setList("purpose", v)} />
+        <DynamicListField label="Recovery" placeholder="Recovery detail" number={9} optional values={form.recovery_details} onChange={(v) => setList("recovery_details", v)} />
+        <DynamicListField label="Risk" placeholder="Risk / Complication" number={10} optional values={form.risks} onChange={(v) => setList("risks", v)} />
+        <DynamicListField label="Summary" placeholder="Summary point" number={11} optional values={form.summary} onChange={(v) => setList("summary", v)} />
+        <DynamicListField label="Why Choose India" placeholder="Reason" number={12} optional values={form.why_choose_india} onChange={(v) => setList("why_choose_india", v)} />
+        <DynamicListField label="Why Choose Turkey" placeholder="Reason" number={13} optional values={form.why_choose_turkey} onChange={(v) => setList("why_choose_turkey", v)} />
 
-        {/* Success Rate - single input */}
-        <div className="bg-white rounded-2xl border border-border p-4 sm:p-5 shadow-sm">
-          <div className="flex items-center gap-2 mb-3">
-            <span className="flex items-center justify-center w-6 h-6 rounded-full bg-accent-jade/15 text-accent-jade text-xs font-bold">12</span>
-            <h3 className="font-bold text-foreground text-sm">Success Rate <span className="text-muted-foreground/70 font-normal text-xs">(optional)</span></h3>
+        {/* ==================================================================
+            6. MORE DETAILS — shown after the numbered sections.
+            ================================================================== */}
+        <SectionLabel step="Next" title="More Details" desc="Shown further down the page, after the sections above" />
+        <DynamicListField label="Treatment Procedures" placeholder="Procedure step" optional values={form.treatment_procedures} onChange={(v) => setList("treatment_procedures", v)} />
+        <DynamicListField label="Additional Information" placeholder="Additional info" optional values={form.additional_information} onChange={(v) => setList("additional_information", v)} />
+
+        {/* ==================================================================
+            7. BACKEND-ONLY — saved to the database for internal reference,
+            deliberately NOT shown on the public page.
+            ================================================================== */}
+        <div className="bg-white rounded-2xl border border-dashed border-border p-4 sm:p-5 shadow-sm">
+          <div className="flex items-center gap-2 mb-1">
+            <EyeOff className="w-4 h-4 text-muted-foreground" />
+            <h3 className="font-bold text-foreground text-sm">Internal Notes</h3>
           </div>
-          <Input value={form.success_rate || ""} onChange={(e) => set("success_rate", e.target.value)} placeholder="e.g., 95% success rate" className="h-10 rounded-lg border-border" />
-        </div>
-
-        <DynamicListField label="Summary" placeholder="Summary point" number={13} optional values={form.summary} onChange={(v) => setList("summary", v)} />
-        <DynamicListField label="Why Choose India" placeholder="Reason" number={14} optional values={form.why_choose_india} onChange={(v) => setList("why_choose_india", v)} />
-        <DynamicListField label="Why Choose Turkey" placeholder="Reason" number={15} optional values={form.why_choose_turkey} onChange={(v) => setList("why_choose_turkey", v)} />
-
-        {/* Additional textareas */}
-        <div className="bg-white rounded-2xl border border-border p-4 sm:p-5 shadow-sm">
-          <h3 className="font-bold text-foreground text-sm mb-4">Additional Information <span className="text-muted-foreground/70 font-normal text-xs">(Optional)</span></h3>
+          <p className="text-xs text-muted-foreground/70 mb-4">
+            Saved for your team's reference only — none of this is shown on the public website.
+          </p>
           <div className="space-y-3">
             <Field label="GVHD Information">
               <Textarea value={form.gvhd_info || ""} onChange={(e) => set("gvhd_info", e.target.value)} placeholder="Graft versus host disease information" className="rounded-lg border-border min-h-[80px]" rows={3} />
@@ -268,13 +308,30 @@ export default function TreatmentForm({ initialData, onCancel, onSaved }) {
   );
 }
 
-function Field({ label, required, children, inline }) {
+// Marks a new section of the form, tying it to where it shows up on the
+// live View Details page — so filling out the form top-to-bottom naturally
+// matches what visitors will see top-to-bottom.
+function SectionLabel({ step, title, desc }) {
+  return (
+    <div className="flex items-center gap-3 pt-2 px-1">
+      <span className="text-[10px] font-bold uppercase tracking-wider text-accent-jade shrink-0">{step}</span>
+      <div className="flex-1 h-px bg-border" />
+      <div className="text-right">
+        <p className="text-sm font-bold text-foreground leading-tight">{title}</p>
+        <p className="text-[11px] text-muted-foreground leading-tight">{desc}</p>
+      </div>
+    </div>
+  );
+}
+
+function Field({ label, required, children, inline, hint }) {
   return (
     <div className={inline ? "flex items-center gap-2" : ""}>
       <label className={`text-sm font-medium text-foreground/80 ${inline ? "whitespace-nowrap" : "block mb-1.5"}`}>
         {label}{required && <span className="text-destructive"> *</span>}
       </label>
       {children}
+      {hint && <p className="text-xs text-muted-foreground/70 mt-1">{hint}</p>}
     </div>
   );
 }

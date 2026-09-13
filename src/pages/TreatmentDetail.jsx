@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -648,6 +648,25 @@ function LandingPage({ treatment, relatedDoctors, relatedHospitals, faqs, openLe
 // every treatment unless "Show as Landing Page" is turned on.
 // ============================================================================
 function ClassicPage({ treatment, relatedDoctors, relatedHospitals, openLeadModal }) {
+  const { data: settings = DEFAULT_SETTINGS } = useSiteSettings();
+
+  // The fixed CTA panel should only appear once the two-column content
+  // section (marked by this ref) has scrolled up to roughly navbar height —
+  // otherwise it floats over the hero image before the user scrolls at all.
+  const contentTopRef = useRef(null);
+  const [showFloatingCta, setShowFloatingCta] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!contentTopRef.current) return;
+      const top = contentTopRef.current.getBoundingClientRect().top;
+      setShowFloatingCta(top <= 96);
+    };
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   const infoCards = [
     { icon: DollarSign, label: "Cost Range", value: treatment.cost_range_usd },
     { icon: Clock, label: "Duration", value: treatment.duration },
@@ -655,28 +674,32 @@ function ClassicPage({ treatment, relatedDoctors, relatedHospitals, openLeadModa
     { icon: RefreshCw, label: "Recovery Time", value: treatment.recovery_time },
   ].filter((c) => c.value);
 
-  const sections = [
-    { key: "overview", title: "Overview", icon: Activity },
-    { key: "signs_symptoms", title: "Signs & Symptoms", icon: AlertTriangle },
-    { key: "related_conditions", title: "Related Conditions", icon: Heart },
-    { key: "diagnosis", title: "Diagnosis", icon: Activity },
-    { key: "treatment_types", title: "Types of Treatment", icon: CheckCircle2 },
-    { key: "surgery_types", title: "Types of Surgery", icon: CheckCircle2 },
-    { key: "how_its_done", title: "How It's Done", icon: Activity },
-    { key: "purpose", title: "Purpose", icon: CheckCircle2 },
-    { key: "recovery_details", title: "Recovery", icon: RefreshCw },
-    { key: "risks", title: "Risks & Complications", icon: AlertTriangle },
-    { key: "summary", title: "Summary", icon: CheckCircle2 },
-    ...(treatment.country !== "Turkey" ? [{ key: "why_choose_india", title: "Why Choose India", icon: Heart }] : []),
-    ...(treatment.country !== "India" ? [{ key: "why_choose_turkey", title: "Why Choose Turkey", icon: Heart }] : []),
-  ];
-  const listSections = sections
+  // Rendered as checkmark bullets, in this order.
+  const checklistSections = [
+    { key: "overview", title: "Overview" },
+    { key: "signs_symptoms", title: "Signs & Symptoms" },
+    { key: "related_conditions", title: "Conditions Treated" },
+    { key: "diagnosis", title: "Diagnosis & Evaluation" },
+    { key: "treatment_types", title: "Types of Treatment" },
+    { key: "surgery_types", title: "Types of Surgery" },
+    { key: "purpose", title: "Purpose" },
+    { key: "recovery_details", title: "Recovery" },
+    { key: "risks", title: "Risks & Complications" },
+    { key: "summary", title: "Summary" },
+    ...(treatment.country !== "Turkey" ? [{ key: "why_choose_india", title: "Why Choose India?" }] : []),
+    ...(treatment.country !== "India" ? [{ key: "why_choose_turkey", title: "Why Choose Turkey?" }] : []),
+  ]
     .map((s) => ({ ...s, items: parseList(treatment[s.key]) }))
     .filter((s) => s.items.length > 0);
+
+  // "How It's Done" is the one section rendered as a numbered list, not checkmarks.
+  const howItsDone = parseList(treatment.how_its_done);
 
   const keyBenefits = parseList(treatment.key_benefits);
   const procedures = parseList(treatment.treatment_procedures);
   const additionalInfo = parseList(treatment.additional_information);
+
+  const waLink = getWhatsAppLink(settings.whatsapp_number);
 
   return (
     <div>
@@ -740,21 +763,35 @@ function ClassicPage({ treatment, relatedDoctors, relatedHospitals, openLeadModa
 
       <section className="pb-8 sm:pb-10 md:pb-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
+          <div ref={contentTopRef} className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
             <div className="lg:col-span-2 space-y-4 sm:space-y-5">
               {treatment.detailed_content && (
-                <div className="bg-white rounded-2xl p-5 sm:p-6 md:p-8 border">
+                <div className="bg-secondary/5 rounded-xl p-5 sm:p-6 md:p-7 border-l-4 border-secondary">
                   <h2 className="font-heading font-bold text-lg sm:text-xl md:text-2xl mb-3 sm:mb-4">
-                    About {treatment.name}
+                    {treatment.name}
                   </h2>
-                  <p className="text-sm sm:text-base text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                  <p className="text-sm sm:text-base text-muted-foreground leading-relaxed whitespace-pre-wrap mb-4">
                     {treatment.detailed_content}
                   </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {treatment.category && (
+                      <div className="bg-white/60 rounded-lg p-3">
+                        <p className="text-xs font-bold text-secondary mb-1">Category</p>
+                        <p className="text-sm text-muted-foreground">{treatment.category}</p>
+                      </div>
+                    )}
+                    {treatment.country && (
+                      <div className="bg-white/60 rounded-lg p-3">
+                        <p className="text-xs font-bold text-secondary mb-1">Available In</p>
+                        <p className="text-sm text-muted-foreground">{countryLabel(treatment.country)}</p>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
 
               {keyBenefits.length > 0 && (
-                <SectionCard title="Key Benefits" icon={CheckCircle2}>
+                <SectionCard title="Key Benefits">
                   <ul className="space-y-2">
                     {keyBenefits.map((item, idx) => (
                       <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
@@ -766,14 +803,12 @@ function ClassicPage({ treatment, relatedDoctors, relatedHospitals, openLeadModa
                 </SectionCard>
               )}
 
-              {listSections.map((section) => (
-                <SectionCard key={section.key} title={section.title} icon={section.icon}>
+              {checklistSections.map((section) => (
+                <SectionCard key={section.key} title={section.title}>
                   <ul className="space-y-2">
                     {section.items.map((item, idx) => (
                       <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
-                        <span className="flex items-center justify-center w-5 h-5 rounded-full bg-primary/10 text-primary text-xs font-bold flex-shrink-0 mt-0.5">
-                          {idx + 1}
-                        </span>
+                        <CheckCircle2 className="w-4 h-4 text-secondary flex-shrink-0 mt-0.5" />
                         {item}
                       </li>
                     ))}
@@ -781,15 +816,30 @@ function ClassicPage({ treatment, relatedDoctors, relatedHospitals, openLeadModa
                 </SectionCard>
               ))}
 
+              {howItsDone.length > 0 && (
+                <SectionCard title="How It Is Done">
+                  <ol className="space-y-3">
+                    {howItsDone.map((item, idx) => (
+                      <li key={idx} className="flex items-start gap-3">
+                        <span className="flex items-center justify-center w-6 h-6 rounded-full bg-accent-jade text-white text-xs font-bold flex-shrink-0">
+                          {idx + 1}
+                        </span>
+                        <p className="text-sm text-muted-foreground pt-0.5">{item}</p>
+                      </li>
+                    ))}
+                  </ol>
+                </SectionCard>
+              )}
+
               {procedures.length > 0 && (
-                <SectionCard title="Treatment Procedures" icon={Activity}>
+                <SectionCard title="Treatment Procedures">
                   <ol className="space-y-3">
                     {procedures.map((item, idx) => (
                       <li key={idx} className="flex items-start gap-3">
-                        <span className="flex items-center justify-center w-7 h-7 rounded-full bg-gradient-to-r from-primary to-secondary text-white text-xs font-bold flex-shrink-0">
+                        <span className="flex items-center justify-center w-6 h-6 rounded-full bg-accent-jade text-white text-xs font-bold flex-shrink-0">
                           {idx + 1}
                         </span>
-                        <p className="text-sm text-muted-foreground pt-1">{item}</p>
+                        <p className="text-sm text-muted-foreground pt-0.5">{item}</p>
                       </li>
                     ))}
                   </ol>
@@ -797,7 +847,7 @@ function ClassicPage({ treatment, relatedDoctors, relatedHospitals, openLeadModa
               )}
 
               {additionalInfo.length > 0 && (
-                <SectionCard title="Additional Information" icon={CheckCircle2}>
+                <SectionCard title="Additional Information">
                   <ul className="space-y-2">
                     {additionalInfo.map((item, idx) => (
                       <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
@@ -810,36 +860,32 @@ function ClassicPage({ treatment, relatedDoctors, relatedHospitals, openLeadModa
               )}
 
               {treatment.gvhd_info && (
-                <SectionCard title="GVHD Information" icon={Activity}>
+                <SectionCard title="GVHD Information">
                   <TextAsList text={treatment.gvhd_info} />
                 </SectionCard>
               )}
               {treatment.gvhd_symptoms && (
-                <SectionCard title="GVHD Symptoms" icon={AlertTriangle}>
+                <SectionCard title="GVHD Symptoms">
                   <TextAsList text={treatment.gvhd_symptoms} />
                 </SectionCard>
               )}
               {treatment.conditions_treated && (
-                <SectionCard title="Conditions Treated" icon={Heart}>
+                <SectionCard title="Conditions Treated">
                   <TextAsList text={treatment.conditions_treated} />
                 </SectionCard>
               )}
               {treatment.diagnosis_detail && (
-                <SectionCard title="Diagnosis Details" icon={Activity}>
+                <SectionCard title="Diagnosis Details">
                   <TextAsList text={treatment.diagnosis_detail} />
                 </SectionCard>
               )}
               {/* "Why India" / "Why Turkey" are intentionally not rendered here —
                   kept as backend-only fields the admin can fill in for internal
                   reference, without showing on the public page. */}
-            </div>
 
-            <div>
-              <div className="bg-white rounded-2xl p-5 sm:p-6 border lg:sticky lg:top-24">
-                <h3 className="font-heading font-bold text-base sm:text-lg mb-3 sm:mb-4">Get a Free Quote</h3>
-                <p className="text-sm text-muted-foreground mb-5 sm:mb-6">
-                  Our medical experts will review your case and provide a detailed treatment plan.
-                </p>
+              {/* Mobile/tablet: the fixed desktop panel below is lg-only, so
+                  show the buttons inline here instead. */}
+              <div className="flex flex-col gap-2 lg:hidden">
                 <Button
                   onClick={() =>
                     openLeadModal({
@@ -848,17 +894,70 @@ function ClassicPage({ treatment, relatedDoctors, relatedHospitals, openLeadModa
                       treatmentInterest: treatment.name,
                     })
                   }
-                  className="w-full h-11 bg-gradient-to-r from-primary to-secondary text-white rounded-xl gap-2"
+                  className="h-12 bg-gradient-to-r from-primary to-secondary text-white rounded-xl text-base font-heading font-bold"
                 >
-                  <Calendar className="w-4 h-4" /> Request Quote
+                  Get Quotation
                 </Button>
+                {settings.whatsapp_number && (
+                  <Button variant="outline" asChild className="h-12 rounded-xl gap-2 text-base font-heading font-semibold">
+                    <a href={waLink} target="_blank" rel="noopener noreferrer">
+                      <MessageCircle className="w-4 h-4" /> WhatsApp
+                    </a>
+                  </Button>
+                )}
               </div>
             </div>
+
+            {/* Empty spacer — just reserves the 1/3 column width so the left
+                content stays at 2/3 width on large screens. The actual
+                visible buttons are the fixed panel below, rendered outside
+                the grid so they're never subject to any sticky/overflow
+                quirks — this is the same fixed-positioning approach already
+                used for the Navbar and the Call/WhatsApp buttons on this
+                site, chosen because plain CSS `sticky` was unreliable here. */}
+            <div className="hidden lg:block" />
           </div>
 
           <RelatedSections relatedDoctors={relatedDoctors} relatedHospitals={relatedHospitals} />
         </div>
       </section>
+
+      {/* Desktop-only fixed panel — stays hidden until the content section
+          (tracked via contentTopRef) has scrolled up near the navbar, so it
+          never floats over the hero image; then it's always visible while
+          scrolling, aligned to where the sidebar column above appears, using
+          the same max-w-7xl container math. */}
+      <div
+        className={`hidden lg:block fixed top-24 inset-x-0 z-30 pointer-events-none transition-opacity duration-300 ${
+          showFloatingCta ? "opacity-100" : "opacity-0"
+        }`}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="flex justify-end">
+            <div className={`w-full lg:w-[calc(33.333%-1rem)] flex flex-col gap-2 ${showFloatingCta ? "pointer-events-auto" : "pointer-events-none"}`}>
+              <Button
+                onClick={() =>
+                  openLeadModal({
+                    title: "Get a Free Quote",
+                    description: `Get a free, no-obligation quote for ${treatment.name}.`,
+                    treatmentInterest: treatment.name,
+                  })
+                }
+                className="h-12 bg-gradient-to-r from-primary to-secondary text-white rounded-xl text-base font-heading font-bold shadow-lg"
+              >
+                Get Quotation
+              </Button>
+              {settings.whatsapp_number && (
+                <Button variant="outline" asChild className="h-12 rounded-xl gap-2 text-base font-heading font-semibold bg-white shadow-lg">
+                  <a href={waLink} target="_blank" rel="noopener noreferrer">
+                    <MessageCircle className="w-4 h-4" /> WhatsApp
+                  </a>
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -891,18 +990,15 @@ function TextAsList({ text }) {
   );
 }
 
-function SectionCard({ title, icon: Icon, children }) {
+function SectionCard({ title, children }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      className="bg-white rounded-2xl p-5 sm:p-6 md:p-7 border"
+      className="bg-secondary/5 rounded-xl p-5 sm:p-6 border-l-4 border-secondary"
     >
-      <div className="flex items-center gap-2 mb-3 sm:mb-4">
-        <Icon className="w-5 h-5 text-primary shrink-0" />
-        <h2 className="font-heading font-bold text-lg sm:text-xl">{title}</h2>
-      </div>
+      <h2 className="font-heading font-bold text-lg sm:text-xl mb-3 sm:mb-4">{title}</h2>
       {children}
     </motion.div>
   );
