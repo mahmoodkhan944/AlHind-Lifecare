@@ -71,7 +71,11 @@ export default function LowestQuotes() {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
           {treatments.map((t, i) => {
             const Icon = getIcon(t.name);
-            const price = t.cost_range_usd || t.cost_range || "—";
+            const rawPrice = t.cost_range_usd || t.cost_range || "";
+            // cost_range_usd is often already stored with a "$" in it (e.g.
+            // "$3,000 - $5,000"), so only prepend one if it's missing —
+            // otherwise it shows up as "$$3,000".
+            const price = rawPrice ? (rawPrice.trim().startsWith("$") ? rawPrice : `$${rawPrice}`) : null;
             return (
               <motion.div
                 key={t.id || i}
@@ -88,7 +92,13 @@ export default function LowestQuotes() {
                 </div>
                 <h3 className="font-heading font-bold text-sm text-foreground mb-1 leading-snug">{t.name}</h3>
                 <p className="text-xs text-muted-foreground mb-3">
-                  Starting <span className="font-bold text-primary">${price}</span>
+                  {price ? (
+                    <>
+                      Starting <span className="font-bold text-primary">{price}</span>
+                    </>
+                  ) : (
+                    <span className="font-medium text-primary">Contact for pricing</span>
+                  )}
                 </p>
                 <button
                   onClick={() => openLeadModal({ title: "Get Quote", description: `Get a free, no-obligation quote for ${t.name}.`, treatmentInterest: t.name })}
