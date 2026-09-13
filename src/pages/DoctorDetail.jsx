@@ -18,6 +18,7 @@ import {
 import { db } from "@/api/dataClient";
 import { Button } from "@/components/ui/button";
 import { useLeadModal } from "@/lib/LeadModalContext";
+import { useDocumentMeta } from "@/hooks/useDocumentMeta";
 
 const parseList = (val) => {
   if (!val) return [];
@@ -89,6 +90,16 @@ export default function DoctorDetail() {
       })
       .catch(() => {});
   }, [doctor]);
+
+  // Sets the browser tab title / SEO meta description only — nothing from
+  // this renders anywhere on the visible page. Falls back to sensible
+  // auto-generated values when the admin hasn't filled in custom SEO text.
+  useDocumentMeta({
+    title: doctor
+      ? doctor.meta_title || `${doctor.name}${doctor.designation ? ` — ${doctor.designation}` : ""} | AlHind Lifecare`
+      : undefined,
+    description: doctor ? doctor.meta_description || doctor.overview || undefined : undefined,
+  });
 
   if (loading) {
     return (

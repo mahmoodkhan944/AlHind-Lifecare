@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ArrowLeft, Loader2, Upload, ImageIcon, Trophy, Save } from "lucide-react";
 import { db } from "@/api/dataClient";
 import { Button } from "@/components/ui/button";
@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
 import DynamicListField from "@/components/admin/DynamicListField";
+import AutocompleteInput from "@/components/admin/AutocompleteInput";
 
 const parseList = (val) => {
   if (!val) return [];
@@ -37,6 +38,13 @@ export default function DoctorForm({ initialData, onCancel, onSaved }) {
   const [saving, setSaving] = useState(false);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [uploadingDoc, setUploadingDoc] = useState(false);
+  const [hospitalNames, setHospitalNames] = useState([]);
+
+  useEffect(() => {
+    db.entities.Hospital.list("name", 2000)
+      .then((hospitals) => setHospitalNames(hospitals.map((h) => h.name).filter(Boolean)))
+      .catch(() => {});
+  }, []);
 
   const set = (key, val) => setForm((p) => ({ ...p, [key]: val }));
   const setList = (key, val) => set(key, val);
@@ -144,7 +152,15 @@ export default function DoctorForm({ initialData, onCancel, onSaved }) {
               <Input value={form.designation || ""} onChange={(e) => set("designation", e.target.value)} placeholder="e.g., Senior Consultant Cardiologist" className="h-10 rounded-lg border-border" />
             </Field>
             <Field label="Hospital" required>
-              <Input value={form.hospital_name || ""} onChange={(e) => set("hospital_name", e.target.value)} placeholder="e.g., Apollo Hospitals, New Delhi" className="h-10 rounded-lg border-border" />
+              <AutocompleteInput
+                value={form.hospital_name || ""}
+                onChange={(v) => set("hospital_name", v)}
+                options={hospitalNames}
+                placeholder="Select or type a hospital name"
+              />
+              <p className="text-xs text-muted-foreground/70 mt-1">
+                Pick an existing hospital, or type a new name if it's not listed yet.
+              </p>
             </Field>
             <div className="grid grid-cols-2 gap-3">
               <Field label="Experience Years" required>
@@ -274,6 +290,37 @@ export default function DoctorForm({ initialData, onCancel, onSaved }) {
             <Input type="number" step="0.1" max="5" value={form.rating ?? ""} onChange={(e) => set("rating", e.target.value)} placeholder="e.g. 4.8" className="h-10 rounded-lg border-border" />
             <p className="text-xs text-muted-foreground/70 mt-1">Between 0 and 5 (e.g. 4.8)</p>
           </Field>
+        </div>
+
+        {/* SEO Settings — used only for the browser tab title and search-engine
+            meta description. Never rendered anywhere on the live page. */}
+        <div className="bg-white rounded-2xl border border-border p-4 sm:p-5 shadow-sm">
+          <h3 className="font-bold text-foreground text-sm mb-4">SEO Settings</h3>
+          <div className="space-y-4">
+            <Field label="Meta Title (optional)">
+              <Input
+                value={form.meta_title || ""}
+                onChange={(e) => set("meta_title", e.target.value)}
+                placeholder="Custom SEO title for search engines"
+                className="h-10 rounded-lg border-border"
+              />
+              <p className="text-xs text-muted-foreground/70 mt-1">
+                Leave empty to auto-generate from doctor name and designation. Recommended: 50-60 characters.
+              </p>
+            </Field>
+            <Field label="Meta Description (optional)">
+              <Textarea
+                value={form.meta_description || ""}
+                onChange={(e) => set("meta_description", e.target.value)}
+                placeholder="Custom SEO description for search engines"
+                className="rounded-lg border-border min-h-[90px]"
+                rows={3}
+              />
+              <p className="text-xs text-muted-foreground/70 mt-1">
+                Leave empty to auto-generate from overview. Recommended: 150-160 characters.
+              </p>
+            </Field>
+          </div>
         </div>
       </div>
 
