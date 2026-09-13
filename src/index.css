@@ -6,13 +6,6 @@
 
 @layer base {
   :root {
-    /* PALETTE v2 — "Marine & Marigold": warm sandstone instead of a cold
-       blue-gray background, a richer vermilion primary, a deep marine
-       secondary (not a flat slate), and a marigold + jade pair so the site
-       has four real notes instead of two. Grounded in the brand: marigold
-       nods to India, deep marine nods to the Bosphorus/Turkey, vermilion is
-       the trust-building CTA red carried over from the existing brand,
-       jade reads as clinical/clean for secondary actions & success states. */
     --background: 38 52% 96%;
     --foreground: 191 35% 12%;
 
@@ -22,30 +15,14 @@
     --popover: 0 0% 100%;
     --popover-foreground: 191 35% 12%;
 
-    /* Primary — Vermilion. Slightly deeper & more saturated than the old
-       #D92E46 so it reads as a considered brand red rather than a flat
-       "bootstrap danger" red. Every hardcoded hex CTA that used to bypass
-       this token (HeroSection, LeadModal, Hospitals, plus the leftover
-       ad-hoc blue/green/orange palettes in HospitalsByCountry,
-       MultiSpecialtyFocus, NewsletterSection, TopDoctors) now reads
-       bg-primary / text-secondary / bg-accent-jade / accent-warm instead,
-       so this file is the only place colors need to change going forward. */
     --primary: 351 74% 56%;
     --primary-foreground: 0 0% 100%;
 
-    /* Secondary — Deep Marine. Warmer & inkier than a generic slate-navy,
-       doubles as the near-black used for dark sections/footers. */
     --secondary: 191 66% 13%;
     --secondary-foreground: 0 0% 100%;
 
-    /* Accent-warm — Marigold. Pushed more saturated/golden than the old
-       amber so award badges, ratings, and "featured" flags actually pop
-       against the new warm sandstone background instead of blending in. */
     --accent-warm: 40 98% 47%;
 
-    /* NEW — Jade. Third accent for secondary buttons, success/verified
-       states, and icon tints so not everything falls back to primary red.
-       Reads as "clinical trust" next to the warmer marigold/vermilion pair. */
     --accent-jade: 171 82% 30%;
 
     --muted: 40 35% 92%;
@@ -91,8 +68,6 @@
 
   html {
     scroll-behavior: smooth;
-    /* FIX: prevents the page from ever being wider than the viewport on any device,
-       which is what causes horizontal scroll/whitespace bugs on mobile. */
     -webkit-text-size-adjust: 100%;
   }
 
@@ -100,15 +75,10 @@
     @apply overflow-x-hidden bg-background text-foreground font-body antialiased;
     width: 100%;
     max-width: 100vw;
-    /* FIX: 100vw can be wider than 100% on some mobile browsers because it includes
-       the scrollbar gutter. min-height ensures full-height layouts (like the hero)
-       never get clipped short on small-height phones/landscape. */
     min-height: 100dvh;
   }
 
   img, video, svg, canvas {
-    /* FIX: sane default so any image/video dropped into the layout without explicit
-       sizing can't blow out its container width. */
     max-width: 100%;
     display: block;
   }
@@ -118,14 +88,11 @@
   }
 }
 
-/* Premium glassmorphism */
+
 .glass {
   @apply bg-white/70 backdrop-blur-xl border border-white/30 shadow-xl shadow-primary/5;
 }
 
-/* These background/text gradients are built entirely from the token
-   variables above, so any future palette change only needs to happen once,
-   at the top of this file. */
 .mesh-bg {
   background-color: hsl(var(--background));
   background-image:
@@ -142,12 +109,10 @@
     radial-gradient(at 90% 90%, hsl(var(--secondary) / 0.05) 0px, transparent 45%);
 }
 
-/* Premium gradient text — vermilion → marigold → deep marine, the full v2 trio */
 .gradient-text {
   @apply bg-clip-text text-transparent bg-gradient-to-r from-primary via-[hsl(var(--accent-warm))] to-secondary;
 }
 
-/* Friendly card shadow */
 .card-shadow {
   @apply shadow-lg shadow-primary/5;
 }
@@ -156,9 +121,6 @@
   @apply hover:shadow-2xl hover:shadow-primary/10 transition-all duration-300;
 }
 
-/* NEW: a slightly-elevated "premium" card treatment — soft layered shadow that
-   lifts and warms on hover, colored with the brand instead of flat black.
-   Use on any card that should feel a step more polished than a plain border. */
 .card-premium {
   @apply bg-white rounded-2xl border border-black/5 transition-all duration-300;
   box-shadow: 0 1px 2px hsl(var(--foreground) / 0.04), 0 8px 24px -12px hsl(var(--primary) / 0.12);
@@ -168,10 +130,6 @@
   box-shadow: 0 4px 8px hsl(var(--foreground) / 0.04), 0 16px 32px -12px hsl(var(--primary) / 0.2);
 }
 
-/* NEW: soft decorative blur shapes — drop one of these inside any
-   `relative overflow-hidden` container to add a bit of organic visual depth
-   behind content, without needing a custom image. Position with an extra
-   className (e.g. "-top-20 -right-20"). */
 .decor-blob {
   @apply absolute rounded-full pointer-events-none;
   filter: blur(60px);
@@ -189,9 +147,6 @@
   background: radial-gradient(circle, hsl(var(--accent-jade) / 0.25), transparent 70%);
 }
 
-/* NEW: a subtle dot-grid texture for section backgrounds that want a touch
-   of pattern without a photo — already used ad hoc in a couple of legal
-   pages; promoted to a reusable class. */
 .dot-grid {
   background-image: radial-gradient(hsl(var(--foreground) / 0.08) 1px, transparent 1px);
   background-size: 22px 22px;
@@ -201,8 +156,6 @@
   background-size: 22px 22px;
 }
 
-/* NEW: consistent "lift" micro-interaction for buttons/links that don't
-   already define their own hover transform. */
 .hover-lift {
   @apply transition-all duration-300;
 }

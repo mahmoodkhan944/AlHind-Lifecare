@@ -7,17 +7,15 @@ import {
   Mail,
   Globe,
   Bed,
-  Users,
   Award,
   ArrowLeft,
   Calendar,
   CheckCircle2,
   Activity,
-  Shield,
   Building2,
-  Car,
-  Stethoscope,
   Star,
+  Info,
+  Medal,
 } from "lucide-react";
 import { db } from "@/api/dataClient";
 import { Button } from "@/components/ui/button";
@@ -193,129 +191,165 @@ export default function HospitalDetail() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div ref={contentTopRef} className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
             <div className="lg:col-span-2 space-y-4 sm:space-y-5">
-              {hospital.description && (
-                <div className="bg-white rounded-2xl p-5 sm:p-6 border">
-                  <h2 className="font-heading font-bold text-lg sm:text-xl mb-3">About the Hospital</h2>
-                  <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">{hospital.description}</p>
-                </div>
-              )}
-
-              {fullDescription.length > 0 && (
-                <SectionCard title="About" icon={Building2}>
-                  <div className="space-y-3">
-                    {fullDescription.map((p, idx) => (
-                      <p key={idx} className="text-sm text-muted-foreground leading-relaxed">
-                        {p}
-                      </p>
-                    ))}
-                  </div>
+              {(hospital.description || fullDescription.length > 0) && (
+                <SectionCard title={`About ${hospital.name}`}>
+                  {hospital.description && (
+                    <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-3">
+                      {hospital.description}
+                    </p>
+                  )}
+                  {fullDescription.length > 0 && (
+                    <div className="space-y-3">
+                      {fullDescription.map((p, idx) => (
+                        <p key={idx} className="text-sm text-muted-foreground leading-relaxed">
+                          {p}
+                        </p>
+                      ))}
+                    </div>
+                  )}
                 </SectionCard>
               )}
 
               {specialities.length > 0 && (
-                <SectionCard title="Specialities" icon={Stethoscope}>
-                  <div className="flex flex-wrap gap-2">
+                <div>
+                  <h2 className="font-heading font-bold text-lg sm:text-xl mb-3">
+                    Medical Specialties Available At {hospital.name}
+                  </h2>
+                  <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
                     {specialities.map((s, idx) => (
-                      <span key={idx} className="px-3 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium">
-                        {s}
-                      </span>
+                      <div
+                        key={idx}
+                        className="flex items-center gap-2 text-sm text-muted-foreground bg-secondary/5 border border-secondary/15 rounded-xl px-3.5 py-3"
+                      >
+                        <CheckCircle2 className="w-4 h-4 text-secondary flex-shrink-0" /> {s}
+                      </div>
                     ))}
                   </div>
-                </SectionCard>
+                </div>
               )}
 
               {doctorsList.length > 0 && (
-                <SectionCard title="Our Doctors" icon={Users}>
-                  <ul className="grid sm:grid-cols-2 gap-2">
+                <div>
+                  <h2 className="font-heading font-bold text-lg sm:text-xl mb-0.5">Doctor's List</h2>
+                  <p className="text-sm text-muted-foreground mb-3">Our team of expert medical professionals</p>
+                  <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
                     {doctorsList.map((doc, idx) => (
-                      <li
+                      <div
                         key={idx}
-                        className="flex items-center gap-2 text-sm text-muted-foreground bg-muted/30 rounded-lg px-3 py-2"
+                        className="flex items-center gap-2 text-sm text-muted-foreground bg-secondary/5 border border-secondary/15 rounded-xl px-3.5 py-3"
                       >
                         <CheckCircle2 className="w-4 h-4 text-secondary flex-shrink-0" /> {doc}
-                      </li>
+                      </div>
                     ))}
-                  </ul>
-                </SectionCard>
+                  </div>
+                </div>
               )}
 
-              {facilities.length > 0 && (
-                <SectionCard title="Facilities" icon={CheckCircle2}>
-                  <ul className="grid sm:grid-cols-2 gap-2">
-                    {facilities.map((f, idx) => (
-                      <li key={idx} className="flex items-center gap-2 text-sm text-muted-foreground">
+              {(facilities.length > 0 || internationalServices.length > 0) && (
+                <div>
+                  <h2 className="font-heading font-bold text-lg sm:text-xl mb-3">Facilities &amp; Patient Services</h2>
+                  <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
+                    {[...facilities, ...internationalServices].map((f, idx) => (
+                      <div
+                        key={idx}
+                        className="flex items-center gap-2 text-sm text-muted-foreground bg-secondary/5 border border-secondary/15 rounded-xl px-3.5 py-3"
+                      >
                         <CheckCircle2 className="w-4 h-4 text-secondary flex-shrink-0" /> {f}
-                      </li>
+                      </div>
                     ))}
-                  </ul>
-                </SectionCard>
-              )}
-
-              {internationalServices.length > 0 && (
-                <SectionCard title="International Patient Services" icon={Globe}>
-                  <ul className="space-y-2">
-                    {internationalServices.map((s, idx) => (
-                      <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
-                        <CheckCircle2 className="w-4 h-4 text-secondary flex-shrink-0 mt-0.5" /> {s}
-                      </li>
-                    ))}
-                  </ul>
-                </SectionCard>
+                  </div>
+                </div>
               )}
 
               {accreditations.length > 0 && (
-                <SectionCard title="Accreditations" icon={Shield}>
-                  <div className="flex flex-wrap gap-2">
+                <div>
+                  <h2 className="font-heading font-bold text-lg sm:text-xl mb-0.5">Accreditations &amp; Certifications</h2>
+                  <p className="text-sm text-muted-foreground mb-3">Recognized for excellence in healthcare quality and safety</p>
+                  <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3 mb-4">
                     {accreditations.map((a, idx) => (
-                      <span
-                        key={idx}
-                        className="px-4 py-2 rounded-lg bg-secondary/10 text-secondary text-sm font-semibold border border-secondary/20"
-                      >
-                        {a}
-                      </span>
+                      <div key={idx} className="relative bg-white border border-border rounded-xl border-t-4 border-t-secondary px-4 py-3.5">
+                        <Star className="absolute top-3 right-3 w-4 h-4 text-secondary/20" />
+                        <p className="font-heading font-bold text-sm text-foreground pr-5">{a}</p>
+                        <p className="flex items-center gap-1 text-xs text-secondary font-medium mt-1">
+                          <CheckCircle2 className="w-3.5 h-3.5" /> Certified Excellence
+                        </p>
+                      </div>
                     ))}
                   </div>
-                </SectionCard>
+                  <div className="flex items-start gap-2.5 bg-blue-50 border border-blue-100 rounded-xl px-4 py-3.5">
+                    <Info className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-heading font-bold text-sm text-foreground mb-0.5">Quality Commitment</p>
+                      <p className="text-sm text-muted-foreground leading-relaxed">
+                        Our accreditations demonstrate our commitment to providing the highest standards of patient
+                        care, safety protocols, and clinical excellence. We undergo rigorous evaluations to maintain
+                        these certifications.
+                      </p>
+                    </div>
+                  </div>
+                </div>
               )}
 
               {expertise.length > 0 && (
-                <SectionCard title="Area of Expertise" icon={Activity}>
-                  <ul className="grid sm:grid-cols-2 gap-2">
+                <div>
+                  <h2 className="font-heading font-bold text-lg sm:text-xl mb-3">Area of Expertise</h2>
+                  <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
                     {expertise.map((e, idx) => (
-                      <li key={idx} className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0" /> {e}
-                      </li>
+                      <div
+                        key={idx}
+                        className="flex items-center gap-2 text-sm text-muted-foreground bg-secondary/5 border border-secondary/15 rounded-xl px-3.5 py-3"
+                      >
+                        <CheckCircle2 className="w-4 h-4 text-secondary flex-shrink-0" /> {e}
+                      </div>
                     ))}
-                  </ul>
-                </SectionCard>
+                  </div>
+                </div>
               )}
 
               {infrastructure.length > 0 && (
-                <SectionCard title="Infrastructure Details" icon={Building2}>
-                  <ul className="space-y-2">
+                <div>
+                  <h2 className="font-heading font-bold text-lg sm:text-xl mb-3">Infrastructure Details</h2>
+                  <div className="grid sm:grid-cols-2 gap-3">
                     {infrastructure.map((i, idx) => (
-                      <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
-                        <CheckCircle2 className="w-4 h-4 text-secondary flex-shrink-0 mt-0.5" /> {i}
-                      </li>
+                      <div
+                        key={idx}
+                        className="flex items-center gap-2 text-sm text-muted-foreground bg-secondary/5 border border-secondary/15 rounded-xl px-3.5 py-3"
+                      >
+                        <CheckCircle2 className="w-4 h-4 text-secondary flex-shrink-0" /> {i}
+                      </div>
                     ))}
-                  </ul>
-                </SectionCard>
+                  </div>
+                </div>
               )}
 
               {awards.length > 0 && (
-                <SectionCard title="Awards & Recognition" icon={Award}>
-                  <ul className="space-y-2">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  className="bg-amber-50 border border-amber-200 rounded-2xl p-5 sm:p-6"
+                >
+                  <div className="flex items-center gap-2.5 mb-4">
+                    <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-[hsl(var(--accent-warm))] text-white shrink-0">
+                      <Award className="w-4.5 h-4.5" />
+                    </span>
+                    <h2 className="font-heading font-bold text-lg sm:text-xl">Awards &amp; Recognition</h2>
+                  </div>
+                  <ul className="space-y-2.5">
                     {awards.map((a, idx) => (
-                      <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
-                        <Award className="w-4 h-4 text-accent flex-shrink-0 mt-0.5" /> {a}
+                      <li key={idx} className="flex items-start gap-2.5 text-sm text-muted-foreground bg-white/70 rounded-lg px-3.5 py-3">
+                        <span className="flex items-center justify-center w-6 h-6 rounded-full bg-[hsl(var(--accent-warm)/0.15)] text-[hsl(var(--accent-warm))] shrink-0">
+                          <Medal className="w-3.5 h-3.5" />
+                        </span>
+                        {a}
                       </li>
                     ))}
                   </ul>
-                </SectionCard>
+                </motion.div>
               )}
 
               {hospital.google_maps_embed_url && (
-                <SectionCard title="Location" icon={MapPin}>
+                <SectionCard title="Location">
                   <div className="rounded-xl overflow-hidden border">
                     <iframe
                       src={hospital.google_maps_embed_url}
@@ -334,7 +368,8 @@ export default function HospitalDetail() {
 
             {/* Sidebar — mobile/tablet: shown inline here. Desktop: this is
                 just a spacer reserving the column width; the actual visible
-                card is the fixed panel below. */}
+                card is the fixed panel below. No lead-capture form here on
+                purpose — just the two action buttons. */}
             <div className="lg:hidden">
               <HospitalSidebarCard hospital={hospital} openLeadModal={openLeadModal} />
             </div>
@@ -345,41 +380,62 @@ export default function HospitalDetail() {
               the hospital details as clickable cards to each doctor's profile. */}
           {doctors.length > 0 && (
             <div className="mt-8 sm:mt-10">
-              <h2 className="font-heading font-bold text-xl sm:text-2xl mb-5 sm:mb-6">
-                Doctors at {hospital.name}
-              </h2>
+              <div className="text-center mb-6">
+                <h2 className="font-heading font-bold text-xl sm:text-2xl">Top Doctors</h2>
+                <p className="text-sm text-muted-foreground mt-1">Highly skilled doctors at {hospital.name}</p>
+              </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 {doctors.map((doc) => (
-                  <Link
+                  <div
                     key={doc.id}
-                    to={`/doctors/${doc.id}`}
-                    className="group flex flex-col items-center text-center bg-white rounded-2xl border border-border/50 shadow-sm hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 transition-all duration-300 p-5 sm:p-6"
+                    className="group bg-white rounded-2xl border border-border/50 shadow-sm hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 transition-all duration-300 overflow-hidden"
                   >
-                    <div className="relative w-20 h-20 sm:w-24 sm:h-24 mb-3">
-                      <div className="w-full h-full rounded-full overflow-hidden bg-gradient-to-br from-primary/10 to-secondary/10 ring-4 ring-white shadow-md">
+                    <Link to={`/doctors/${doc.id}`} className="block">
+                      <div className="relative aspect-[4/3] bg-gradient-to-br from-primary/5 to-secondary/5">
                         {doc.photo_url ? (
                           <img src={doc.photo_url} alt={doc.name} loading="lazy" className="w-full h-full object-cover" />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
-                            <span className="text-2xl font-bold text-primary/25">{doc.name?.[0]}</span>
+                            <span className="text-3xl font-bold text-primary/25">{doc.name?.[0]}</span>
                           </div>
                         )}
+                        {doc.rating > 0 && (
+                          <span className="absolute top-2.5 left-2.5 flex items-center gap-1 px-2 py-1 rounded-full bg-accent-jade text-white text-[11px] font-bold shadow-sm">
+                            <Star className="w-2.5 h-2.5 fill-current" />
+                            {doc.rating}
+                          </span>
+                        )}
+                        {doc.experience_years > 0 && (
+                          <span className="absolute top-2.5 right-2.5 px-2 py-1 rounded-full bg-white/95 text-foreground text-[11px] font-bold shadow-sm">
+                            {doc.experience_years}+
+                          </span>
+                        )}
                       </div>
-                      {doc.rating > 0 && (
-                        <span className="absolute -top-1 -left-1 flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold shadow-md">
-                          <Star className="w-2.5 h-2.5 fill-current" />
-                          {doc.rating}
-                        </span>
-                      )}
+                      <div className="p-4">
+                        <h3 className="font-heading font-bold text-sm sm:text-base text-foreground group-hover:text-primary transition-colors line-clamp-1">
+                          {doc.name}
+                        </h3>
+                        <p className="text-primary text-xs sm:text-sm font-semibold line-clamp-1 mt-0.5">
+                          {doc.designation || doc.speciality}
+                        </p>
+                      </div>
+                    </Link>
+                    <div className="px-4 pb-4">
+                      <Button
+                        variant="outline"
+                        onClick={() =>
+                          openLeadModal({
+                            title: "Book Appointment",
+                            description: `Book a consultation with ${doc.name}.`,
+                            treatmentInterest: doc.name,
+                          })
+                        }
+                        className="w-full h-9 rounded-lg text-sm border-accent-jade text-accent-jade hover:bg-accent-jade/5"
+                      >
+                        Book Appointment
+                      </Button>
                     </div>
-                    <h3 className="font-heading font-bold text-sm sm:text-base text-foreground group-hover:text-primary transition-colors line-clamp-1">
-                      {doc.name}
-                    </h3>
-                    <p className="text-primary text-xs sm:text-sm font-semibold line-clamp-1">{doc.speciality}</p>
-                    {doc.experience_years > 0 && (
-                      <p className="text-xs text-muted-foreground mt-1">{doc.experience_years}+ yrs experience</p>
-                    )}
-                  </Link>
+                  </div>
                 ))}
               </div>
             </div>
@@ -460,18 +516,15 @@ function HospitalSidebarCard({ hospital, openLeadModal }) {
   );
 }
 
-function SectionCard({ title, icon: Icon, children }) {
+function SectionCard({ title, children }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      className="bg-white rounded-2xl p-5 sm:p-6 md:p-7 border"
+      className="bg-secondary/5 rounded-xl p-5 sm:p-6 border-l-4 border-secondary"
     >
-      <div className="flex items-center gap-2 mb-3 sm:mb-4">
-        <Icon className="w-5 h-5 text-primary shrink-0" />
-        <h2 className="font-heading font-bold text-lg sm:text-xl">{title}</h2>
-      </div>
+      <h2 className="font-heading font-bold text-lg sm:text-xl mb-3 sm:mb-4">{title}</h2>
       {children}
     </motion.div>
   );
