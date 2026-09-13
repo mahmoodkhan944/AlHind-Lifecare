@@ -9,13 +9,33 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { useToast } from "@/components/ui/use-toast";
 import { Plus, Pencil, Trash2, Search } from "lucide-react";
 import AdminPagination from "@/components/admin/AdminPagination";
+import AdminPageHeader from "@/components/admin/AdminPageHeader";
+import StatCard from "@/components/admin/StatCard";
 
 const PAGE_SIZE = 15;
 
-export default function EntityManager({ entityName, fields, displayField = "name", cardView = false, renderCard }) {
+export default function EntityManager({
+  entityName,
+  fields,
+  displayField = "name",
+  cardView = false,
+  renderCard,
+  // Optional richer header/stats/filter UI (used by FAQs, Testimonials, etc).
+  // Falls back to the plain search-bar-only header when these are omitted,
+  // so existing callers are unaffected.
+  icon,
+  pageTitle,
+  subtitle,
+  addLabel,
+  searchPlaceholder,
+  computeStats, // (items) => [{ label, value, color, icon?, dot? }]
+  filterField, // e.g. "status" or "category"
+  filterOptions, // [{ value, label }] — "All" is added automatically
+}) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [filterValue, setFilterValue] = useState("all");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editItem, setEditItem] = useState(null);
   const [form, setForm] = useState({});
@@ -33,10 +53,10 @@ export default function EntityManager({ entityName, fields, displayField = "name
 
   useEffect(loadItems, [entityName]);
 
-  // Reset to page 1 whenever the search changes, so results never open on an empty page.
+  // Reset to page 1 whenever the search or filter changes, so results never open on an empty page.
   useEffect(() => {
     setPage(1);
-  }, [search]);
+  }, [search, filterValue]);
 
   const openNew = () => { setEditItem(null); setForm({}); setDialogOpen(true); };
   const openEdit = (item) => { setEditItem(item); setForm({ ...item }); setDialogOpen(true); };
@@ -68,9 +88,11 @@ export default function EntityManager({ entityName, fields, displayField = "name
     toast({ title: "Deleted" });
   };
 
-  const filtered = items.filter((item) =>
-    !search || String(item[displayField] || "").toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = items.filter((item) => {
+    const matchesSearch = !search || String(item[displayField] || "").toLowerCase().includes(search.toLowerCase());
+    const matchesFilter = !filterField || filterValue === "all" || String(item[filterField] ?? "").toLowerCase() === filterValue.toLowerCase();
+    return matchesSearch && matchesFilter;
+  });
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
@@ -92,17 +114,73 @@ export default function EntityManager({ entityName, fields, displayField = "name
 
   if (loading) return <div className="flex justify-center py-20"><div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin" /></div>;
 
+  const useRichHeader = !!(pageTitle || computeStats || filterField);
+  const stats = computeStats ? computeStats(items) : null;
+
   return (
     <div>
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-6">
-        <div className="relative w-full sm:flex-1 sm:max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder={`Search ${entityName}s...`} className="pl-9" />
+      {useRichHeader ? (
+        <AdminPageHeader
+          icon={icon}
+          title={pageTitle || entityName}
+          subtitle={subtitle}
+          actions={
+            <Button onClick={openNew} className="gap-2 bg-accent-jade hover:bg-accent-jade/90 text-white rounded-xl">
+              <Plus className="w-4 h-4" /> {addLabel || `Add ${entityName}`}
+            </Button>
+          }
+        />
+      ) : (
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-6">
+          <div className="relative w-full sm:flex-1 sm:max-w-sm">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder={searchPlaceholder || `Search ${entityName}s...`} className="pl-9" />
+          </div>
+          <Button onClick={openNew} className="gap-2 bg-gradient-to-r from-primary to-secondary text-white rounded-xl shrink-0">
+            <Plus className="w-4 h-4" /> {addLabel || `Add ${entityName}`}
+          </Button>
         </div>
-        <Button onClick={openNew} className="gap-2 bg-gradient-to-r from-primary to-secondary text-white rounded-xl shrink-0">
-          <Plus className="w-4 h-4" /> Add {entityName}
-        </Button>
-      </div>
+      )}
+
+      {stats && stats.length > 0 && (
+        <div
+          className={`grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 ${
+            { 2: "md:grid-cols-2", 3: "md:grid-cols-3", 4: "md:grid-cols-4" }[Math.min(stats.length, 4)] || "md:grid-cols-4"
+          }`}
+        >
+          {stats.map((s, i) => <StatCard key={i} {...s} />)}
+        </div>
+      )}
+
+      {useRichHeader && (
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-6">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder={searchPlaceholder || `Search ${entityName}s...`} className="pl-9 rounded-full" />
+          </div>
+          {filterField && filterOptions && (
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => setFilterValue("all")}
+                className={`px-3.5 py-1.5 rounded-full text-sm font-medium transition-colors ${filterValue === "all" ? "bg-foreground text-white" : "bg-white border border-border text-muted-foreground hover:bg-muted"}`}
+              >
+                All
+              </button>
+              {filterOptions.map((o) => (
+                <button
+                  key={o.value}
+                  type="button"
+                  onClick={() => setFilterValue(o.value)}
+                  className={`px-3.5 py-1.5 rounded-full text-sm font-medium transition-colors ${filterValue === o.value ? "bg-foreground text-white" : "bg-white border border-border text-muted-foreground hover:bg-muted"}`}
+                >
+                  {o.label}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {cardView && renderCard ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -3,9 +3,10 @@ import { db } from "@/api/dataClient";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
-import { Plus, Pencil, Trash2, Search, Loader2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Search, Loader2, FileText, Calendar } from "lucide-react";
 import BlogForm from "@/components/admin/BlogForm";
 import AdminPagination from "@/components/admin/AdminPagination";
+import AdminPageHeader from "@/components/admin/AdminPageHeader";
 
 const PAGE_SIZE = 15;
 
@@ -75,78 +76,73 @@ export default function AdminBlog() {
 
   return (
     <div>
-      <div className="flex items-center justify-between gap-4 mb-6">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search blog posts..." className="pl-9" />
-        </div>
-        <Button onClick={openNew} className="gap-2 bg-accent-jade hover:bg-accent-jade/90 text-white rounded-xl">
-          <Plus className="w-4 h-4" /> Add New Blog Post
-        </Button>
+      <AdminPageHeader
+        title="Blog Posts"
+        subtitle="Manage your blog content"
+        actions={
+          <Button onClick={openNew} className="gap-2 bg-accent-jade hover:bg-accent-jade/90 text-white rounded-xl">
+            <Plus className="w-4 h-4" /> Create New Post
+          </Button>
+        }
+      />
+
+      <div className="relative mb-6">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search blog posts..." className="pl-9 rounded-full" />
       </div>
 
       <div className="bg-white rounded-2xl border border-border overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-left border-b bg-muted">
-                <th className="p-4 font-medium text-muted-foreground">Post</th>
-                <th className="p-4 font-medium text-muted-foreground">Category</th>
-                <th className="p-4 font-medium text-muted-foreground">Author</th>
-                <th className="p-4 font-medium text-muted-foreground">Status</th>
-                <th className="p-4 font-medium text-muted-foreground text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y">
-              {paginated.map((item) => (
-                <tr key={item.id} className="hover:bg-muted">
-                  <td className="p-4">
-                    <div className="flex items-center gap-3">
-                      {item.cover_image_url ? (
-                        <img src={item.cover_image_url} alt={item.title} className="w-10 h-10 rounded-lg object-cover" />
-                      ) : (
-                        <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center text-muted-foreground/70 text-xs font-bold">
-                          {String(item.title || "B").charAt(0)}
-                        </div>
-                      )}
-                      <div>
-                        <div className="font-medium text-foreground max-w-[220px] truncate">{item.title}</div>
-                        {item.featured && <span className="text-xs text-accent-jade font-medium">★ Featured</span>}
-                      </div>
-                    </div>
-                  </td>
-                  <td className="p-4 text-muted-foreground">{item.category || "-"}</td>
-                  <td className="p-4 text-muted-foreground">{item.author || "-"}</td>
-                  <td className="p-4">
-                    <span
-                      className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${
-                        item.status === "published" ? "bg-accent-jade/10 text-accent-jade" : "bg-muted text-muted-foreground"
-                      }`}
-                    >
-                      {item.status || "draft"}
+        <div className="flex items-center gap-2 px-4 py-3 border-b bg-muted">
+          <FileText className="w-4 h-4 text-muted-foreground" />
+          <span className="font-medium text-foreground">All Posts</span>
+          <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-accent-jade/10 text-accent-jade">{filtered.length}</span>
+        </div>
+
+        <div className="divide-y">
+          {paginated.map((item) => (
+            <div key={item.id} className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+              <div className="flex-1 min-w-0">
+                <h3 className="font-heading font-bold text-foreground text-base leading-snug truncate">{item.title}</h3>
+                <div className="flex flex-wrap items-center gap-2 mt-2">
+                  {item.category && (
+                    <span className="inline-flex px-2.5 py-1 rounded-full bg-fuchsia-50 text-fuchsia-700 text-xs font-medium">
+                      {item.category}
                     </span>
-                  </td>
-                  <td className="p-4">
-                    <div className="flex gap-1 justify-end">
-                      <Button variant="ghost" size="sm" onClick={() => openEdit(item)}>
-                        <Pencil className="w-4 h-4" />
-                      </Button>
-                      <Button variant="ghost" size="sm" onClick={() => handleDelete(item.id)}>
-                        <Trash2 className="w-4 h-4 text-destructive" />
-                      </Button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-              {paginated.length === 0 && (
-                <tr>
-                  <td colSpan={5} className="p-8 text-center text-muted-foreground/70">
-                    No blog posts found. Click "Add New Blog Post" to create one.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                  )}
+                  <span
+                    className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium ${
+                      item.status === "published" ? "bg-accent-jade/10 text-accent-jade" : "bg-muted text-muted-foreground"
+                    }`}
+                  >
+                    {item.status || "draft"}
+                  </span>
+                  {item.created_date && (
+                    <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+                      <Calendar className="w-3.5 h-3.5" /> {new Date(item.created_date).toLocaleDateString()}
+                    </span>
+                  )}
+                </div>
+              </div>
+              <div className="flex gap-2 shrink-0">
+                <Button variant="outline" size="sm" onClick={() => openEdit(item)} className="gap-1.5 rounded-lg">
+                  <Pencil className="w-3.5 h-3.5" /> Edit
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleDelete(item.id)}
+                  className="gap-1.5 rounded-lg text-destructive border-destructive/30 hover:bg-destructive/5"
+                >
+                  <Trash2 className="w-3.5 h-3.5" /> Delete
+                </Button>
+              </div>
+            </div>
+          ))}
+          {paginated.length === 0 && (
+            <div className="p-8 text-center text-muted-foreground/70">
+              No blog posts found. Click "Create New Post" to create one.
+            </div>
+          )}
         </div>
       </div>
       <AdminPagination page={page} totalPages={totalPages} onPageChange={setPage} />
