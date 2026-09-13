@@ -829,16 +829,9 @@ function ClassicPage({ treatment, relatedDoctors, relatedHospitals, openLeadModa
                   <TextAsList text={treatment.diagnosis_detail} />
                 </SectionCard>
               )}
-              {treatment.why_india_detail && (
-                <SectionCard title="Why Choose India" icon={Heart}>
-                  <TextAsList text={treatment.why_india_detail} />
-                </SectionCard>
-              )}
-              {treatment.why_turkey_detail && (
-                <SectionCard title="Why Choose Turkey" icon={Heart}>
-                  <TextAsList text={treatment.why_turkey_detail} />
-                </SectionCard>
-              )}
+              {/* "Why India" / "Why Turkey" are intentionally not rendered here —
+                  kept as backend-only fields the admin can fill in for internal
+                  reference, without showing on the public page. */}
             </div>
 
             <div>
