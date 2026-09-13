@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -43,6 +43,23 @@ export default function HospitalDetail() {
   const [loading, setLoading] = useState(true);
   const [doctors, setDoctors] = useState([]);
   const { openLeadModal } = useLeadModal();
+
+  // The fixed CTA panel should only appear once the two-column content
+  // section (marked by this ref) has scrolled up to roughly navbar height —
+  // otherwise it floats over the hero before the user scrolls at all.
+  const contentTopRef = useRef(null);
+  const [showFloatingCta, setShowFloatingCta] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!contentTopRef.current) return;
+      const top = contentTopRef.current.getBoundingClientRect().top;
+      setShowFloatingCta(top <= 96);
+    };
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   useEffect(() => {
     db.entities.Hospital.get(id)
@@ -174,7 +191,7 @@ export default function HospitalDetail() {
       {/* Content */}
       <section className="pb-8 sm:pb-10 md:pb-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
+          <div ref={contentTopRef} className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
             <div className="lg:col-span-2 space-y-4 sm:space-y-5">
               {hospital.description && (
                 <div className="bg-white rounded-2xl p-5 sm:p-6 border">
@@ -315,60 +332,13 @@ export default function HospitalDetail() {
               )}
             </div>
 
-            {/* Sidebar */}
-            <div>
-              <div className="bg-white rounded-2xl p-5 sm:p-6 border lg:sticky lg:top-24 space-y-3.5">
-                <h3 className="font-heading font-bold text-base sm:text-lg">Get in Touch</h3>
-                {/* FIX: was a <Button> (renders its own <button>) wrapped inside a plain
-                    <button> — invalid nested interactive elements. Now a single Button
-                    with onClick directly on it. */}
-                <Button
-                  onClick={() =>
-                    openLeadModal({
-                      title: "Request Appointment",
-                      description: `Request an appointment at ${hospital.name}.`,
-                      treatmentInterest: hospital.name,
-                    })
-                  }
-                  className="w-full h-11 bg-gradient-to-r from-primary to-secondary text-white rounded-xl gap-2"
-                >
-                  <Calendar className="w-4 h-4" /> Request Appointment
-                </Button>
-                <a
-                  href={`https://wa.me/919876543210?text=I'm interested in ${hospital.name}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block"
-                >
-                  <Button variant="outline" className="w-full h-11 rounded-xl gap-2">
-                    <Phone className="w-4 h-4" /> WhatsApp
-                  </Button>
-                </a>
-                {hospital.contact_email && (
-                  <p className="flex items-center gap-2 text-sm text-muted-foreground pt-3.5 border-t break-all">
-                    <Mail className="w-4 h-4 shrink-0" />
-                    {hospital.contact_email}
-                  </p>
-                )}
-                {hospital.contact_phone && (
-                  <p className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Phone className="w-4 h-4 shrink-0" />
-                    {hospital.contact_phone}
-                  </p>
-                )}
-                {hospital.website && (
-                  <a
-                    href={hospital.website}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-sm text-primary hover:underline"
-                  >
-                    <Globe className="w-4 h-4 shrink-0" />
-                    Visit Website
-                  </a>
-                )}
-              </div>
+            {/* Sidebar — mobile/tablet: shown inline here. Desktop: this is
+                just a spacer reserving the column width; the actual visible
+                card is the fixed panel below. */}
+            <div className="lg:hidden">
+              <HospitalSidebarCard hospital={hospital} openLeadModal={openLeadModal} />
             </div>
+            <div className="hidden lg:block" />
           </div>
 
           {/* Doctors at this hospital — real linked Doctor records, shown below
@@ -416,6 +386,76 @@ export default function HospitalDetail() {
           )}
         </div>
       </section>
+
+      {/* Desktop-only fixed panel — hidden until contentTopRef has scrolled
+          up near the navbar (so it never floats over the hero), then stays
+          visible throughout the rest of the scroll. */}
+      <div
+        className={`hidden lg:block fixed top-24 inset-x-0 z-30 pointer-events-none transition-opacity duration-300 ${
+          showFloatingCta ? "opacity-100" : "opacity-0"
+        }`}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="flex justify-end">
+            <div className={`w-full lg:w-[calc(33.333%-1rem)] ${showFloatingCta ? "pointer-events-auto" : "pointer-events-none"}`}>
+              <HospitalSidebarCard hospital={hospital} openLeadModal={openLeadModal} />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function HospitalSidebarCard({ hospital, openLeadModal }) {
+  return (
+    <div className="bg-white rounded-2xl p-5 sm:p-6 border shadow-lg space-y-3.5">
+      <h3 className="font-heading font-bold text-base sm:text-lg">Get in Touch</h3>
+      <Button
+        onClick={() =>
+          openLeadModal({
+            title: "Request Appointment",
+            description: `Request an appointment at ${hospital.name}.`,
+            treatmentInterest: hospital.name,
+          })
+        }
+        className="w-full h-11 bg-gradient-to-r from-primary to-secondary text-white rounded-xl gap-2"
+      >
+        <Calendar className="w-4 h-4" /> Request Appointment
+      </Button>
+      <a
+        href={`https://wa.me/919876543210?text=I'm interested in ${hospital.name}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block"
+      >
+        <Button variant="outline" className="w-full h-11 rounded-xl gap-2">
+          <Phone className="w-4 h-4" /> WhatsApp
+        </Button>
+      </a>
+      {hospital.contact_email && (
+        <p className="flex items-center gap-2 text-sm text-muted-foreground pt-3.5 border-t break-all">
+          <Mail className="w-4 h-4 shrink-0" />
+          {hospital.contact_email}
+        </p>
+      )}
+      {hospital.contact_phone && (
+        <p className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Phone className="w-4 h-4 shrink-0" />
+          {hospital.contact_phone}
+        </p>
+      )}
+      {hospital.website && (
+        <a
+          href={hospital.website}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-2 text-sm text-primary hover:underline"
+        >
+          <Globe className="w-4 h-4 shrink-0" />
+          Visit Website
+        </a>
+      )}
     </div>
   );
 }

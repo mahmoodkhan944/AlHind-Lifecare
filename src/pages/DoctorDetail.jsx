@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -39,6 +39,23 @@ export default function DoctorDetail() {
   const [loading, setLoading] = useState(true);
   const [relatedDoctors, setRelatedDoctors] = useState([]);
   const { openLeadModal } = useLeadModal();
+
+  // The fixed CTA panel should only appear once the two-column content
+  // section (marked by this ref) has scrolled up to roughly navbar height —
+  // otherwise it floats over the hero before the user scrolls at all.
+  const contentTopRef = useRef(null);
+  const [showFloatingCta, setShowFloatingCta] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!contentTopRef.current) return;
+      const top = contentTopRef.current.getBoundingClientRect().top;
+      setShowFloatingCta(top <= 96);
+    };
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   useEffect(() => {
     db.entities.Doctor.get(id)
@@ -189,7 +206,7 @@ export default function DoctorDetail() {
       {/* Content */}
       <section className="pb-8 sm:pb-10 md:pb-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
+          <div ref={contentTopRef} className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
             <div className="lg:col-span-2 space-y-4 sm:space-y-5">
               {doctor.overview && (
                 <SectionCard title="Overview" icon={Activity}>
@@ -296,55 +313,15 @@ export default function DoctorDetail() {
               )}
             </div>
 
-            {/* Sidebar */}
-            <div className="space-y-4">
-              <div className="bg-white rounded-2xl p-5 sm:p-6 border lg:sticky lg:top-24">
-                <h3 className="font-heading font-bold text-base sm:text-lg mb-3 sm:mb-4">Book Consultation</h3>
-                {doctor.consultation_fee_usd && (
-                  <p className="text-xl sm:text-2xl font-bold text-primary mb-4">
-                    ${doctor.consultation_fee_usd}{" "}
-                    <span className="text-sm font-normal text-muted-foreground">/ consultation</span>
-                  </p>
-                )}
-                {/* FIX: was a <Button> (which renders its own <button>) wrapped inside
-                    a plain <button> — nested interactive elements are invalid HTML and
-                    can cause inconsistent click/focus behavior across browsers. */}
-                <Button
-                  onClick={() =>
-                    openLeadModal({
-                      title: "Book Appointment",
-                      description: `Book a consultation with ${doctor.name}.`,
-                      treatmentInterest: doctor.name,
-                    })
-                  }
-                  className="w-full h-11 bg-gradient-to-r from-primary to-secondary text-white rounded-xl gap-2 mb-3"
-                >
-                  <Calendar className="w-4 h-4" /> Book Appointment
-                </Button>
-                <a
-                  href={`https://wa.me/919876543210?text=I'd like to consult with ${doctor.name}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block"
-                >
-                  <Button variant="outline" className="w-full h-11 rounded-xl gap-2">
-                    <Phone className="w-4 h-4" /> WhatsApp
-                  </Button>
-                </a>
-                {doctor.hospital_name && (
-                  <div className="mt-4 pt-4 border-t">
-                    <p className="text-sm text-muted-foreground mb-1">Hospital</p>
-                    <p className="font-medium text-sm sm:text-base">{doctor.hospital_name}</p>
-                  </div>
-                )}
-                {doctor.languages && (
-                  <div className="mt-4 pt-4 border-t">
-                    <p className="text-sm text-muted-foreground mb-1">Languages</p>
-                    <p className="font-medium text-sm sm:text-base">{doctor.languages}</p>
-                  </div>
-                )}
-              </div>
+            {/* Sidebar — mobile/tablet: shown inline here. Desktop: this is
+                just a spacer reserving the column width; the actual visible
+                card is the fixed panel below (position: sticky was
+                unreliable on this site, so it uses the same fixed-panel
+                approach as the Navbar). */}
+            <div className="lg:hidden">
+              <DoctorSidebarCard doctor={doctor} openLeadModal={openLeadModal} />
             </div>
+            <div className="hidden lg:block" />
           </div>
 
           {/* Related doctors — same speciality / hospital, shown below the
@@ -390,6 +367,71 @@ export default function DoctorDetail() {
           )}
         </div>
       </section>
+
+      {/* Desktop-only fixed panel — hidden until contentTopRef has scrolled
+          up near the navbar (so it never floats over the hero), then stays
+          visible throughout the rest of the scroll. */}
+      <div
+        className={`hidden lg:block fixed top-24 inset-x-0 z-30 pointer-events-none transition-opacity duration-300 ${
+          showFloatingCta ? "opacity-100" : "opacity-0"
+        }`}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="flex justify-end">
+            <div className={`w-full lg:w-[calc(33.333%-1rem)] ${showFloatingCta ? "pointer-events-auto" : "pointer-events-none"}`}>
+              <DoctorSidebarCard doctor={doctor} openLeadModal={openLeadModal} />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function DoctorSidebarCard({ doctor, openLeadModal }) {
+  return (
+    <div className="bg-white rounded-2xl p-5 sm:p-6 border shadow-lg">
+      <h3 className="font-heading font-bold text-base sm:text-lg mb-3 sm:mb-4">Book Consultation</h3>
+      {doctor.consultation_fee_usd && (
+        <p className="text-xl sm:text-2xl font-bold text-primary mb-4">
+          ${doctor.consultation_fee_usd}{" "}
+          <span className="text-sm font-normal text-muted-foreground">/ consultation</span>
+        </p>
+      )}
+      <Button
+        onClick={() =>
+          openLeadModal({
+            title: "Book Appointment",
+            description: `Book a consultation with ${doctor.name}.`,
+            treatmentInterest: doctor.name,
+          })
+        }
+        className="w-full h-11 bg-gradient-to-r from-primary to-secondary text-white rounded-xl gap-2 mb-3"
+      >
+        <Calendar className="w-4 h-4" /> Book Appointment
+      </Button>
+      <a
+        href={`https://wa.me/919876543210?text=I'd like to consult with ${doctor.name}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block"
+      >
+        <Button variant="outline" className="w-full h-11 rounded-xl gap-2">
+          <Phone className="w-4 h-4" /> WhatsApp
+        </Button>
+      </a>
+      {doctor.hospital_name && (
+        <div className="mt-4 pt-4 border-t">
+          <p className="text-sm text-muted-foreground mb-1">Hospital</p>
+          <p className="font-medium text-sm sm:text-base">{doctor.hospital_name}</p>
+        </div>
+      )}
+      {doctor.languages && (
+        <div className="mt-4 pt-4 border-t">
+          <p className="text-sm text-muted-foreground mb-1">Languages</p>
+          <p className="font-medium text-sm sm:text-base">{doctor.languages}</p>
+        </div>
+      )}
     </div>
   );
 }
