@@ -38,6 +38,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { useLeadModal } from "@/lib/LeadModalContext";
 import { COUNTRIES, getDialCode } from "@/lib/countries";
 import { useSiteSettings, DEFAULT_SETTINGS, getWhatsAppLink } from "@/hooks/useSiteSettings";
+import { slugify } from "@/lib/slugify";
 
 const parseList = (val) => {
   if (!val) return [];
@@ -104,12 +105,22 @@ export default function TreatmentDetail({ forceLanding = false }) {
 
   useEffect(() => {
     setLoading(true);
-    // Prefer the SEO-friendly slug; fall back to treating the param as a raw
-    // id so any old /treatments/<uuid> links people already have keep working.
+    // Try, in order: (1) an exact slug match — the normal case; (2) treat the
+    // param as a raw id, for old /treatments/<uuid> links; (3) for older
+    // records created before the slug column was populated, compute
+    // slugify(name) for every treatment and match against that — so a
+    // treatment whose `slug` field is blank in the database still resolves
+    // correctly instead of showing "Treatment not found".
     db.entities.Treatment.filter({ slug })
       .then((matches) => {
         if (matches.length > 0) return matches[0];
-        return db.entities.Treatment.get(slug);
+        return db.entities.Treatment.get(slug).catch(() => null);
+      })
+      .then((found) => {
+        if (found) return found;
+        return db.entities.Treatment.list("-created_date", 2000).then(
+          (all) => all.find((t) => slugify(t.slug || t.name) === slugify(slug)) || null
+        );
       })
       .then(setTreatment)
       .catch(() => setTreatment(null))
