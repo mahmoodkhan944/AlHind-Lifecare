@@ -32,6 +32,8 @@ const DOCTOR_BULK_COLUMNS = [
   { key: "why_choose_doctor", label: "Why Choose This Doctor (separate with |)", type: "list", example: "20+ years experience | Internationally trained" },
   { key: "featured", label: "Featured (yes/no)", type: "boolean", example: "no" },
   { key: "status", label: "Status (active/inactive)", type: "text", example: "active" },
+  { key: "meta_title", label: "SEO Meta Title (optional)", type: "text", example: "" },
+  { key: "meta_description", label: "SEO Meta Description (optional)", type: "text", example: "" },
 ];
 
 const DOCTOR_BULK_DEFAULTS = {

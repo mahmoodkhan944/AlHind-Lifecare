@@ -27,6 +27,8 @@ const TREATMENT_BULK_COLUMNS = [
   { key: "key_benefits", label: "Key Benefits (separate with |)", type: "list", example: "Minimally invasive | Fast recovery" },
   { key: "why_choose_india", label: "Why Choose India (separate with |)", type: "list", example: "Lower cost | JCI hospitals" },
   { key: "why_choose_turkey", label: "Why Choose Turkey (separate with |)", type: "list", example: "Modern facilities | Easy visa" },
+  { key: "hospital_ids", label: "Hospitals — by name (separate with |)", type: "lookup-list", example: "Apollo Hospitals, New Delhi" },
+  { key: "doctor_ids", label: "Doctors — by name (separate with |)", type: "lookup-list", example: "Dr John Smith" },
   { key: "featured", label: "Featured (yes/no)", type: "boolean", example: "no" },
   { key: "landing_page_enabled", label: "Show as Landing Page (yes/no)", type: "boolean", example: "no" },
   { key: "status", label: "Status (active/inactive)", type: "text", example: "active" },
@@ -47,7 +49,18 @@ export default function AdminTreatments() {
   const [page, setPage] = useState(1);
   const [showForm, setShowForm] = useState(false);
   const [editItem, setEditItem] = useState(null);
+  const [hospitalLookup, setHospitalLookup] = useState(new Map());
+  const [doctorLookup, setDoctorLookup] = useState(new Map());
   const { toast } = useToast();
+
+  useEffect(() => {
+    db.entities.Hospital.list("name", 2000)
+      .then((hospitals) => setHospitalLookup(new Map(hospitals.map((h) => [String(h.name).toLowerCase(), h.id]))))
+      .catch(() => {});
+    db.entities.Doctor.list("name", 2000)
+      .then((doctors) => setDoctorLookup(new Map(doctors.map((d) => [String(d.name).toLowerCase(), d.id]))))
+      .catch(() => {});
+  }, []);
 
   const loadItems = () => {
     setLoading(true);
@@ -134,6 +147,7 @@ export default function AdminTreatments() {
             entity={db.entities.Treatment}
             columns={TREATMENT_BULK_COLUMNS}
             requiredDefaults={TREATMENT_BULK_DEFAULTS}
+            lookupMaps={{ hospital_ids: hospitalLookup, doctor_ids: doctorLookup }}
             onImported={loadItems}
           />
           <Button onClick={openNew} className="gap-2 bg-accent-jade hover:bg-accent-jade/90 text-white rounded-xl">

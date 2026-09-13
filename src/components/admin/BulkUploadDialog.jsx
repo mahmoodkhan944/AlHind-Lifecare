@@ -16,15 +16,23 @@ import { Upload, Download, Loader2, FileSpreadsheet, CheckCircle2, XCircle } fro
  * Props:
  *  - entityLabel: display name, e.g. "Doctors"
  *  - entity: db.entities.Doctor (needs .create())
- *  - columns: [{ key, label, type: "text"|"number"|"boolean"|"list", example? }]
+ *  - columns: [{ key, label, type: "text"|"number"|"boolean"|"list"|"lookup-list", example? }]
  *      "list" columns accept pipe-separated values in one cell (e.g.
  *      "Cardiology | Heart Surgery") and are stored as a JSON array string,
  *      matching how the full add/edit forms store their list fields.
+ *      "lookup-list" columns also accept pipe-separated values, but each
+ *      value is a human-readable NAME that gets resolved to a record id via
+ *      lookupMaps[col.key] (case-insensitive) — for relation fields like
+ *      hospital_ids/doctor_ids, so people can type names in the sheet
+ *      instead of needing to know internal ids. Names with no match are
+ *      silently skipped rather than blocking the row.
+ *  - lookupMaps: { [columnKey]: Map<lowercaseName, id> } — only needed when
+ *      using "lookup-list" columns.
  *  - requiredDefaults: { dbColumnKey: fallbackValue | (rowIndex) => value }
  *      applied only when that column ends up empty after the row is read.
  *  - onImported: called after a successful import (e.g. to reload the list)
  */
-export default function BulkUploadDialog({ entityLabel, entity, columns, requiredDefaults = {}, onImported }) {
+export default function BulkUploadDialog({ entityLabel, entity, columns, requiredDefaults = {}, lookupMaps = {}, onImported }) {
   const [open, setOpen] = useState(false);
   const [rows, setRows] = useState(null);
   const [fileName, setFileName] = useState("");
@@ -48,6 +56,7 @@ export default function BulkUploadDialog({ entityLabel, entity, columns, require
     XLSX.utils.book_append_sheet(wb, ws, entityLabel);
 
     const listCols = columns.filter((c) => c.type === "list").map((c) => c.label);
+    const lookupCols = columns.filter((c) => c.type === "lookup-list").map((c) => c.label);
     const notes = [
       ["How to use this template"],
       ["Every column is optional — leave anything blank you don't have yet."],
@@ -55,6 +64,9 @@ export default function BulkUploadDialog({ entityLabel, entity, columns, require
       ["You can add as many rows as you like; each row becomes one entry."],
       listCols.length
         ? [`For list-style columns (${listCols.join(", ")}), separate multiple values with a "|" character.`]
+        : [""],
+      lookupCols.length
+        ? [`For columns (${lookupCols.join(", ")}), type existing names separated by "|" — they'll be matched automatically. Names that don't match anything are skipped, not an error.`]
         : [""],
       ["Missing required fields (like name) will be auto-filled with a placeholder you can rename later from Edit."],
     ];
@@ -98,6 +110,14 @@ export default function BulkUploadDialog({ entityLabel, entity, columns, require
     if (col.type === "list") {
       const items = String(value).split("|").map((s) => s.trim()).filter(Boolean);
       return items.length ? JSON.stringify(items) : undefined;
+    }
+    if (col.type === "lookup-list") {
+      const names = String(value).split("|").map((s) => s.trim()).filter(Boolean);
+      const map = lookupMaps[col.key];
+      const ids = names
+        .map((n) => map?.get(n.toLowerCase()))
+        .filter(Boolean);
+      return ids.length ? JSON.stringify(ids) : undefined;
     }
     return String(value);
   };
