@@ -128,21 +128,35 @@ export default function TreatmentDetail({ forceLanding = false }) {
   }, [slug]);
 
   useEffect(() => {
-    if (!treatment?.category) return;
-    db.entities.Doctor.filter({ status: "active", speciality: treatment.category }, "-rating", 4)
-      .then(setRelatedDoctors)
-      .catch(() => {});
-  }, [treatment?.category]);
+    if (!treatment) return;
+    const doctorIds = parseList(treatment.doctor_ids);
+    if (doctorIds.length > 0) {
+      Promise.all(doctorIds.map((id) => db.entities.Doctor.get(id).catch(() => null)))
+        .then((docs) => setRelatedDoctors(docs.filter((d) => d && d.status !== "inactive").slice(0, 4)))
+        .catch(() => {});
+    } else if (treatment.category) {
+      db.entities.Doctor.filter({ status: "active", speciality: treatment.category }, "-rating", 4)
+        .then(setRelatedDoctors)
+        .catch(() => {});
+    }
+  }, [treatment]);
 
   useEffect(() => {
-    if (!treatment?.category) return;
-    db.entities.Hospital.filter({ status: "active" }, "-rating", 200)
-      .then((hospitals) => {
-        const matches = hospitals.filter((h) => parseList(h.specialities).includes(treatment.category));
-        setRelatedHospitals(matches.slice(0, 4));
-      })
-      .catch(() => {});
-  }, [treatment?.category]);
+    if (!treatment) return;
+    const hospitalIds = parseList(treatment.hospital_ids);
+    if (hospitalIds.length > 0) {
+      Promise.all(hospitalIds.map((id) => db.entities.Hospital.get(id).catch(() => null)))
+        .then((hospitals) => setRelatedHospitals(hospitals.filter((h) => h && h.status !== "inactive").slice(0, 4)))
+        .catch(() => {});
+    } else if (treatment.category) {
+      db.entities.Hospital.filter({ status: "active" }, "-rating", 200)
+        .then((hospitals) => {
+          const matches = hospitals.filter((h) => parseList(h.specialities).includes(treatment.category));
+          setRelatedHospitals(matches.slice(0, 4));
+        })
+        .catch(() => {});
+    }
+  }, [treatment]);
 
   useEffect(() => {
     db.entities.FAQ.filter({ status: "active" }, "order", 6)

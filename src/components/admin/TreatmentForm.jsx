@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ArrowLeft, Loader2, Upload, ImageIcon, EyeOff } from "lucide-react";
 import { db } from "@/api/dataClient";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/components/ui/use-toast";
 import DynamicListField from "@/components/admin/DynamicListField";
+import SearchableCheckboxList from "@/components/admin/SearchableCheckboxList";
 
 const parseList = (val) => {
   if (!val) return [];
@@ -22,13 +23,20 @@ export default function TreatmentForm({ initialData, onCancel, onSaved }) {
   const [form, setForm] = useState(() => {
     if (!initialData) return {};
     const f = { ...initialData };
-    ["key_benefits","treatment_procedures","overview","additional_information","signs_symptoms","related_conditions","diagnosis","treatment_types","surgery_types","how_its_done","purpose","recovery_details","risks","summary","why_choose_india","why_choose_turkey"].forEach((k) => {
+    ["key_benefits","treatment_procedures","overview","additional_information","signs_symptoms","related_conditions","diagnosis","treatment_types","surgery_types","how_its_done","purpose","recovery_details","risks","summary","why_choose_india","why_choose_turkey","hospital_ids","doctor_ids"].forEach((k) => {
       f[k] = parseList(initialData[k]);
     });
     return f;
   });
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [allHospitals, setAllHospitals] = useState([]);
+  const [allDoctors, setAllDoctors] = useState([]);
+
+  useEffect(() => {
+    db.entities.Hospital.list("name", 2000).then(setAllHospitals).catch(() => {});
+    db.entities.Doctor.list("name", 2000).then(setAllDoctors).catch(() => {});
+  }, []);
 
   const set = (key, val) => setForm((p) => ({ ...p, [key]: val }));
   const setList = (key, val) => set(key, val);
@@ -82,6 +90,8 @@ export default function TreatmentForm({ initialData, onCancel, onSaved }) {
       summary: JSON.stringify(form.summary || []),
       why_choose_india: JSON.stringify(form.why_choose_india || []),
       why_choose_turkey: JSON.stringify(form.why_choose_turkey || []),
+      hospital_ids: JSON.stringify(form.hospital_ids || []),
+      doctor_ids: JSON.stringify(form.doctor_ids || []),
     };
 
     try {
@@ -259,6 +269,31 @@ export default function TreatmentForm({ initialData, onCancel, onSaved }) {
         <SectionLabel step="Next" title="More Details" desc="Shown further down the page, after the sections above" />
         <DynamicListField label="Treatment Procedures" placeholder="Procedure step" optional values={form.treatment_procedures} onChange={(v) => setList("treatment_procedures", v)} />
         <DynamicListField label="Additional Information" placeholder="Additional info" optional values={form.additional_information} onChange={(v) => setList("additional_information", v)} />
+
+        {/* ==================================================================
+            HOSPITALS & DOCTORS — pick which ones offer/perform this
+            treatment. Optional: when left empty, the page falls back to
+            matching by category automatically.
+            ================================================================== */}
+        <SectionLabel step="Next" title="Related Hospitals & Doctors" desc="Shown as 'Related Hospitals' / 'Related Doctors' on the page" />
+        <SearchableCheckboxList
+          label="Hospitals"
+          optional
+          items={allHospitals.map((h) => ({ id: h.id, name: h.name, subtitle: h.city }))}
+          selectedIds={form.hospital_ids || []}
+          onChange={(v) => setList("hospital_ids", v)}
+          searchPlaceholder="Search Hospitals..."
+          emptyText="No hospitals added yet."
+        />
+        <SearchableCheckboxList
+          label="Doctors"
+          optional
+          items={allDoctors.map((d) => ({ id: d.id, name: d.name, subtitle: d.speciality }))}
+          selectedIds={form.doctor_ids || []}
+          onChange={(v) => setList("doctor_ids", v)}
+          searchPlaceholder="Search Doctors..."
+          emptyText="No doctors added yet."
+        />
 
         {/* ==================================================================
             7. BACKEND-ONLY — saved to the database for internal reference,
