@@ -2,9 +2,8 @@ import React, { useState, useEffect } from "react";
 import { db } from "@/api/dataClient";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/components/ui/use-toast";
-import { Plus, Pencil, Trash2, Search, Loader2, Eye, Users, Filter } from "lucide-react";
+import { Plus, Pencil, Trash2, Search, Loader2, Eye, Copy, Star, Users, Filter } from "lucide-react";
 import DoctorForm from "@/components/admin/DoctorForm";
 import BulkUploadDialog from "@/components/admin/BulkUploadDialog";
 import AdminPagination from "@/components/admin/AdminPagination";
@@ -39,7 +38,7 @@ const DOCTOR_BULK_DEFAULTS = {
 export default function AdminDoctors() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState(""); 
+  const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [showForm, setShowForm] = useState(false);
   const [editItem, setEditItem] = useState(null);
@@ -74,12 +73,14 @@ export default function AdminDoctors() {
 
   const liveUrl = (item) => `${window.location.origin}${import.meta.env.BASE_URL}doctors/${item.id}`;
 
-  const filtered = items.filter((item) =>
-    !search || String(item.name || "").toLowerCase().includes(search.toLowerCase()) || String(item.speciality || "").toLowerCase().includes(search.toLowerCase())
-  );
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-  const activeCount = items.filter((i) => (i.status || "active") === "active").length;
+  const copyUrl = async (item) => {
+    try {
+      await navigator.clipboard.writeText(liveUrl(item));
+      toast({ title: "Link copied" });
+    } catch {
+      toast({ title: "Couldn't copy link", variant: "destructive" });
+    }
+  };
 
   const toggleSelect = (id) => {
     setSelected((prev) => {
@@ -88,14 +89,23 @@ export default function AdminDoctors() {
       return next;
     });
   };
-  const toggleSelectAllOnPage = () => {
-    const allSelected = paginated.every((i) => selected.has(i.id));
-    setSelected((prev) => {
-      const next = new Set(prev);
-      paginated.forEach((i) => (allSelected ? next.delete(i.id) : next.add(i.id)));
-      return next;
-    });
+
+  const handleBulkDelete = async () => {
+    if (selected.size === 0) return;
+    if (!window.confirm(`Delete ${selected.size} selected doctor${selected.size > 1 ? "s" : ""}? This action cannot be undone.`)) return;
+    const ids = Array.from(selected);
+    await Promise.all(ids.map((id) => db.entities.Doctor.delete(id).catch(() => {})));
+    setItems((prev) => prev.filter((i) => !selected.has(i.id)));
+    setSelected(new Set());
+    toast({ title: `${ids.length} doctor${ids.length > 1 ? "s" : ""} deleted` });
   };
+
+  const filtered = items.filter((item) =>
+    !search || String(item.name || "").toLowerCase().includes(search.toLowerCase()) || String(item.speciality || "").toLowerCase().includes(search.toLowerCase())
+  );
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const activeCount = items.filter((i) => (i.status || "active") === "active").length;
 
   if (showForm) {
     return <DoctorForm initialData={editItem} onCancel={closeForm} onSaved={() => { closeForm(); loadItems(); }} />;
@@ -147,78 +157,116 @@ export default function AdminDoctors() {
         </Button>
       </div>
 
-      <div className="bg-white rounded-2xl border border-border overflow-hidden">
-        <div className="flex items-center gap-2 px-4 py-3 border-b bg-muted">
-          <Users className="w-4 h-4 text-muted-foreground" />
-          <span className="font-medium text-foreground">All Doctors</span>
-          <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-accent-jade/10 text-accent-jade">{filtered.length}</span>
+      {selected.size > 0 && (
+        <div className="flex items-center justify-between gap-3 mb-4 px-4 py-3 rounded-xl bg-destructive/5 border border-destructive/20">
+          <span className="text-sm font-medium text-foreground">
+            {selected.size} doctor{selected.size > 1 ? "s" : ""} selected
+          </span>
+          <div className="flex gap-2">
+            <Button variant="ghost" size="sm" onClick={() => setSelected(new Set())}>
+              Clear
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleBulkDelete}
+              className="gap-1.5 rounded-lg text-destructive border-destructive/30 hover:bg-destructive/10"
+            >
+              <Trash2 className="w-3.5 h-3.5" /> Delete Selected
+            </Button>
+          </div>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-left border-b bg-muted">
-                <th className="p-4 w-8">
-                  <Checkbox
-                    checked={paginated.length > 0 && paginated.every((i) => selected.has(i.id))}
-                    onCheckedChange={toggleSelectAllOnPage}
-                  />
-                </th>
-                <th className="p-4 font-medium text-muted-foreground">Sr No</th>
-                <th className="p-4 font-medium text-muted-foreground">Doctor</th>
-                <th className="p-4 font-medium text-muted-foreground">Hospital</th>
-                <th className="p-4 font-medium text-muted-foreground">Categories</th>
-                <th className="p-4 font-medium text-muted-foreground">Status</th>
-                <th className="p-4 font-medium text-muted-foreground text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y">
-              {paginated.map((item, i) => (
-                <tr key={item.id} className="hover:bg-muted">
-                  <td className="p-4">
-                    <Checkbox checked={selected.has(item.id)} onCheckedChange={() => toggleSelect(item.id)} />
-                  </td>
-                  <td className="p-4 text-muted-foreground">{(page - 1) * PAGE_SIZE + i + 1}</td>
-                  <td className="p-4">
-                    <div className="flex items-center gap-3">
-                      {item.photo_url ? (
-                        <img src={item.photo_url} alt={item.name} className="w-10 h-10 rounded-full object-cover" />
-                      ) : (
-                        <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground/70 text-xs font-bold">
-                          {String(item.name || "D").charAt(0)}
-                        </div>
-                      )}
-                      <div>
-                        <div className="font-medium text-foreground">{item.name}</div>
-                        {item.featured && <span className="text-xs text-accent-jade font-medium">★ Featured</span>}
-                      </div>
-                    </div>
-                  </td>
-                  <td className="p-4 text-muted-foreground">{item.hospital_name || "-"}</td>
-                  <td className="p-4 text-muted-foreground">{item.speciality || "-"}</td>
-                  <td className="p-4">
-                    <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${item.status === "active" ? "bg-accent-jade/10 text-accent-jade" : "bg-muted text-muted-foreground"}`}>
-                      {item.status || "active"}
-                    </span>
-                  </td>
-                  <td className="p-4">
-                    <div className="flex gap-1 justify-end">
-                      <Button variant="ghost" size="sm" asChild>
-                        <a href={liveUrl(item)} target="_blank" rel="noopener noreferrer" title="View live page">
-                          <Eye className="w-4 h-4 text-muted-foreground" />
-                        </a>
-                      </Button>
-                      <Button variant="ghost" size="sm" onClick={() => openEdit(item)}><Pencil className="w-4 h-4" /></Button>
-                      <Button variant="ghost" size="sm" onClick={() => handleDelete(item.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-              {filtered.length === 0 && (
-                <tr><td colSpan={7} className="p-8 text-center text-muted-foreground/70">No doctors found. Click "Add New Doctor" to create one.</td></tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+      )}
+
+      <div className="flex items-center gap-2 mb-4">
+        <Users className="w-4 h-4 text-muted-foreground" />
+        <span className="font-medium text-foreground">All Doctors</span>
+        <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-accent-jade/10 text-accent-jade">{filtered.length}</span>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {paginated.map((item) => (
+          <div key={item.id} className="bg-white rounded-2xl border border-border p-5">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-center gap-3 min-w-0">
+                <div
+                  onClick={() => toggleSelect(item.id)}
+                  className={`w-5 h-5 rounded border shrink-0 mt-2.5 cursor-pointer flex items-center justify-center ${
+                    selected.has(item.id) ? "bg-accent-jade border-accent-jade" : "border-border"
+                  }`}
+                  title="Select"
+                >
+                  {selected.has(item.id) && <span className="w-2 h-2 rounded-sm bg-white" />}
+                </div>
+                {item.photo_url ? (
+                  <img src={item.photo_url} alt={item.name} className="w-10 h-10 rounded-full object-cover shrink-0" />
+                ) : (
+                  <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground/70 text-xs font-bold shrink-0">
+                    {String(item.name || "D").charAt(0)}
+                  </div>
+                )}
+                <div className="flex items-center gap-1.5 min-w-0">
+                  {item.featured && <Star className="w-4 h-4 text-amber-500 fill-amber-500 shrink-0" />}
+                  <h3 className="font-heading font-bold text-foreground text-base leading-snug truncate">{item.name}</h3>
+                </div>
+              </div>
+              <div className="flex gap-0.5 shrink-0">
+                <Button variant="ghost" size="sm" asChild>
+                  <a href={liveUrl(item)} target="_blank" rel="noopener noreferrer" title="View live page">
+                    <Eye className="w-4 h-4 text-muted-foreground" />
+                  </a>
+                </Button>
+                <Button variant="ghost" size="sm" onClick={() => openEdit(item)} title="Edit">
+                  <Pencil className="w-4 h-4" />
+                </Button>
+                <Button variant="ghost" size="sm" onClick={() => handleDelete(item.id)} title="Delete">
+                  <Trash2 className="w-4 h-4 text-destructive" />
+                </Button>
+              </div>
+            </div>
+
+            {item.speciality && (
+              <span className="inline-block mt-2 px-2.5 py-1 rounded-full bg-fuchsia-50 text-fuchsia-700 text-xs font-medium">
+                {item.speciality}
+              </span>
+            )}
+
+            <div className="mt-3 space-y-1.5 text-sm text-muted-foreground">
+              <p className="truncate">
+                <span className="font-medium text-foreground/80">Hospital:</span> {item.hospital_name || "-"}
+              </p>
+              <p>
+                <span className="font-medium text-foreground/80">Experience:</span>{" "}
+                {item.experience_years ? `${item.experience_years} yrs` : "-"}
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2 mt-3 text-xs">
+              <span className="font-medium text-foreground/80 shrink-0">Live URL:</span>
+              <a href={liveUrl(item)} target="_blank" rel="noopener noreferrer" className="text-primary underline truncate">
+                {liveUrl(item)}
+              </a>
+              <button type="button" onClick={() => copyUrl(item)} className="text-muted-foreground hover:text-foreground shrink-0" title="Copy link">
+                <Copy className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            <div className="mt-3">
+              <span
+                className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${
+                  item.status === "active" ? "bg-accent-jade/10 text-accent-jade" : "bg-muted text-muted-foreground"
+                }`}
+              >
+                {item.status || "active"}
+              </span>
+            </div>
+          </div>
+        ))}
+        {filtered.length === 0 && (
+          <div className="md:col-span-2 bg-white rounded-2xl border border-border p-8 text-center text-muted-foreground/70">
+            No doctors found. Click "Add New Doctor" to create one.
+          </div>
+        )}
       </div>
       <AdminPagination page={page} totalPages={totalPages} onPageChange={setPage} />
     </div>
