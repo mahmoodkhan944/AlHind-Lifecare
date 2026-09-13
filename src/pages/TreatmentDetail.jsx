@@ -175,27 +175,6 @@ function LandingPage({ treatment, relatedDoctors, relatedHospitals, faqs, openLe
 
   const country = countryLabel(treatment.country);
   const keyBenefits = parseList(treatment.key_benefits);
-  const procedures = parseList(treatment.treatment_procedures);
-  const additionalInfo = parseList(treatment.additional_information);
-
-  const sections = [
-    { key: "overview", title: "Overview" },
-    { key: "signs_symptoms", title: "Signs & Symptoms" },
-    { key: "related_conditions", title: "Related Conditions" },
-    { key: "diagnosis", title: "Diagnosis" },
-    { key: "treatment_types", title: "Types of Treatment" },
-    { key: "surgery_types", title: "Types of Surgery" },
-    { key: "how_its_done", title: "How It's Done" },
-    { key: "purpose", title: "Purpose" },
-    { key: "recovery_details", title: "Recovery" },
-    { key: "risks", title: "Risks & Complications" },
-    { key: "summary", title: "Summary" },
-    ...(treatment.country !== "Turkey" ? [{ key: "why_choose_india", title: "Why Choose India" }] : []),
-    ...(treatment.country !== "India" ? [{ key: "why_choose_turkey", title: "Why Choose Turkey" }] : []),
-  ];
-  const listSections = sections
-    .map((s) => ({ ...s, items: parseList(treatment[s.key]) }))
-    .filter((s) => s.items.length > 0);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -383,9 +362,9 @@ function LandingPage({ treatment, relatedDoctors, relatedHospitals, faqs, openLe
             </span>
           )}
           <h2 className="font-heading font-bold text-xl sm:text-2xl mb-3 text-balance">{treatment.name}</h2>
-          {(treatment.detailed_content || treatment.description) && (
-            <p className="text-sm sm:text-base text-muted-foreground leading-relaxed whitespace-pre-wrap mb-5">
-              {treatment.detailed_content || treatment.description}
+          {(treatment.description || treatment.detailed_content) && (
+            <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-5 line-clamp-4">
+              {treatment.description || treatment.detailed_content}
             </p>
           )}
           <Button
@@ -504,54 +483,6 @@ function LandingPage({ treatment, relatedDoctors, relatedHospitals, faqs, openLe
           </div>
         </div>
       </section>
-
-      {(listSections.length > 0 || procedures.length > 0 || additionalInfo.length > 0) && (
-        <section className="py-8 sm:py-10">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 space-y-5">
-            {listSections.map((section) => (
-              <div key={section.key} className="bg-white rounded-2xl p-5 sm:p-6 border">
-                <h2 className="font-heading font-bold text-lg sm:text-xl mb-3">{section.title}</h2>
-                <ul className="space-y-2">
-                  {section.items.map((item, idx) => (
-                    <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
-                      <CheckCircle2 className="w-4 h-4 text-secondary flex-shrink-0 mt-0.5" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-            {procedures.length > 0 && (
-              <div className="bg-white rounded-2xl p-5 sm:p-6 border">
-                <h2 className="font-heading font-bold text-lg sm:text-xl mb-3">Treatment Procedures</h2>
-                <ol className="space-y-3">
-                  {procedures.map((item, idx) => (
-                    <li key={idx} className="flex items-start gap-3">
-                      <span className="flex items-center justify-center w-7 h-7 rounded-full bg-gradient-to-r from-primary to-secondary text-white text-xs font-bold flex-shrink-0">
-                        {idx + 1}
-                      </span>
-                      <p className="text-sm text-muted-foreground pt-1">{item}</p>
-                    </li>
-                  ))}
-                </ol>
-              </div>
-            )}
-            {additionalInfo.length > 0 && (
-              <div className="bg-white rounded-2xl p-5 sm:p-6 border">
-                <h2 className="font-heading font-bold text-lg sm:text-xl mb-3">Additional Information</h2>
-                <ul className="space-y-2">
-                  {additionalInfo.map((item, idx) => (
-                    <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
-                      <CheckCircle2 className="w-4 h-4 text-secondary flex-shrink-0 mt-0.5" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
-        </section>
-      )}
 
       <RelatedSections relatedDoctors={relatedDoctors} relatedHospitals={relatedHospitals} shaded />
 
