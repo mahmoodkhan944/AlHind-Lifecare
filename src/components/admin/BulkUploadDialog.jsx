@@ -119,7 +119,7 @@ export default function BulkUploadDialog({ entityLabel, entity, columns, require
       // that truly can't be blank, so this row can never fail for that reason.
       for (const [key, fallback] of Object.entries(requiredDefaults)) {
         if (payload[key] === undefined || payload[key] === "") {
-          payload[key] = typeof fallback === "function" ? fallback(i + 1) : fallback;
+          payload[key] = typeof fallback === "function" ? fallback(i + 1, payload) : fallback;
         }
       }
       try {

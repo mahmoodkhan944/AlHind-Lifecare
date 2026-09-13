@@ -3,6 +3,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Search, Clock, DollarSign, TrendingUp, Stethoscope, ChevronLeft, ChevronRight, Award } from "lucide-react";
 import { db } from "@/api/dataClient";
+import { treatmentUrl } from "@/lib/slugify";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
@@ -178,7 +179,7 @@ export default function Treatments() {
                   transition={{ delay: Math.min(i * 0.05, 0.4) }}
                   className="group flex flex-col h-full bg-white rounded-2xl overflow-hidden border border-border/50 hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 transition-all duration-300"
                 >
-                  <Link to={`/treatments/${t.id}`} className="relative h-40 sm:h-44 bg-gradient-to-br from-primary/5 to-secondary/5 overflow-hidden shrink-0 block">
+                  <Link to={treatmentUrl(t)} className="relative h-40 sm:h-44 bg-gradient-to-br from-primary/5 to-secondary/5 overflow-hidden shrink-0 block">
                     {t.image_url ? (
                       <img
                         src={t.image_url}
@@ -204,7 +205,7 @@ export default function Treatments() {
                     )}
                   </Link>
                   <div className="p-5 sm:p-6 flex flex-col flex-1">
-                    <Link to={`/treatments/${t.id}`}>
+                    <Link to={treatmentUrl(t)}>
                       <h3 className="font-heading font-bold text-base sm:text-lg mb-2 group-hover:text-primary transition-colors line-clamp-1">
                         {t.name}
                       </h3>
@@ -235,7 +236,7 @@ export default function Treatments() {
 
                     {/* Actions */}
                     <div className="flex gap-2 mt-auto">
-                      <Link to={`/treatments/${t.id}`} className="flex-1">
+                      <Link to={treatmentUrl(t)} className="flex-1">
                         <Button variant="outline" className="w-full h-9 rounded-full text-xs sm:text-sm">
                           View Details
                         </Button>

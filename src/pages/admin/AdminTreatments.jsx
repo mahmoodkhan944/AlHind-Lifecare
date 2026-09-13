@@ -3,15 +3,17 @@ import { db } from "@/api/dataClient";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
-import { Plus, Pencil, Trash2, Search, Loader2, Eye, Copy, Star } from "lucide-react";
+import { Plus, Pencil, Trash2, Search, Loader2, Eye, Copy, Star, Home } from "lucide-react";
 import TreatmentForm from "@/components/admin/TreatmentForm";
 import BulkUploadDialog from "@/components/admin/BulkUploadDialog";
 import AdminPagination from "@/components/admin/AdminPagination";
+import { slugify } from "@/lib/slugify";
 
 const PAGE_SIZE = 15;
 
 const TREATMENT_BULK_COLUMNS = [
   { key: "name", label: "Name", type: "text", example: "Heart Bypass Surgery" },
+  { key: "slug", label: "URL Slug (leave blank to auto-generate from Name)", type: "text", example: "" },
   { key: "category", label: "Category", type: "text", example: "Cardiology" },
   { key: "description", label: "Short Description", type: "text", example: "" },
   { key: "country", label: "Country (India/Turkey/Both)", type: "text", example: "Both" },
@@ -21,12 +23,16 @@ const TREATMENT_BULK_COLUMNS = [
   { key: "image_url", label: "Image URL", type: "text", example: "" },
   { key: "key_benefits", label: "Key Benefits (separate with |)", type: "list", example: "Minimally invasive | Fast recovery" },
   { key: "featured", label: "Featured (yes/no)", type: "boolean", example: "no" },
+  { key: "landing_page_enabled", label: "Show as Landing Page (yes/no)", type: "boolean", example: "no" },
   { key: "status", label: "Status (active/inactive)", type: "text", example: "active" },
 ];
 
 const TREATMENT_BULK_DEFAULTS = {
   name: (i) => `Untitled Treatment ${i}`,
   category: "General",
+  // Runs after "name" above (object key order), so it can slugify whatever
+  // name ended up on the row — typed or auto-generated.
+  slug: (i, payload) => slugify(payload.name) || `untitled-treatment-${i}`,
 };
 
 export default function AdminTreatments() {
@@ -67,7 +73,7 @@ export default function AdminTreatments() {
   };
 
   // The live page for a treatment, e.g. https://yoursite.com/AlHind-Lifecare/treatments/<id>
-  const liveUrl = (item) => `${window.location.origin}${import.meta.env.BASE_URL}treatments/${item.id}`;
+  const liveUrl = (item) => `${window.location.origin}${import.meta.env.BASE_URL}treatments/${item.slug || slugify(item.name) || item.id}`;
 
   const copyUrl = async (item) => {
     try {
@@ -75,6 +81,19 @@ export default function AdminTreatments() {
       toast({ title: "Link copied" });
     } catch {
       toast({ title: "Couldn't copy link", variant: "destructive" });
+    }
+  };
+
+  const toggleLandingPage = async (item) => {
+    const next = !item.landing_page_enabled;
+    setItems((prev) => prev.map((i) => (i.id === item.id ? { ...i, landing_page_enabled: next } : i)));
+    try {
+      await db.entities.Treatment.update(item.id, { landing_page_enabled: next });
+      toast({ title: next ? "Landing page enabled" : "Landing page disabled" });
+    } catch (err) {
+      // Revert on failure so the UI doesn't lie about what's saved.
+      setItems((prev) => prev.map((i) => (i.id === item.id ? { ...i, landing_page_enabled: !next } : i)));
+      toast({ title: "Couldn't update", description: err?.message, variant: "destructive" });
     }
   };
 
@@ -124,8 +143,21 @@ export default function AdminTreatments() {
               <div className="flex items-center gap-1.5 min-w-0">
                 {item.featured && <Star className="w-4 h-4 text-amber-500 fill-amber-500 shrink-0" />}
                 <h3 className="font-heading font-bold text-foreground text-base leading-snug truncate">{item.name}</h3>
+                {item.landing_page_enabled && (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-accent-jade/10 text-accent-jade text-[10px] font-bold shrink-0">
+                    <Home className="w-2.5 h-2.5" /> Landing Page
+                  </span>
+                )}
               </div>
               <div className="flex gap-0.5 shrink-0">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => toggleLandingPage(item)}
+                  title={item.landing_page_enabled ? "Landing page ON — click to turn off" : "Landing page OFF — click to turn on"}
+                >
+                  <Home className={`w-4 h-4 ${item.landing_page_enabled ? "text-accent-jade" : "text-muted-foreground/50"}`} />
+                </Button>
                 <Button variant="ghost" size="sm" asChild>
                   <a href={liveUrl(item)} target="_blank" rel="noopener noreferrer" title="View live page">
                     <Eye className="w-4 h-4 text-muted-foreground" />

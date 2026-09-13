@@ -63,6 +63,7 @@ export default function TreatmentForm({ initialData, onCancel, onSaved }) {
       hospitals_count: Number(form.hospitals_count) || 0,
       doctors_count: Number(form.doctors_count) || 0,
       featured: !!form.featured,
+      landing_page_enabled: !!form.landing_page_enabled,
       status: form.status || "active",
       country: form.country || "Both",
       key_benefits: JSON.stringify(form.key_benefits || []),
@@ -177,9 +178,12 @@ export default function TreatmentForm({ initialData, onCancel, onSaved }) {
                 <Input value={form.recovery_time || ""} onChange={(e) => set("recovery_time", e.target.value)} placeholder="e.g., 2-4 weeks" className="h-10 rounded-lg border-border" />
               </Field>
             </div>
-            <div className="flex items-center gap-6 pt-1">
+            <div className="flex items-center gap-6 pt-1 flex-wrap">
               <label className="flex items-center gap-2 text-sm font-medium text-foreground/80">
                 <Switch checked={!!form.featured} onCheckedChange={(v) => set("featured", v)} /> Featured
+              </label>
+              <label className="flex items-center gap-2 text-sm font-medium text-foreground/80" title="Shows the full marketing landing-page design (hero pitch, lead form, why-us grid, FAQ) instead of the classic detail page">
+                <Switch checked={!!form.landing_page_enabled} onCheckedChange={(v) => set("landing_page_enabled", v)} /> Show as Landing Page
               </label>
               <Field label="Status" inline>
                 <Select value={form.status || "active"} onValueChange={(v) => set("status", v)}>

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Search, X, Stethoscope, Building2, Heart, Loader2, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { db } from "@/api/dataClient";
+import { treatmentUrl } from "@/lib/slugify";
 import { useQuery } from "@tanstack/react-query";
 
 export default function SmartSearch({ scrolled }) {
@@ -130,7 +131,7 @@ export default function SmartSearch({ scrolled }) {
                         <ResultGroup icon={Building2} title="Hospitals" items={matchedHospitals.map((h) => ({ label: h.name, sub: h.city, path: `/hospitals/${h.id}` }))} onItemClick={go} />
                       )}
                       {matchedTreatments.length > 0 && (
-                        <ResultGroup icon={Heart} title="Treatments" items={matchedTreatments.map((t) => ({ label: t.name, sub: t.category, path: `/treatments/${t.id}` }))} onItemClick={go} />
+                        <ResultGroup icon={Heart} title="Treatments" items={matchedTreatments.map((t) => ({ label: t.name, sub: t.category, path: treatmentUrl(t) }))} onItemClick={go} />
                       )}
                     </div>
                   )}

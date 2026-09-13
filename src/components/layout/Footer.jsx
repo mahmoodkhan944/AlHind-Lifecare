@@ -4,6 +4,7 @@ import { MapPin, Phone, Mail, Youtube, Linkedin, Facebook, Instagram, Twitter, M
 import { useSiteSettings, getWhatsAppLink, getTelLink } from "@/hooks/useSiteSettings";
 import { LOGO_URL } from "@/lib/brand-assets";
 import { db } from "@/api/dataClient";
+import { treatmentUrl } from "@/lib/slugify";
 
 // Fallback text-only links (search by name) shown only until real featured
 // Hospital/Treatment records are marked "featured" in the admin panel.
@@ -135,7 +136,7 @@ export default function Footer() {
               {(topTreatments || fallbackTreatmentNames).map((t) => (
                 <li key={t.id || t}>
                   <Link
-                    to={t.id ? `/treatments/${t.id}` : `/treatments?q=${encodeURIComponent(t)}`}
+                    to={t.id ? treatmentUrl(t) : `/treatments?q=${encodeURIComponent(t)}`}
                     className="flex items-start gap-1 text-xs text-muted-foreground hover:text-primary transition-colors"
                   >
                     <ChevronRight className="w-3 h-3 flex-shrink-0 mt-0.5" /> {t.name || t}

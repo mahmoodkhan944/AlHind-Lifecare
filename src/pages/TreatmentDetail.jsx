@@ -3,23 +3,41 @@ import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   ArrowLeft,
+  CheckCircle2,
+  MessageCircle,
   DollarSign,
   Clock,
-  TrendingUp,
-  RefreshCw,
-  Calendar,
-  CheckCircle2,
-  Activity,
-  AlertTriangle,
-  Heart,
+  ShieldCheck,
+  UserCheck,
+  FileText,
+  HeartHandshake,
   Star,
   MapPin,
   Bed,
   Building2,
+  Loader2,
+  ArrowRight,
+  Headset,
+  Plane,
+  Hospital,
+  BadgeCheck,
+  TrendingUp,
+  RefreshCw,
+  Calendar,
+  Activity,
+  AlertTriangle,
+  Heart,
 } from "lucide-react";
 import { db } from "@/api/dataClient";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { useToast } from "@/components/ui/use-toast";
 import { useLeadModal } from "@/lib/LeadModalContext";
+import { COUNTRIES, getDialCode } from "@/lib/countries";
+import { useSiteSettings, DEFAULT_SETTINGS, getWhatsAppLink } from "@/hooks/useSiteSettings";
 
 const parseList = (val) => {
   if (!val) return [];
@@ -35,22 +53,69 @@ const parseList = (val) => {
 const HERO_IMAGE =
   "https://images.unsplash.com/photo-1758691461957-474a7686e388?w=1600&q=80";
 
+// A treatment's `country` field is 'India' | 'Turkey' | 'Both' (or blank).
+// This turns that into copy-friendly text used throughout the landing page,
+// so the same page correctly promotes whichever country(s) the treatment is
+// actually offered in — no need for separate per-country URLs.
+const countryLabel = (country) => {
+  if (country === "India") return "India";
+  if (country === "Turkey") return "Turkey";
+  return "India and Turkey";
+};
+
+const TRUST_BADGES = [
+  { icon: Headset, label: "24/7 Support" },
+  { icon: Plane, label: "Visa & Travel Help" },
+  { icon: Hospital, label: "JCI & NABH Hospitals" },
+  { icon: BadgeCheck, label: "Fully Guided Journey" },
+];
+
+const whyChoiceItems = (country) => [
+  { icon: DollarSign, title: "Significantly Lower Cost", desc: `World-class treatment at a fraction of the cost compared to the US, UK, or Gulf — without compromising on quality of care.` },
+  { icon: ShieldCheck, title: "JCI & NABH Accredited Hospitals", desc: "Every partner hospital holds international accreditation — the same standard held by leading hospitals worldwide." },
+  { icon: UserCheck, title: "Senior, Experienced Specialists", desc: "Your treatment is led by senior consultants with years of hands-on surgical experience." },
+  { icon: FileText, title: "Medical Visa — We Handle It", desc: `We prepare your hospital invitation letter and guide you through the entire ${country} medical visa process.` },
+  { icon: Clock, title: "Minimal Waiting Times", desc: "Skip long waitlists back home — get scheduled quickly with fast hospital availability." },
+  { icon: HeartHandshake, title: "Dedicated Patient Coordinator", desc: "From airport pickup to discharge, your coordinator handles logistics, translation, and hospital communication." },
+];
+
+const PROCESS_STEPS = [
+  { title: "Share Your Reports", desc: "Send us your diagnosis, imaging, or medical records — WhatsApp or email, any format works." },
+  { title: "Get Your Quote", desc: "Our team reviews your case and shares a detailed treatment plan with a cost estimate, usually within 48 hours." },
+  { title: "Visa & Travel", desc: "We prepare your medical visa invitation letter, book flights, and arrange airport transfers and accommodation." },
+  { title: "Arrive & Recover", desc: "Your coordinator receives you at the airport. You get world-class treatment and guided recovery before heading home." },
+];
+
+const visaSteps = (country) => [
+  { title: "We Prepare Your Hospital Letter", desc: `We arrange the official hospital invitation letter and documentation needed for your ${country} medical visa application.` },
+  { title: "We Handle Your Visa, End to End", desc: "We guide you through the medical visa application so you arrive with everything in order." },
+  { title: "We Help Book Your Flights", desc: "We advise on the best routes and fares to your treatment city for your travel dates." },
+  { title: "We Receive You at the Airport", desc: "Our representative meets you on arrival and transfers you directly to your hospital or hotel." },
+];
+
 export default function TreatmentDetail() {
-  const { id } = useParams();
+  const { slug } = useParams();
   const [treatment, setTreatment] = useState(null);
   const [loading, setLoading] = useState(true);
   const [relatedDoctors, setRelatedDoctors] = useState([]);
   const [relatedHospitals, setRelatedHospitals] = useState([]);
+  const [faqs, setFaqs] = useState([]);
   const { openLeadModal } = useLeadModal();
 
   useEffect(() => {
-    db.entities.Treatment.get(id)
+    setLoading(true);
+    // Prefer the SEO-friendly slug; fall back to treating the param as a raw
+    // id so any old /treatments/<uuid> links people already have keep working.
+    db.entities.Treatment.filter({ slug })
+      .then((matches) => {
+        if (matches.length > 0) return matches[0];
+        return db.entities.Treatment.get(slug);
+      })
       .then(setTreatment)
-      .catch(() => {})
+      .catch(() => setTreatment(null))
       .finally(() => setLoading(false));
-  }, [id]);
+  }, [slug]);
 
-  // Related doctors — same speciality as this treatment's category.
   useEffect(() => {
     if (!treatment?.category) return;
     db.entities.Doctor.filter({ status: "active", speciality: treatment.category }, "-rating", 4)
@@ -58,9 +123,6 @@ export default function TreatmentDetail() {
       .catch(() => {});
   }, [treatment?.category]);
 
-  // Related hospitals — those listing this treatment's category among their
-  // specialities. Hospital specialities are stored as a JSON list, so this
-  // filter has to happen client-side after a broader fetch.
   useEffect(() => {
     if (!treatment?.category) return;
     db.entities.Hospital.filter({ status: "active" }, "-rating", 200)
@@ -70,6 +132,12 @@ export default function TreatmentDetail() {
       })
       .catch(() => {});
   }, [treatment?.category]);
+
+  useEffect(() => {
+    db.entities.FAQ.filter({ status: "active" }, "order", 6)
+      .then(setFaqs)
+      .catch(() => {});
+  }, []);
 
   if (loading) {
     return (
@@ -90,6 +158,474 @@ export default function TreatmentDetail() {
     );
   }
 
+  const shared = { treatment, relatedDoctors, relatedHospitals, faqs, openLeadModal };
+
+  return treatment.landing_page_enabled ? <LandingPage {...shared} /> : <ClassicPage {...shared} />;
+}
+
+// ============================================================================
+// LANDING PAGE — full marketing funnel design, opt-in per treatment via
+// Admin → Treatments → Edit → "Show as Landing Page".
+// ============================================================================
+function LandingPage({ treatment, relatedDoctors, relatedHospitals, faqs, openLeadModal }) {
+  const { toast } = useToast();
+  const { data: settings = DEFAULT_SETTINGS } = useSiteSettings();
+  const [form, setForm] = useState({ patient_name: "", email: "", country: "Select Country", phone: "", message: "" });
+  const [submitting, setSubmitting] = useState(false);
+
+  const country = countryLabel(treatment.country);
+  const keyBenefits = parseList(treatment.key_benefits);
+  const procedures = parseList(treatment.treatment_procedures);
+  const additionalInfo = parseList(treatment.additional_information);
+
+  const sections = [
+    { key: "overview", title: "Overview" },
+    { key: "signs_symptoms", title: "Signs & Symptoms" },
+    { key: "related_conditions", title: "Related Conditions" },
+    { key: "diagnosis", title: "Diagnosis" },
+    { key: "treatment_types", title: "Types of Treatment" },
+    { key: "surgery_types", title: "Types of Surgery" },
+    { key: "how_its_done", title: "How It's Done" },
+    { key: "purpose", title: "Purpose" },
+    { key: "recovery_details", title: "Recovery" },
+    { key: "risks", title: "Risks & Complications" },
+    { key: "summary", title: "Summary" },
+    { key: "why_choose_india", title: `Why Choose ${country}` },
+  ];
+  const listSections = sections
+    .map((s) => ({ ...s, items: parseList(treatment[s.key]) }))
+    .filter((s) => s.items.length > 0);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!form.patient_name || !form.phone) return;
+    setSubmitting(true);
+    try {
+      await db.entities.Lead.create({
+        patient_name: form.patient_name,
+        email: form.email || "",
+        phone: `${getDialCode(form.country)} ${form.phone}`,
+        country: form.country,
+        treatment_interest: treatment.name,
+        message: form.message,
+        source: "treatment_landing_page",
+        status: "new",
+      });
+      toast({ title: "Thank you! Our team will contact you shortly." });
+      setForm({ patient_name: "", email: "", country: "Select Country", phone: "", message: "" });
+    } catch {
+      toast({ title: "Something went wrong. Please try again.", variant: "destructive" });
+    }
+    setSubmitting(false);
+  };
+
+  const waLink = getWhatsAppLink(settings.whatsapp_number);
+
+  return (
+    <div>
+      {/* HERO — headline, benefits, trust badges, CTA + inline lead form */}
+      <section className="relative pt-20 sm:pt-24 pb-10 sm:pb-14 bg-gradient-to-br from-secondary via-secondary to-[#0E8C7A] overflow-hidden">
+        <div className="absolute inset-0 opacity-10">
+          <img src={treatment.image_url || HERO_IMAGE} alt="" className="w-full h-full object-cover" />
+        </div>
+        <div className="decor-blob decor-blob-primary w-96 h-96 -top-24 -right-24" />
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-white">
+              <span className="inline-block px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-white/90 text-xs font-semibold tracking-wide mb-4">
+                For International Patients Seeking {treatment.name} in {country}
+              </span>
+              <h1 className="font-heading font-extrabold text-[clamp(1.6rem,4.5vw,2.75rem)] leading-tight mb-2 text-balance">
+                World-Class {treatment.name} Treatment in {country}
+              </h1>
+              <p className="text-accent-warm font-semibold text-base sm:text-lg mb-5">Affordable. Proven. Guided.</p>
+
+              {keyBenefits.length > 0 && (
+                <ul className="space-y-2 mb-6">
+                  {keyBenefits.slice(0, 5).map((b, i) => (
+                    <li key={i} className="flex items-start gap-2 text-white/90 text-sm sm:text-base">
+                      <CheckCircle2 className="w-5 h-5 text-accent-warm shrink-0 mt-0.5" />
+                      {b}
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              <div className="flex flex-wrap gap-2 mb-6">
+                {TRUST_BADGES.map(({ icon: Icon, label }) => (
+                  <span key={label} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 border border-white/15 text-white/85 text-xs font-medium">
+                    <Icon className="w-3.5 h-3.5" /> {label}
+                  </span>
+                ))}
+              </div>
+
+              {(settings.patients_assisted || settings.google_rating || settings.trusted_since_year) && (
+                <div className="flex flex-wrap gap-x-6 gap-y-2 mb-7 text-sm text-white/80">
+                  {settings.patients_assisted && (
+                    <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-accent-warm" /> {settings.patients_assisted} Patients Assisted</span>
+                  )}
+                  {settings.google_rating && (
+                    <span className="flex items-center gap-1.5"><Star className="w-4 h-4 text-accent-warm fill-accent-warm" /> {settings.google_rating} Google Rating</span>
+                  )}
+                  {settings.trusted_since_year && (
+                    <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-accent-warm" /> Trusted Since {settings.trusted_since_year}</span>
+                  )}
+                </div>
+              )}
+
+              <div className="flex flex-col sm:flex-row gap-3">
+                <a
+                  href="#quote-form"
+                  className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-primary hover:bg-primary/90 text-white font-heading font-bold text-sm shadow-lg shadow-black/20 transition-all hover:-translate-y-0.5"
+                >
+                  Get Free Treatment Plan <ArrowRight className="w-4 h-4" />
+                </a>
+                {settings.whatsapp_number && (
+                  <a
+                    href={waLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-white/10 border border-white/25 hover:bg-white/20 text-white font-heading font-semibold text-sm transition-all"
+                  >
+                    <MessageCircle className="w-4 h-4" /> Message on WhatsApp
+                  </a>
+                )}
+              </div>
+            </motion.div>
+
+            <motion.div
+              id="quote-form"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="bg-white rounded-2xl shadow-2xl p-5 sm:p-6 scroll-mt-24"
+            >
+              <h2 className="font-heading font-bold text-lg sm:text-xl text-secondary mb-1">Get Free Consultation</h2>
+              <p className="text-xs sm:text-sm text-muted-foreground mb-4">
+                Share a few details — our medical team will get back to you shortly.
+              </p>
+              <form onSubmit={handleSubmit} className="space-y-3">
+                <Input
+                  placeholder="Full Name *"
+                  value={form.patient_name}
+                  onChange={(e) => setForm({ ...form, patient_name: e.target.value })}
+                  className="h-10 rounded-lg text-sm"
+                  required
+                />
+                <Input
+                  type="email"
+                  placeholder="Email Address (Optional)"
+                  value={form.email}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                  className="h-10 rounded-lg text-sm"
+                />
+                <Select value={form.country} onValueChange={(v) => setForm({ ...form, country: v })}>
+                  <SelectTrigger className="h-10 rounded-lg text-sm">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-64">
+                    {COUNTRIES.map((c) => (
+                      <SelectItem key={c.code} value={c.name}>
+                        <span className="mr-2">{c.flag}</span> {c.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <div className="flex gap-2">
+                  <div className="flex items-center justify-center px-2.5 h-10 rounded-lg border border-input bg-muted/50 text-xs font-semibold whitespace-nowrap min-w-[56px] shrink-0">
+                    {getDialCode(form.country)}
+                  </div>
+                  <Input
+                    type="tel"
+                    placeholder="WhatsApp Number *"
+                    value={form.phone}
+                    onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                    className="flex-1 min-w-0 h-10 rounded-lg text-sm"
+                    required
+                  />
+                </div>
+                <Textarea
+                  placeholder="Anything specific about your condition you'd like us to know? (Optional)"
+                  value={form.message}
+                  onChange={(e) => setForm({ ...form, message: e.target.value })}
+                  className="rounded-lg text-sm min-h-[64px] resize-none"
+                  rows={2}
+                />
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="w-full h-11 rounded-xl bg-primary text-white hover:bg-primary/90 font-heading font-bold text-sm transition-all shadow-lg shadow-primary/25 hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 disabled:opacity-60 disabled:translate-y-0 disabled:cursor-not-allowed"
+                >
+                  {submitting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" /> Submitting...
+                    </>
+                  ) : (
+                    <>
+                      Get Free Treatment Plan <ArrowRight className="w-4 h-4" />
+                    </>
+                  )}
+                </button>
+              </form>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Treatment overview */}
+      <section className="py-8 sm:py-10">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6">
+          {treatment.featured && (
+            <span className="inline-block px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold mb-3">
+              Most Requested
+            </span>
+          )}
+          <h2 className="font-heading font-bold text-xl sm:text-2xl mb-3 text-balance">{treatment.name}</h2>
+          {(treatment.detailed_content || treatment.description) && (
+            <p className="text-sm sm:text-base text-muted-foreground leading-relaxed whitespace-pre-wrap mb-5">
+              {treatment.detailed_content || treatment.description}
+            </p>
+          )}
+          <Button
+            onClick={() =>
+              openLeadModal({
+                title: "Get a Free Quote",
+                description: `Get a free, no-obligation quote for ${treatment.name}.`,
+                treatmentInterest: treatment.name,
+              })
+            }
+            className="bg-gradient-to-r from-primary to-secondary text-white rounded-xl"
+          >
+            Get a Quote
+          </Button>
+        </div>
+      </section>
+
+      {/* Why choose this country */}
+      <section className="py-8 sm:py-10 bg-muted">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="text-center max-w-2xl mx-auto mb-8">
+            <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wider uppercase mb-3">
+              Why Us
+            </span>
+            <h2 className="font-heading font-bold text-xl sm:text-2xl md:text-3xl mb-2 text-balance">
+              Why international patients choose {country} for healthcare
+            </h2>
+            <p className="text-sm sm:text-base text-muted-foreground">
+              World-class hospitals, international accreditation, and costs a fraction of Western alternatives —
+              without compromising on quality of care.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {whyChoiceItems(country).map(({ icon: Icon, title, desc }) => (
+              <motion.div
+                key={title}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="bg-white rounded-2xl p-5 sm:p-6 shadow-sm ring-1 ring-black/5"
+              >
+                <span className="flex items-center justify-center w-11 h-11 rounded-xl bg-primary/10 text-primary mb-4">
+                  <Icon className="w-5 h-5" />
+                </span>
+                <h3 className="font-heading font-bold text-base mb-2">{title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* How it works */}
+      <section className="py-8 sm:py-10">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="text-center max-w-2xl mx-auto mb-8">
+            <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wider uppercase mb-3">
+              How It Works
+            </span>
+            <h2 className="font-heading font-bold text-xl sm:text-2xl md:text-3xl text-balance">
+              From your country to {country} — in 4 simple steps
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {PROCESS_STEPS.map((step, i) => (
+              <motion.div
+                key={step.title}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.05 }}
+                className="bg-white rounded-2xl p-5 shadow-sm ring-1 ring-black/5"
+              >
+                <span className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-gradient-to-r from-primary to-secondary text-white text-sm font-bold mb-3">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <h3 className="font-heading font-bold text-sm sm:text-base mb-1.5">{step.title}</h3>
+                <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">{step.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Visa & travel */}
+      <section className="py-8 sm:py-10 bg-muted">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="text-center max-w-2xl mx-auto mb-8">
+            <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wider uppercase mb-3">
+              Visa &amp; Travel
+            </span>
+            <h2 className="font-heading font-bold text-xl sm:text-2xl md:text-3xl mb-2 text-balance">
+              The {country} medical visa process, simplified
+            </h2>
+            <p className="text-sm sm:text-base text-muted-foreground">
+              We guide every patient through the entire process — from the hospital letter to landing in {country}.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {visaSteps(country).map((step, i) => (
+              <motion.div
+                key={step.title}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.05 }}
+                className="bg-white rounded-2xl p-5 shadow-sm ring-1 ring-black/5"
+              >
+                <span className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-gradient-to-r from-primary to-secondary text-white text-sm font-bold mb-3">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <h3 className="font-heading font-bold text-sm sm:text-base mb-1.5">{step.title}</h3>
+                <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">{step.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {(listSections.length > 0 || procedures.length > 0 || additionalInfo.length > 0) && (
+        <section className="py-8 sm:py-10">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 space-y-5">
+            {listSections.map((section) => (
+              <div key={section.key} className="bg-white rounded-2xl p-5 sm:p-6 border">
+                <h2 className="font-heading font-bold text-lg sm:text-xl mb-3">{section.title}</h2>
+                <ul className="space-y-2">
+                  {section.items.map((item, idx) => (
+                    <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
+                      <CheckCircle2 className="w-4 h-4 text-secondary flex-shrink-0 mt-0.5" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+            {procedures.length > 0 && (
+              <div className="bg-white rounded-2xl p-5 sm:p-6 border">
+                <h2 className="font-heading font-bold text-lg sm:text-xl mb-3">Treatment Procedures</h2>
+                <ol className="space-y-3">
+                  {procedures.map((item, idx) => (
+                    <li key={idx} className="flex items-start gap-3">
+                      <span className="flex items-center justify-center w-7 h-7 rounded-full bg-gradient-to-r from-primary to-secondary text-white text-xs font-bold flex-shrink-0">
+                        {idx + 1}
+                      </span>
+                      <p className="text-sm text-muted-foreground pt-1">{item}</p>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            )}
+            {additionalInfo.length > 0 && (
+              <div className="bg-white rounded-2xl p-5 sm:p-6 border">
+                <h2 className="font-heading font-bold text-lg sm:text-xl mb-3">Additional Information</h2>
+                <ul className="space-y-2">
+                  {additionalInfo.map((item, idx) => (
+                    <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
+                      <CheckCircle2 className="w-4 h-4 text-secondary flex-shrink-0 mt-0.5" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
+      <RelatedSections relatedDoctors={relatedDoctors} relatedHospitals={relatedHospitals} shaded />
+
+      {faqs.length > 0 && (
+        <section className="py-8 sm:py-10 bg-muted">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6">
+            <div className="text-center max-w-2xl mx-auto mb-8">
+              <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wider uppercase mb-3">
+                Common Questions
+              </span>
+              <h2 className="font-heading font-bold text-xl sm:text-2xl md:text-3xl text-balance">
+                Frequently asked questions
+              </h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              {faqs.map((faq, i) => (
+                <div key={faq.id || i} className="rounded-xl border border-primary/20 bg-white overflow-hidden hover:border-primary/40 transition-colors">
+                  <Accordion type="single" collapsible>
+                    <AccordionItem value={`faq-${i}`} className="border-0">
+                      <AccordionTrigger className="font-heading font-semibold text-left text-sm md:text-base py-4 px-5 hover:no-underline hover:text-primary text-foreground">
+                        {faq.question}
+                      </AccordionTrigger>
+                      <AccordionContent className="text-sm text-muted-foreground leading-relaxed px-5 pb-4">
+                        {faq.answer}
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      <section className="py-10 sm:py-14 bg-gradient-to-br from-secondary via-secondary to-[#0E8C7A]">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
+          <span className="inline-block px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-white/90 text-xs font-semibold tracking-wide mb-4">
+            For a Better Life
+          </span>
+          <h2 className="font-heading font-bold text-xl sm:text-2xl md:text-3xl text-white mb-3 text-balance">
+            Get your personalised treatment plan
+          </h2>
+          <p className="text-white/80 text-sm sm:text-base mb-7">
+            Share your reports or describe your symptoms. Our team reviews your case and sends a treatment plan
+            and cost estimate — with no obligation and no pressure.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <a
+              href="#quote-form"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-primary hover:bg-primary/90 text-white font-heading font-bold text-sm shadow-lg shadow-black/20 transition-all hover:-translate-y-0.5"
+            >
+              Get My Free Treatment Plan <ArrowRight className="w-4 h-4" />
+            </a>
+            {settings.whatsapp_number && (
+              <a
+                href={waLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-white/10 border border-white/25 hover:bg-white/20 text-white font-heading font-semibold text-sm transition-all"
+              >
+                <MessageCircle className="w-4 h-4" /> WhatsApp Us Now
+              </a>
+            )}
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+// ============================================================================
+// CLASSIC PAGE — the original, simpler detail page. Used by default for
+// every treatment unless "Show as Landing Page" is turned on.
+// ============================================================================
+function ClassicPage({ treatment, relatedDoctors, relatedHospitals, openLeadModal }) {
   const infoCards = [
     { icon: DollarSign, label: "Cost Range", value: treatment.cost_range_usd },
     { icon: Clock, label: "Duration", value: treatment.duration },
@@ -109,9 +645,8 @@ export default function TreatmentDetail() {
     { key: "recovery_details", title: "Recovery", icon: RefreshCw },
     { key: "risks", title: "Risks & Complications", icon: AlertTriangle },
     { key: "summary", title: "Summary", icon: CheckCircle2 },
-    { key: "why_choose_india", title: "Why Choose India", icon: Heart },
+    { key: "why_choose_india", title: "Why Choose Us", icon: Heart },
   ];
-
   const listSections = sections
     .map((s) => ({ ...s, items: parseList(treatment[s.key]) }))
     .filter((s) => s.items.length > 0);
@@ -122,7 +657,6 @@ export default function TreatmentDetail() {
 
   return (
     <div>
-      {/* Hero */}
       <section className="pt-20 sm:pt-24 md:pt-28 pb-8 sm:pb-10 md:pb-12">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <Link
@@ -181,12 +715,10 @@ export default function TreatmentDetail() {
         </div>
       </section>
 
-      {/* Content */}
       <section className="pb-8 sm:pb-10 md:pb-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
             <div className="lg:col-span-2 space-y-4 sm:space-y-5">
-
               {treatment.detailed_content && (
                 <div className="bg-white rounded-2xl p-5 sm:p-6 md:p-8 border">
                   <h2 className="font-heading font-bold text-lg sm:text-xl md:text-2xl mb-3 sm:mb-4">
@@ -275,22 +807,18 @@ export default function TreatmentDetail() {
                 </SectionCard>
               )}
               {treatment.why_india_detail && (
-                <SectionCard title="Why Choose India" icon={Heart}>
+                <SectionCard title="Why Choose Us" icon={Heart}>
                   <p className="text-sm text-muted-foreground leading-relaxed">{treatment.why_india_detail}</p>
                 </SectionCard>
               )}
             </div>
 
-            {/* Sidebar */}
             <div>
               <div className="bg-white rounded-2xl p-5 sm:p-6 border lg:sticky lg:top-24">
                 <h3 className="font-heading font-bold text-base sm:text-lg mb-3 sm:mb-4">Get a Free Quote</h3>
                 <p className="text-sm text-muted-foreground mb-5 sm:mb-6">
                   Our medical experts will review your case and provide a detailed treatment plan.
                 </p>
-                {/* FIX: was a <Button> (renders its own <button>) wrapped inside a plain
-                    <button> — invalid nested interactive elements. Now a single Button
-                    with onClick directly on it. */}
                 <Button
                   onClick={() =>
                     openLeadModal({
@@ -307,100 +835,7 @@ export default function TreatmentDetail() {
             </div>
           </div>
 
-          {/* Related doctors — specialists in this treatment's category */}
-          {relatedDoctors.length > 0 && (
-            <div className="mt-8 sm:mt-10">
-              <h2 className="font-heading font-bold text-xl sm:text-2xl mb-5 sm:mb-6">Related Doctors</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-                {relatedDoctors.map((doc) => (
-                  <Link
-                    key={doc.id}
-                    to={`/doctors/${doc.id}`}
-                    className="group flex flex-col items-center text-center bg-white rounded-2xl border border-border/50 shadow-sm hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 transition-all duration-300 p-5 sm:p-6"
-                  >
-                    <div className="relative w-20 h-20 sm:w-24 sm:h-24 mb-3">
-                      <div className="w-full h-full rounded-full overflow-hidden bg-gradient-to-br from-primary/10 to-secondary/10 ring-4 ring-white shadow-md">
-                        {doc.photo_url ? (
-                          <img src={doc.photo_url} alt={doc.name} loading="lazy" className="w-full h-full object-cover" />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center">
-                            <span className="text-2xl font-bold text-primary/25">{doc.name?.[0]}</span>
-                          </div>
-                        )}
-                      </div>
-                      {doc.rating > 0 && (
-                        <span className="absolute -top-1 -left-1 flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold shadow-md">
-                          <Star className="w-2.5 h-2.5 fill-current" />
-                          {doc.rating}
-                        </span>
-                      )}
-                    </div>
-                    <h3 className="font-heading font-bold text-sm sm:text-base text-foreground group-hover:text-primary transition-colors line-clamp-1">
-                      {doc.name}
-                    </h3>
-                    <p className="text-primary text-xs sm:text-sm font-semibold line-clamp-1">{doc.speciality}</p>
-                    {doc.hospital_name && (
-                      <p className="text-xs text-muted-foreground mt-1 line-clamp-1">{doc.hospital_name}</p>
-                    )}
-                  </Link>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Related hospitals — hospitals offering this treatment's category */}
-          {relatedHospitals.length > 0 && (
-            <div className="mt-8 sm:mt-10">
-              <h2 className="font-heading font-bold text-xl sm:text-2xl mb-5 sm:mb-6">Related Hospitals</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-                {relatedHospitals.map((h) => (
-                  <Link
-                    key={h.id}
-                    to={`/hospitals/${h.id}`}
-                    className="group flex flex-col h-full bg-white rounded-2xl overflow-hidden border border-border/50 shadow-sm hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 transition-all duration-300"
-                  >
-                    <div className="relative h-32 bg-gradient-to-br from-primary/5 to-secondary/5 overflow-hidden shrink-0">
-                      {h.cover_image_url ? (
-                        <img
-                          src={h.cover_image_url}
-                          alt={h.name}
-                          loading="lazy"
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <Building2 className="w-8 h-8 text-primary/20" />
-                        </div>
-                      )}
-                    </div>
-                    <div className="p-4 flex flex-col flex-1">
-                      <h3 className="font-heading font-bold text-sm mb-1 group-hover:text-primary transition-colors line-clamp-1">
-                        {h.name}
-                      </h3>
-                      <p className="flex items-center gap-1 text-xs text-muted-foreground mb-2 line-clamp-1">
-                        <MapPin className="w-3.5 h-3.5 shrink-0" />
-                        {h.city}, {h.country}
-                      </p>
-                      <div className="flex items-center gap-3 text-xs text-muted-foreground mt-auto pt-2 border-t border-border/50">
-                        {h.beds_count > 0 && (
-                          <span className="flex items-center gap-1">
-                            <Bed className="w-3.5 h-3.5 shrink-0" />
-                            {h.beds_count}
-                          </span>
-                        )}
-                        {h.rating > 0 && (
-                          <span className="flex items-center gap-1 text-[hsl(var(--accent-warm))]">
-                            <Star className="w-3.5 h-3.5 fill-current shrink-0" />
-                            {h.rating}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          )}
+          <RelatedSections relatedDoctors={relatedDoctors} relatedHospitals={relatedHospitals} />
         </div>
       </section>
     </div>
@@ -421,5 +856,110 @@ function SectionCard({ title, icon: Icon, children }) {
       </div>
       {children}
     </motion.div>
+  );
+}
+
+// Shared "Related Doctors" / "Related Hospitals" grids, used by both designs.
+function RelatedSections({ relatedDoctors, relatedHospitals, shaded = false }) {
+  if (relatedDoctors.length === 0 && relatedHospitals.length === 0) return null;
+  return (
+    <>
+      {relatedDoctors.length > 0 && (
+        <div className={shaded ? "py-8 sm:py-10 bg-muted" : "mt-8 sm:mt-10"}>
+          <div className={shaded ? "max-w-7xl mx-auto px-4 sm:px-6" : ""}>
+            <h2 className="font-heading font-bold text-xl sm:text-2xl mb-5 sm:mb-6">Related Doctors</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+              {relatedDoctors.map((doc) => (
+                <Link
+                  key={doc.id}
+                  to={`/doctors/${doc.id}`}
+                  className="group flex flex-col items-center text-center bg-white rounded-2xl border border-border/50 shadow-sm hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 transition-all duration-300 p-5 sm:p-6"
+                >
+                  <div className="relative w-20 h-20 sm:w-24 sm:h-24 mb-3">
+                    <div className="w-full h-full rounded-full overflow-hidden bg-gradient-to-br from-primary/10 to-secondary/10 ring-4 ring-white shadow-md">
+                      {doc.photo_url ? (
+                        <img src={doc.photo_url} alt={doc.name} loading="lazy" className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <span className="text-2xl font-bold text-primary/25">{doc.name?.[0]}</span>
+                        </div>
+                      )}
+                    </div>
+                    {doc.rating > 0 && (
+                      <span className="absolute -top-1 -left-1 flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold shadow-md">
+                        <Star className="w-2.5 h-2.5 fill-current" />
+                        {doc.rating}
+                      </span>
+                    )}
+                  </div>
+                  <h3 className="font-heading font-bold text-sm sm:text-base text-foreground group-hover:text-primary transition-colors line-clamp-1">
+                    {doc.name}
+                  </h3>
+                  <p className="text-primary text-xs sm:text-sm font-semibold line-clamp-1">{doc.speciality}</p>
+                  {doc.hospital_name && (
+                    <p className="text-xs text-muted-foreground mt-1 line-clamp-1">{doc.hospital_name}</p>
+                  )}
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {relatedHospitals.length > 0 && (
+        <div className={shaded ? "" : "mt-8 sm:mt-10"}>
+          <div className={shaded ? "max-w-7xl mx-auto px-4 sm:px-6 pt-8 sm:pt-10" : ""}>
+            <h2 className="font-heading font-bold text-xl sm:text-2xl mb-5 sm:mb-6">Related Hospitals</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+              {relatedHospitals.map((h) => (
+                <Link
+                  key={h.id}
+                  to={`/hospitals/${h.id}`}
+                  className="group flex flex-col h-full bg-white rounded-2xl overflow-hidden border border-border/50 shadow-sm hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 transition-all duration-300"
+                >
+                  <div className="relative h-32 bg-gradient-to-br from-primary/5 to-secondary/5 overflow-hidden shrink-0">
+                    {h.cover_image_url ? (
+                      <img
+                        src={h.cover_image_url}
+                        alt={h.name}
+                        loading="lazy"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <Building2 className="w-8 h-8 text-primary/20" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-4 flex flex-col flex-1">
+                    <h3 className="font-heading font-bold text-sm mb-1 group-hover:text-primary transition-colors line-clamp-1">
+                      {h.name}
+                    </h3>
+                    <p className="flex items-center gap-1 text-xs text-muted-foreground mb-2 line-clamp-1">
+                      <MapPin className="w-3.5 h-3.5 shrink-0" />
+                      {h.city}, {h.country}
+                    </p>
+                    <div className="flex items-center gap-3 text-xs text-muted-foreground mt-auto pt-2 border-t border-border/50">
+                      {h.beds_count > 0 && (
+                        <span className="flex items-center gap-1">
+                          <Bed className="w-3.5 h-3.5 shrink-0" />
+                          {h.beds_count}
+                        </span>
+                      )}
+                      {h.rating > 0 && (
+                        <span className="flex items-center gap-1 text-[hsl(var(--accent-warm))]">
+                          <Star className="w-3.5 h-3.5 fill-current shrink-0" />
+                          {h.rating}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
