@@ -24,8 +24,12 @@ const DOCTOR_BULK_COLUMNS = [
   { key: "languages", label: "Languages", type: "text", example: "English, Hindi" },
   { key: "photo_url", label: "Photo URL", type: "text", example: "" },
   { key: "overview", label: "Overview", type: "text", example: "Brief bio about the doctor..." },
+  { key: "detailed_experience", label: "Detailed Experience", type: "text", example: "" },
   { key: "rating", label: "Rating (0-5)", type: "number", example: 4.8 },
   { key: "specializations", label: "Specializations (separate with |)", type: "list", example: "Heart Surgery | Angioplasty" },
+  { key: "treatments_list", label: "Treatments Offered (separate with |)", type: "list", example: "Bypass Surgery | Valve Replacement" },
+  { key: "qualifications_list", label: "Qualifications (separate with |)", type: "list", example: "MBBS - AIIMS | MD Cardiology" },
+  { key: "why_choose_doctor", label: "Why Choose This Doctor (separate with |)", type: "list", example: "20+ years experience | Internationally trained" },
   { key: "featured", label: "Featured (yes/no)", type: "boolean", example: "no" },
   { key: "status", label: "Status (active/inactive)", type: "text", example: "active" },
 ];

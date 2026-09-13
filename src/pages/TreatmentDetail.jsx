@@ -190,7 +190,8 @@ function LandingPage({ treatment, relatedDoctors, relatedHospitals, faqs, openLe
     { key: "recovery_details", title: "Recovery" },
     { key: "risks", title: "Risks & Complications" },
     { key: "summary", title: "Summary" },
-    { key: "why_choose_india", title: `Why Choose ${country}` },
+    ...(treatment.country !== "Turkey" ? [{ key: "why_choose_india", title: "Why Choose India" }] : []),
+    ...(treatment.country !== "India" ? [{ key: "why_choose_turkey", title: "Why Choose Turkey" }] : []),
   ];
   const listSections = sections
     .map((s) => ({ ...s, items: parseList(treatment[s.key]) }))
@@ -645,7 +646,8 @@ function ClassicPage({ treatment, relatedDoctors, relatedHospitals, openLeadModa
     { key: "recovery_details", title: "Recovery", icon: RefreshCw },
     { key: "risks", title: "Risks & Complications", icon: AlertTriangle },
     { key: "summary", title: "Summary", icon: CheckCircle2 },
-    { key: "why_choose_india", title: "Why Choose Us", icon: Heart },
+    ...(treatment.country !== "Turkey" ? [{ key: "why_choose_india", title: "Why Choose India", icon: Heart }] : []),
+    ...(treatment.country !== "India" ? [{ key: "why_choose_turkey", title: "Why Choose Turkey", icon: Heart }] : []),
   ];
   const listSections = sections
     .map((s) => ({ ...s, items: parseList(treatment[s.key]) }))
@@ -807,8 +809,13 @@ function ClassicPage({ treatment, relatedDoctors, relatedHospitals, openLeadModa
                 </SectionCard>
               )}
               {treatment.why_india_detail && (
-                <SectionCard title="Why Choose Us" icon={Heart}>
+                <SectionCard title="Why Choose India" icon={Heart}>
                   <p className="text-sm text-muted-foreground leading-relaxed">{treatment.why_india_detail}</p>
+                </SectionCard>
+              )}
+              {treatment.why_turkey_detail && (
+                <SectionCard title="Why Choose Turkey" icon={Heart}>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{treatment.why_turkey_detail}</p>
                 </SectionCard>
               )}
             </div>

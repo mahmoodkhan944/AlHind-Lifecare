@@ -22,7 +22,7 @@ export default function TreatmentForm({ initialData, onCancel, onSaved }) {
   const [form, setForm] = useState(() => {
     if (!initialData) return {};
     const f = { ...initialData };
-    ["key_benefits","treatment_procedures","overview","additional_information","signs_symptoms","related_conditions","diagnosis","treatment_types","surgery_types","how_its_done","purpose","recovery_details","risks","summary","why_choose_india"].forEach((k) => {
+    ["key_benefits","treatment_procedures","overview","additional_information","signs_symptoms","related_conditions","diagnosis","treatment_types","surgery_types","how_its_done","purpose","recovery_details","risks","summary","why_choose_india","why_choose_turkey"].forEach((k) => {
       f[k] = parseList(initialData[k]);
     });
     return f;
@@ -81,6 +81,7 @@ export default function TreatmentForm({ initialData, onCancel, onSaved }) {
       risks: JSON.stringify(form.risks || []),
       summary: JSON.stringify(form.summary || []),
       why_choose_india: JSON.stringify(form.why_choose_india || []),
+      why_choose_turkey: JSON.stringify(form.why_choose_turkey || []),
     };
 
     try {
@@ -226,6 +227,7 @@ export default function TreatmentForm({ initialData, onCancel, onSaved }) {
 
         <DynamicListField label="Summary" placeholder="Summary point" number={13} optional values={form.summary} onChange={(v) => setList("summary", v)} />
         <DynamicListField label="Why Choose India" placeholder="Reason" number={14} optional values={form.why_choose_india} onChange={(v) => setList("why_choose_india", v)} />
+        <DynamicListField label="Why Choose Turkey" placeholder="Reason" number={15} optional values={form.why_choose_turkey} onChange={(v) => setList("why_choose_turkey", v)} />
 
         {/* Additional textareas */}
         <div className="bg-white rounded-2xl border border-border p-4 sm:p-5 shadow-sm">
@@ -245,6 +247,9 @@ export default function TreatmentForm({ initialData, onCancel, onSaved }) {
             </Field>
             <Field label="Why India">
               <Textarea value={form.why_india_detail || ""} onChange={(e) => set("why_india_detail", e.target.value)} placeholder="Why choose India for this treatment" className="rounded-lg border-border min-h-[80px]" rows={3} />
+            </Field>
+            <Field label="Why Turkey">
+              <Textarea value={form.why_turkey_detail || ""} onChange={(e) => set("why_turkey_detail", e.target.value)} placeholder="Why choose Turkey for this treatment" className="rounded-lg border-border min-h-[80px]" rows={3} />
             </Field>
           </div>
         </div>

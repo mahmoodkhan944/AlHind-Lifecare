@@ -12,6 +12,7 @@ const PAGE_SIZE = 15;
 
 const HOSPITAL_BULK_COLUMNS = [
   { key: "name", label: "Name", type: "text", example: "Apollo Hospitals" },
+  { key: "cover_image_url", label: "Cover Image URL", type: "text", example: "" },
   { key: "hospital_type", label: "Hospital Type", type: "text", example: "Multi-Specialty" },
   { key: "address", label: "Full Address", type: "text", example: "" },
   { key: "city", label: "City", type: "text", example: "New Delhi" },
@@ -22,11 +23,16 @@ const HOSPITAL_BULK_COLUMNS = [
   { key: "rating", label: "Rating (0-5)", type: "number", example: 4.5 },
   { key: "reviews_count", label: "Review Count", type: "number", example: 120 },
   { key: "description", label: "Short Description", type: "text", example: "" },
+  { key: "full_description", label: "Full Description (separate with |)", type: "list", example: "Paragraph one | Paragraph two" },
   { key: "hospital_owner", label: "Hospital Owner / Chairman", type: "text", example: "" },
   { key: "contact_email", label: "Contact Email", type: "text", example: "" },
   { key: "contact_phone", label: "Contact Phone", type: "text", example: "" },
   { key: "website", label: "Website", type: "text", example: "" },
   { key: "specialities", label: "Specialities (separate with |)", type: "list", example: "Cardiology | Oncology" },
+  { key: "facilities", label: "Facilities (separate with |)", type: "list", example: "ICU | 24/7 Pharmacy | Blood Bank" },
+  { key: "accreditations", label: "Accreditations (separate with |)", type: "list", example: "JCI | NABH" },
+  { key: "emergency_services", label: "Emergency Services (yes/no)", type: "boolean", example: "yes" },
+  { key: "parking_available", label: "Parking Available (yes/no)", type: "boolean", example: "yes" },
   { key: "featured", label: "Featured (yes/no)", type: "boolean", example: "no" },
   { key: "status", label: "Status (active/inactive)", type: "text", example: "active" },
 ];
