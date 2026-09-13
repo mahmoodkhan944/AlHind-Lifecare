@@ -79,10 +79,11 @@ export default function AdminTreatments() {
 
   // The live page for a treatment, e.g. https://yoursite.com/AlHind-Lifecare/treatments/<id>
   const liveUrl = (item) => `${window.location.origin}${import.meta.env.BASE_URL}treatments/${item.slug || slugify(item.name) || item.id}`;
+  const landingUrl = (item) => `${window.location.origin}${import.meta.env.BASE_URL}landing/${item.slug || slugify(item.name) || item.id}`;
 
-  const copyUrl = async (item) => {
+  const copyUrl = async (url) => {
     try {
-      await navigator.clipboard.writeText(liveUrl(item));
+      await navigator.clipboard.writeText(url);
       toast({ title: "Link copied" });
     } catch {
       toast({ title: "Couldn't copy link", variant: "destructive" });
@@ -195,7 +196,7 @@ export default function AdminTreatments() {
             </p>
 
             <div className="flex items-center gap-2 mt-3 text-xs">
-              <span className="font-medium text-foreground/80 shrink-0">Live URL:</span>
+              <span className="font-medium text-foreground/80 shrink-0">Page URL:</span>
               <a
                 href={liveUrl(item)}
                 target="_blank"
@@ -206,13 +207,35 @@ export default function AdminTreatments() {
               </a>
               <button
                 type="button"
-                onClick={() => copyUrl(item)}
+                onClick={() => copyUrl(liveUrl(item))}
                 className="text-muted-foreground hover:text-foreground shrink-0"
                 title="Copy link"
               >
                 <Copy className="w-3.5 h-3.5" />
               </button>
             </div>
+
+            {item.landing_page_enabled && (
+              <div className="flex items-center gap-2 mt-1.5 text-xs">
+                <span className="font-medium text-accent-jade shrink-0">Landing URL:</span>
+                <a
+                  href={landingUrl(item)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-accent-jade underline truncate"
+                >
+                  {landingUrl(item)}
+                </a>
+                <button
+                  type="button"
+                  onClick={() => copyUrl(landingUrl(item))}
+                  className="text-muted-foreground hover:text-foreground shrink-0"
+                  title="Copy link"
+                >
+                  <Copy className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            )}
 
             <div className="mt-3">
               <span

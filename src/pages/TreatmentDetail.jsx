@@ -93,7 +93,7 @@ const visaSteps = (country) => [
   { icon: MapPin, title: "We Receive You at the Airport", desc: "Our representative meets you on arrival and transfers you directly to your hospital or hotel." },
 ];
 
-export default function TreatmentDetail() {
+export default function TreatmentDetail({ forceLanding = false }) {
   const { slug } = useParams();
   const [treatment, setTreatment] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -160,7 +160,13 @@ export default function TreatmentDetail() {
 
   const shared = { treatment, relatedDoctors, relatedHospitals, faqs, openLeadModal };
 
-  return treatment.landing_page_enabled ? <LandingPage {...shared} /> : <ClassicPage {...shared} />;
+  // The landing (ad-style) design only ever shows on /landing/:slug — and
+  // only if the admin has actually turned it on for this treatment. Every
+  // other path, including "View Details" links from the site's own
+  // Treatments listing, always uses the classic page.
+  const showLanding = forceLanding && treatment.landing_page_enabled;
+
+  return showLanding ? <LandingPage {...shared} /> : <ClassicPage {...shared} />;
 }
 
 // ============================================================================
