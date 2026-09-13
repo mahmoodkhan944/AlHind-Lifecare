@@ -3,7 +3,7 @@ import { db } from "@/api/dataClient";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
-import { Plus, Pencil, Trash2, Search, Loader2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Search, Loader2, Eye, Copy, Star } from "lucide-react";
 import HospitalForm from "@/components/admin/HospitalForm";
 import BulkUploadDialog from "@/components/admin/BulkUploadDialog";
 import AdminPagination from "@/components/admin/AdminPagination";
@@ -73,6 +73,17 @@ export default function AdminHospitals() {
     toast({ title: "Deleted" });
   };
 
+  const liveUrl = (item) => `${window.location.origin}${import.meta.env.BASE_URL}hospitals/${item.id}`;
+
+  const copyUrl = async (item) => {
+    try {
+      await navigator.clipboard.writeText(liveUrl(item));
+      toast({ title: "Link copied" });
+    } catch {
+      toast({ title: "Couldn't copy link", variant: "destructive" });
+    }
+  };
+
   const filtered = items.filter((item) =>
     !search || String(item.name || "").toLowerCase().includes(search.toLowerCase()) || String(item.city || "").toLowerCase().includes(search.toLowerCase())
   );
@@ -112,59 +123,76 @@ export default function AdminHospitals() {
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-border overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-left border-b bg-muted">
-                <th className="p-4 font-medium text-muted-foreground">Hospital</th>
-                <th className="p-4 font-medium text-muted-foreground">City</th>
-                <th className="p-4 font-medium text-muted-foreground">Country</th>
-                <th className="p-4 font-medium text-muted-foreground">Beds</th>
-                <th className="p-4 font-medium text-muted-foreground">Status</th>
-                <th className="p-4 font-medium text-muted-foreground text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y">
-              {paginated.map((item) => (
-                <tr key={item.id} className="hover:bg-muted">
-                  <td className="p-4">
-                    <div className="flex items-center gap-3">
-                      {item.cover_image_url ? (
-                        <img src={item.cover_image_url} alt={item.name} className="w-10 h-10 rounded-lg object-cover" />
-                      ) : (
-                        <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center text-muted-foreground/70 text-xs font-bold">
-                          {String(item.name || "H").charAt(0)}
-                        </div>
-                      )}
-                      <div>
-                        <div className="font-medium text-foreground">{item.name}</div>
-                        {item.featured && <span className="text-xs text-accent-jade font-medium">★ Featured</span>}
-                      </div>
-                    </div>
-                  </td>
-                  <td className="p-4 text-muted-foreground">{item.city || "-"}</td>
-                  <td className="p-4 text-muted-foreground">{item.country || "-"}</td>
-                  <td className="p-4 text-muted-foreground">{item.beds_count || "-"}</td>
-                  <td className="p-4">
-                    <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${item.status === "active" ? "bg-accent-jade/10 text-accent-jade" : "bg-muted text-muted-foreground"}`}>
-                      {item.status || "active"}
-                    </span>
-                  </td>
-                  <td className="p-4">
-                    <div className="flex gap-1 justify-end">
-                      <Button variant="ghost" size="sm" onClick={() => openEdit(item)}><Pencil className="w-4 h-4" /></Button>
-                      <Button variant="ghost" size="sm" onClick={() => handleDelete(item.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-              {filtered.length === 0 && (
-                <tr><td colSpan={6} className="p-8 text-center text-muted-foreground/70">No hospitals found. Click "Add New Hospital" to create one.</td></tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {paginated.map((item) => (
+          <div key={item.id} className="bg-white rounded-2xl border border-border p-5">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-center gap-3 min-w-0">
+                {item.cover_image_url ? (
+                  <img src={item.cover_image_url} alt={item.name} className="w-10 h-10 rounded-lg object-cover shrink-0" />
+                ) : (
+                  <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center text-muted-foreground/70 text-xs font-bold shrink-0">
+                    {String(item.name || "H").charAt(0)}
+                  </div>
+                )}
+                <div className="flex items-center gap-1.5 min-w-0">
+                  {item.featured && <Star className="w-4 h-4 text-amber-500 fill-amber-500 shrink-0" />}
+                  <h3 className="font-heading font-bold text-foreground text-base leading-snug truncate">{item.name}</h3>
+                </div>
+              </div>
+              <div className="flex gap-0.5 shrink-0">
+                <Button variant="ghost" size="sm" asChild>
+                  <a href={liveUrl(item)} target="_blank" rel="noopener noreferrer" title="View live page">
+                    <Eye className="w-4 h-4 text-muted-foreground" />
+                  </a>
+                </Button>
+                <Button variant="ghost" size="sm" onClick={() => openEdit(item)} title="Edit">
+                  <Pencil className="w-4 h-4" />
+                </Button>
+                <Button variant="ghost" size="sm" onClick={() => handleDelete(item.id)} title="Delete">
+                  <Trash2 className="w-4 h-4 text-destructive" />
+                </Button>
+              </div>
+            </div>
+
+            {item.city && (
+              <span className="inline-block mt-2 px-2.5 py-1 rounded-full bg-fuchsia-50 text-fuchsia-700 text-xs font-medium">
+                {item.city}{item.country ? `, ${item.country}` : ""}
+              </span>
+            )}
+
+            <div className="mt-3 space-y-1.5 text-sm text-muted-foreground">
+              <p>
+                <span className="font-medium text-foreground/80">Beds:</span> {item.beds_count || "-"}
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2 mt-3 text-xs">
+              <span className="font-medium text-foreground/80 shrink-0">Live URL:</span>
+              <a href={liveUrl(item)} target="_blank" rel="noopener noreferrer" className="text-primary underline truncate">
+                {liveUrl(item)}
+              </a>
+              <button type="button" onClick={() => copyUrl(item)} className="text-muted-foreground hover:text-foreground shrink-0" title="Copy link">
+                <Copy className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            <div className="mt-3">
+              <span
+                className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${
+                  item.status === "active" ? "bg-accent-jade/10 text-accent-jade" : "bg-muted text-muted-foreground"
+                }`}
+              >
+                {item.status || "active"}
+              </span>
+            </div>
+          </div>
+        ))}
+        {filtered.length === 0 && (
+          <div className="md:col-span-2 bg-white rounded-2xl border border-border p-8 text-center text-muted-foreground/70">
+            No hospitals found. Click "Add New Hospital" to create one.
+          </div>
+        )}
       </div>
       <AdminPagination page={page} totalPages={totalPages} onPageChange={setPage} />
     </div>

@@ -12,7 +12,7 @@ import AdminPagination from "@/components/admin/AdminPagination";
 
 const PAGE_SIZE = 15;
 
-export default function EntityManager({ entityName, fields, displayField = "name" }) {
+export default function EntityManager({ entityName, fields, displayField = "name", cardView = false, renderCard }) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -104,6 +104,16 @@ export default function EntityManager({ entityName, fields, displayField = "name
         </Button>
       </div>
 
+      {cardView && renderCard ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {paginated.map((item) => renderCard(item, { openEdit, handleDelete }))}
+          {filtered.length === 0 && (
+            <div className="md:col-span-2 bg-white rounded-2xl border border-border p-8 text-center text-muted-foreground/70">
+              No items found
+            </div>
+          )}
+        </div>
+      ) : (
       <div className="bg-white rounded-2xl border overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
@@ -136,6 +146,7 @@ export default function EntityManager({ entityName, fields, displayField = "name
           </table>
         </div>
       </div>
+      )}
       <AdminPagination page={page} totalPages={totalPages} onPageChange={setPage} />
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>

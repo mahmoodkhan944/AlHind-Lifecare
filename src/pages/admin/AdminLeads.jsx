@@ -75,45 +75,56 @@ export default function AdminLeads() {
         </Select>
       </div>
 
-      <div className="bg-white rounded-2xl border overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-left border-b bg-muted/30">
-                <th className="p-4 font-medium text-muted-foreground">Name</th>
-                <th className="p-4 font-medium text-muted-foreground">Email</th>
-                <th className="p-4 font-medium text-muted-foreground">Phone</th>
-                <th className="p-4 font-medium text-muted-foreground">Country</th>
-                <th className="p-4 font-medium text-muted-foreground">Interest</th>
-                <th className="p-4 font-medium text-muted-foreground">Status</th>
-                <th className="p-4 font-medium text-muted-foreground">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y">
-              {paginated.map((lead) => (
-                <tr key={lead.id} className="hover:bg-muted/20">
-                  <td className="p-4 font-medium">{lead.patient_name}</td>
-                  <td className="p-4 text-muted-foreground">{lead.email}</td>
-                  <td className="p-4 text-muted-foreground">{lead.phone || "-"}</td>
-                  <td className="p-4 text-muted-foreground">{lead.country || "-"}</td>
-                  <td className="p-4 text-muted-foreground max-w-[150px] truncate">{lead.treatment_interest || "-"}</td>
-                  <td className="p-4">
-                    <Select value={lead.status} onValueChange={(v) => updateStatus(lead.id, v)}>
-                      <SelectTrigger className={`h-8 w-32 text-xs rounded-full border-0 ${statusColors[lead.status] || ""}`}><SelectValue /></SelectTrigger>
-                      <SelectContent>{statuses.map((s) => <SelectItem key={s} value={s}>{s.replace("_", " ")}</SelectItem>)}</SelectContent>
-                    </Select>
-                  </td>
-                  <td className="p-4">
-                    <div className="flex gap-1">
-                      <Button variant="ghost" size="sm" onClick={() => setSelected(lead)}><Eye className="w-4 h-4" /></Button>
-                      <Button variant="ghost" size="sm" onClick={() => deleteLead(lead.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {paginated.map((lead) => (
+          <div key={lead.id} className="bg-white rounded-2xl border border-border p-5">
+            <div className="flex items-start justify-between gap-3">
+              <h3 className="font-heading font-bold text-foreground text-base leading-snug truncate">
+                {lead.patient_name || "Unnamed"}
+              </h3>
+              <div className="flex gap-0.5 shrink-0">
+                <Button variant="ghost" size="sm" onClick={() => setSelected(lead)} title="View details">
+                  <Eye className="w-4 h-4" />
+                </Button>
+                <Button variant="ghost" size="sm" onClick={() => deleteLead(lead.id)} title="Delete">
+                  <Trash2 className="w-4 h-4 text-destructive" />
+                </Button>
+              </div>
+            </div>
+
+            {lead.treatment_interest && (
+              <span className="inline-block mt-2 px-2.5 py-1 rounded-full bg-fuchsia-50 text-fuchsia-700 text-xs font-medium truncate max-w-full">
+                {lead.treatment_interest}
+              </span>
+            )}
+
+            <div className="mt-3 space-y-1.5 text-sm text-muted-foreground">
+              <p className="truncate">
+                <span className="font-medium text-foreground/80">Email:</span> {lead.email || "-"}
+              </p>
+              <p>
+                <span className="font-medium text-foreground/80">Phone:</span> {lead.phone || "-"}
+              </p>
+              <p>
+                <span className="font-medium text-foreground/80">Country:</span> {lead.country || "-"}
+              </p>
+            </div>
+
+            <div className="mt-3">
+              <Select value={lead.status} onValueChange={(v) => updateStatus(lead.id, v)}>
+                <SelectTrigger className={`h-8 w-40 text-xs rounded-full border-0 ${statusColors[lead.status] || ""}`}>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>{statuses.map((s) => <SelectItem key={s} value={s}>{s.replace("_", " ")}</SelectItem>)}</SelectContent>
+              </Select>
+            </div>
+          </div>
+        ))}
+        {filtered.length === 0 && (
+          <div className="md:col-span-2 bg-white rounded-2xl border border-border p-8 text-center text-muted-foreground/70">
+            No leads found.
+          </div>
+        )}
       </div>
       <AdminPagination page={page} totalPages={totalPages} onPageChange={setPage} />
 
