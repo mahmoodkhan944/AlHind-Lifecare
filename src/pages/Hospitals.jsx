@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useLeadModal } from "@/lib/LeadModalContext";
+import { formatCountApprox } from "@/lib/utils";
 
 const PAGE_SIZE = 12;
 
@@ -105,13 +106,13 @@ export default function Hospitals() {
           >
             <div>
               <p className="font-heading font-extrabold text-3xl sm:text-4xl text-white leading-tight">
-                {hospitals.length > 0 ? `${hospitals.length}+` : "50+"}
+                {hospitals.length > 0 ? formatCountApprox(hospitals.length) : "50+"}
               </p>
               <p className="text-white/70 text-xs sm:text-sm mt-1">Medical Facilities</p>
             </div>
             <div>
               <p className="font-heading font-extrabold text-3xl sm:text-4xl text-white leading-tight">
-                {totalBeds > 0 ? `${totalBeds}+` : "2500+"}
+                {totalBeds > 0 ? formatCountApprox(totalBeds) : "2500+"}
               </p>
               <p className="text-white/70 text-xs sm:text-sm mt-1">Total Beds</p>
             </div>
