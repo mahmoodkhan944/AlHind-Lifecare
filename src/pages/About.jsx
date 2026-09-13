@@ -532,7 +532,7 @@ export default function About() {
             <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wider uppercase mb-4">
               {leadershipHeader.badge}
             </span>
-            <h2 className="font-heading font-bold text-[clamp(0.9rem,4.2vw,2.25rem)] mb-3 text-balance whitespace-nowrap sm:whitespace-normal">
+            <h2 className="font-heading font-bold text-[clamp(0.9rem,4.2vw,2.25rem)] mb-3 text-balance whitespace-nowrap">
               {leadershipHeader.heading}
             </h2>
             <p className="text-sm sm:text-base text-muted-foreground leading-relaxed text-balance">
