@@ -5,9 +5,36 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { Plus, Pencil, Trash2, Search, Loader2 } from "lucide-react";
 import HospitalForm from "@/components/admin/HospitalForm";
+import BulkUploadDialog from "@/components/admin/BulkUploadDialog";
 import AdminPagination from "@/components/admin/AdminPagination";
 
 const PAGE_SIZE = 15;
+
+const HOSPITAL_BULK_COLUMNS = [
+  { key: "name", label: "Name", type: "text", example: "Apollo Hospitals" },
+  { key: "hospital_type", label: "Hospital Type", type: "text", example: "Multi-Specialty" },
+  { key: "address", label: "Full Address", type: "text", example: "" },
+  { key: "city", label: "City", type: "text", example: "New Delhi" },
+  { key: "state", label: "State", type: "text", example: "Delhi" },
+  { key: "country", label: "Country (India/Turkey)", type: "text", example: "India" },
+  { key: "beds_count", label: "Number of Beds", type: "number", example: 500 },
+  { key: "established_year", label: "Year Established", type: "number", example: 1983 },
+  { key: "rating", label: "Rating (0-5)", type: "number", example: 4.5 },
+  { key: "reviews_count", label: "Review Count", type: "number", example: 120 },
+  { key: "description", label: "Short Description", type: "text", example: "" },
+  { key: "hospital_owner", label: "Hospital Owner / Chairman", type: "text", example: "" },
+  { key: "contact_email", label: "Contact Email", type: "text", example: "" },
+  { key: "contact_phone", label: "Contact Phone", type: "text", example: "" },
+  { key: "website", label: "Website", type: "text", example: "" },
+  { key: "specialities", label: "Specialities (separate with |)", type: "list", example: "Cardiology | Oncology" },
+  { key: "featured", label: "Featured (yes/no)", type: "boolean", example: "no" },
+  { key: "status", label: "Status (active/inactive)", type: "text", example: "active" },
+];
+
+const HOSPITAL_BULK_DEFAULTS = {
+  name: (i) => `Untitled Hospital ${i}`,
+  city: "N/A",
+};
 
 export default function AdminHospitals() {
   const [items, setItems] = useState([]);
@@ -71,9 +98,18 @@ export default function AdminHospitals() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search hospitals..." className="pl-9" />
         </div>
-        <Button onClick={openNew} className="gap-2 bg-accent-jade hover:bg-accent-jade/90 text-white rounded-xl">
-          <Plus className="w-4 h-4" /> Add New Hospital
-        </Button>
+        <div className="flex gap-2">
+          <BulkUploadDialog
+            entityLabel="Hospitals"
+            entity={db.entities.Hospital}
+            columns={HOSPITAL_BULK_COLUMNS}
+            requiredDefaults={HOSPITAL_BULK_DEFAULTS}
+            onImported={loadItems}
+          />
+          <Button onClick={openNew} className="gap-2 bg-accent-jade hover:bg-accent-jade/90 text-white rounded-xl">
+            <Plus className="w-4 h-4" /> Add New Hospital
+          </Button>
+        </div>
       </div>
 
       <div className="bg-white rounded-2xl border border-border overflow-hidden">

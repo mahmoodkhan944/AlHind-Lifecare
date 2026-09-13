@@ -5,9 +5,33 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { Plus, Pencil, Trash2, Search, Loader2 } from "lucide-react";
 import DoctorForm from "@/components/admin/DoctorForm";
+import BulkUploadDialog from "@/components/admin/BulkUploadDialog";
 import AdminPagination from "@/components/admin/AdminPagination";
 
 const PAGE_SIZE = 15;
+
+const DOCTOR_BULK_COLUMNS = [
+  { key: "name", label: "Name", type: "text", example: "Dr John Smith" },
+  { key: "speciality", label: "Speciality", type: "text", example: "Cardiology" },
+  { key: "designation", label: "Designation", type: "text", example: "Senior Consultant" },
+  { key: "hospital_name", label: "Hospital", type: "text", example: "Apollo Hospitals, New Delhi" },
+  { key: "country", label: "Country (India/Turkey)", type: "text", example: "India" },
+  { key: "city", label: "City", type: "text", example: "New Delhi" },
+  { key: "experience_years", label: "Experience (Years)", type: "number", example: 15 },
+  { key: "consultation_fee_usd", label: "Consultation Fee (USD)", type: "number", example: 50 },
+  { key: "languages", label: "Languages", type: "text", example: "English, Hindi" },
+  { key: "photo_url", label: "Photo URL", type: "text", example: "" },
+  { key: "overview", label: "Overview", type: "text", example: "Brief bio about the doctor..." },
+  { key: "rating", label: "Rating (0-5)", type: "number", example: 4.8 },
+  { key: "specializations", label: "Specializations (separate with |)", type: "list", example: "Heart Surgery | Angioplasty" },
+  { key: "featured", label: "Featured (yes/no)", type: "boolean", example: "no" },
+  { key: "status", label: "Status (active/inactive)", type: "text", example: "active" },
+];
+
+const DOCTOR_BULK_DEFAULTS = {
+  name: (i) => `Untitled Doctor ${i}`,
+  speciality: "General",
+};
 
 export default function AdminDoctors() {
   const [items, setItems] = useState([]);
@@ -71,9 +95,18 @@ export default function AdminDoctors() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search doctors..." className="pl-9" />
         </div>
-        <Button onClick={openNew} className="gap-2 bg-accent-jade hover:bg-accent-jade/90 text-white rounded-xl">
-          <Plus className="w-4 h-4" /> Add New Doctor
-        </Button>
+        <div className="flex gap-2">
+          <BulkUploadDialog
+            entityLabel="Doctors"
+            entity={db.entities.Doctor}
+            columns={DOCTOR_BULK_COLUMNS}
+            requiredDefaults={DOCTOR_BULK_DEFAULTS}
+            onImported={loadItems}
+          />
+          <Button onClick={openNew} className="gap-2 bg-accent-jade hover:bg-accent-jade/90 text-white rounded-xl">
+            <Plus className="w-4 h-4" /> Add New Doctor
+          </Button>
+        </div>
       </div>
 
       <div className="bg-white rounded-2xl border border-border overflow-hidden">
