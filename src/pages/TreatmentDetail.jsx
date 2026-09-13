@@ -71,26 +71,26 @@ const TRUST_BADGES = [
 ];
 
 const whyChoiceItems = (country) => [
-  { icon: DollarSign, title: "Significantly Lower Cost", desc: `World-class treatment at a fraction of the cost compared to the US, UK, or Gulf — without compromising on quality of care.` },
-  { icon: ShieldCheck, title: "JCI & NABH Accredited Hospitals", desc: "Every partner hospital holds international accreditation — the same standard held by leading hospitals worldwide." },
-  { icon: UserCheck, title: "Senior, Experienced Specialists", desc: "Your treatment is led by senior consultants with years of hands-on surgical experience." },
-  { icon: FileText, title: "Medical Visa — We Handle It", desc: `We prepare your hospital invitation letter and guide you through the entire ${country} medical visa process.` },
-  { icon: Clock, title: "Minimal Waiting Times", desc: "Skip long waitlists back home — get scheduled quickly with fast hospital availability." },
-  { icon: HeartHandshake, title: "Dedicated Patient Coordinator", desc: "From airport pickup to discharge, your coordinator handles logistics, translation, and hospital communication." },
+  { icon: DollarSign, title: "Significantly Lower Cost", desc: `World-class treatment at a fraction of the cost compared to the US, UK, or Gulf — without compromising on quality of care.`, stat: "Fraction of Cost", statLabel: "vs. US, UK & Gulf pricing" },
+  { icon: ShieldCheck, title: "JCI & NABH Accredited Hospitals", desc: "Every partner hospital holds international accreditation — the same standard held by leading hospitals worldwide.", stat: "100%", statLabel: "Accredited partner hospitals" },
+  { icon: UserCheck, title: "Senior, Experienced Specialists", desc: "Your treatment is led by senior consultants with years of hands-on surgical experience.", stat: "Senior Only", statLabel: "No trainees, ever" },
+  { icon: FileText, title: "Medical Visa — We Handle It", desc: `We prepare your hospital invitation letter and guide you through the entire ${country} medical visa process.`, stat: "Full Support", statLabel: "Visa handled end-to-end" },
+  { icon: Clock, title: "Minimal Waiting Times", desc: "Skip long waitlists back home — get scheduled quickly with fast hospital availability.", stat: "Fast-Track", statLabel: "No referral needed" },
+  { icon: HeartHandshake, title: "Dedicated Patient Coordinator", desc: "From airport pickup to discharge, your coordinator handles logistics, translation, and hospital communication.", stat: "24/7", statLabel: "Support availability" },
 ];
 
 const PROCESS_STEPS = [
-  { title: "Share Your Reports", desc: "Send us your diagnosis, imaging, or medical records — WhatsApp or email, any format works." },
-  { title: "Get Your Quote", desc: "Our team reviews your case and shares a detailed treatment plan with a cost estimate, usually within 48 hours." },
-  { title: "Visa & Travel", desc: "We prepare your medical visa invitation letter, book flights, and arrange airport transfers and accommodation." },
-  { title: "Arrive & Recover", desc: "Your coordinator receives you at the airport. You get world-class treatment and guided recovery before heading home." },
+  { icon: FileText, title: "Share Your Reports", desc: "Send us your diagnosis, imaging, or medical records — WhatsApp or email, any format works." },
+  { icon: Calendar, title: "Get Your Quote", desc: "Our team reviews your case and shares a detailed treatment plan with a cost estimate, usually within 48 hours." },
+  { icon: Plane, title: "Visa & Travel", desc: "We prepare your medical visa invitation letter, book flights, and arrange airport transfers and accommodation." },
+  { icon: HeartHandshake, title: "Arrive & Recover", desc: "Your coordinator receives you at the airport. You get world-class treatment and guided recovery before heading home." },
 ];
 
 const visaSteps = (country) => [
-  { title: "We Prepare Your Hospital Letter", desc: `We arrange the official hospital invitation letter and documentation needed for your ${country} medical visa application.` },
-  { title: "We Handle Your Visa, End to End", desc: "We guide you through the medical visa application so you arrive with everything in order." },
-  { title: "We Help Book Your Flights", desc: "We advise on the best routes and fares to your treatment city for your travel dates." },
-  { title: "We Receive You at the Airport", desc: "Our representative meets you on arrival and transfers you directly to your hospital or hotel." },
+  { icon: FileText, title: "We Prepare Your Hospital Letter", desc: `We arrange the official hospital invitation letter and documentation needed for your ${country} medical visa application.` },
+  { icon: ShieldCheck, title: "We Handle Your Visa, End to End", desc: "We guide you through the medical visa application so you arrive with everything in order." },
+  { icon: Plane, title: "We Help Book Your Flights", desc: "We advise on the best routes and fares to your treatment city for your travel dates." },
+  { icon: MapPin, title: "We Receive You at the Airport", desc: "Our representative meets you on arrival and transfers you directly to your hospital or hotel." },
 ];
 
 export default function TreatmentDetail() {
@@ -173,7 +173,15 @@ function LandingPage({ treatment, relatedDoctors, relatedHospitals, faqs, openLe
   const [form, setForm] = useState({ patient_name: "", email: "", country: "Select Country", phone: "", message: "" });
   const [submitting, setSubmitting] = useState(false);
 
-  const country = countryLabel(treatment.country);
+  // If the treatment is offered in both countries, let the patient pick
+  // which one they're interested in — this choice then drives every "India"
+  // / "Turkey" mention on the page (heading, visa section, etc.) and gets
+  // sent along with their lead so the team knows their preference.
+  const offersBoth = treatment.country === "Both" || !treatment.country;
+  const [selectedDestination, setSelectedDestination] = useState(
+    offersBoth ? "India" : treatment.country
+  );
+  const country = offersBoth ? selectedDestination : countryLabel(treatment.country);
   const keyBenefits = parseList(treatment.key_benefits);
 
   const handleSubmit = async (e) => {
@@ -186,8 +194,8 @@ function LandingPage({ treatment, relatedDoctors, relatedHospitals, faqs, openLe
         email: form.email || "",
         phone: `${getDialCode(form.country)} ${form.phone}`,
         country: form.country,
-        treatment_interest: treatment.name,
-        message: form.message,
+        treatment_interest: offersBoth ? `${treatment.name} (${selectedDestination})` : treatment.name,
+        message: `Preferred destination: ${country}${form.message ? `\n\n${form.message}` : ""}`,
         source: "treatment_landing_page",
         status: "new",
       });
@@ -251,6 +259,28 @@ function LandingPage({ treatment, relatedDoctors, relatedHospitals, faqs, openLe
                   {settings.trusted_since_year && (
                     <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-accent-warm" /> Trusted Since {settings.trusted_since_year}</span>
                   )}
+                </div>
+              )}
+
+              {offersBoth && (
+                <div className="mb-7">
+                  <p className="text-white/70 text-xs font-semibold uppercase tracking-wide mb-2">
+                    Where would you like to be treated?
+                  </p>
+                  <div className="inline-flex rounded-full bg-white/10 border border-white/20 p-1">
+                    {["India", "Turkey"].map((c) => (
+                      <button
+                        key={c}
+                        type="button"
+                        onClick={() => setSelectedDestination(c)}
+                        className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold transition-colors ${
+                          selectedDestination === c ? "bg-white text-secondary" : "text-white/80 hover:text-white"
+                        }`}
+                      >
+                        <MapPin className="w-3.5 h-3.5" /> {c}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               )}
 
@@ -354,65 +384,90 @@ function LandingPage({ treatment, relatedDoctors, relatedHospitals, faqs, openLe
       </section>
 
       {/* Treatment overview */}
-      <section className="py-8 sm:py-10">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6">
-          {treatment.featured && (
-            <span className="inline-block px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold mb-3">
-              Most Requested
-            </span>
-          )}
-          <h2 className="font-heading font-bold text-xl sm:text-2xl mb-3 text-balance">{treatment.name}</h2>
-          {(treatment.description || treatment.detailed_content) && (
-            <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-5 line-clamp-4">
-              {treatment.description || treatment.detailed_content}
-            </p>
-          )}
-          <Button
-            onClick={() =>
-              openLeadModal({
-                title: "Get a Free Quote",
-                description: `Get a free, no-obligation quote for ${treatment.name}.`,
-                treatmentInterest: treatment.name,
-              })
-            }
-            className="bg-gradient-to-r from-primary to-secondary text-white rounded-xl"
-          >
-            Get a Quote
-          </Button>
+      <section className="pt-6 sm:pt-8 pb-8 sm:pb-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="relative bg-gradient-to-br from-secondary via-secondary to-[#0E8C7A] rounded-3xl p-6 sm:p-8 md:p-10 overflow-hidden">
+            <div className="decor-blob decor-blob-primary w-72 h-72 -top-20 -right-10" />
+            <div className="relative flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+              <div className="min-w-0">
+                {treatment.featured && (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary text-white text-xs font-bold mb-3">
+                    <Star className="w-3 h-3 fill-current" /> Most Requested
+                  </span>
+                )}
+                <h2 className="font-heading font-extrabold text-xl sm:text-2xl md:text-3xl text-white mb-2 text-balance">
+                  {treatment.name} in {country}
+                </h2>
+                {(treatment.description || treatment.detailed_content) && (
+                  <p className="text-sm sm:text-base text-white/80 leading-relaxed max-w-2xl line-clamp-3">
+                    {treatment.description || treatment.detailed_content}
+                  </p>
+                )}
+              </div>
+              <Button
+                onClick={() =>
+                  openLeadModal({
+                    title: "Get a Free Quote",
+                    description: `Get a free, no-obligation quote for ${treatment.name} in ${country}.`,
+                    treatmentInterest: offersBoth ? `${treatment.name} (${selectedDestination})` : treatment.name,
+                  })
+                }
+                className="bg-white text-secondary hover:bg-white/90 rounded-2xl h-12 px-8 font-heading font-bold shrink-0 shadow-lg"
+              >
+                Get a Quote
+              </Button>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* Why choose this country */}
       <section className="py-8 sm:py-10 bg-muted">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="text-center max-w-2xl mx-auto mb-8">
+          <div className="text-center mb-8">
             <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wider uppercase mb-3">
               Why Us
             </span>
-            <h2 className="font-heading font-bold text-xl sm:text-2xl md:text-3xl mb-2 text-balance">
+            <h2 className="font-heading font-bold text-[clamp(0.85rem,3.2vw,1.75rem)] whitespace-nowrap mb-2">
               Why international patients choose {country} for healthcare
             </h2>
-            <p className="text-sm sm:text-base text-muted-foreground">
+            <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto">
               World-class hospitals, international accreditation, and costs a fraction of Western alternatives —
               without compromising on quality of care.
             </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {whyChoiceItems(country).map(({ icon: Icon, title, desc }) => (
-              <motion.div
-                key={title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="bg-white rounded-2xl p-5 sm:p-6 shadow-sm ring-1 ring-black/5"
-              >
-                <span className="flex items-center justify-center w-11 h-11 rounded-xl bg-primary/10 text-primary mb-4">
-                  <Icon className="w-5 h-5" />
-                </span>
-                <h3 className="font-heading font-bold text-base mb-2">{title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{desc}</p>
-              </motion.div>
-            ))}
+            {whyChoiceItems(country).map(({ icon: Icon, title, desc, stat, statLabel }, i) => {
+              const palette = [
+                { bg: "bg-amber-100", text: "text-amber-600", stat: "text-amber-600" },
+                { bg: "bg-rose-100", text: "text-rose-600", stat: "text-rose-600" },
+                { bg: "bg-orange-100", text: "text-orange-600", stat: "text-orange-600" },
+                { bg: "bg-blue-100", text: "text-blue-600", stat: "text-violet-600" },
+                { bg: "bg-red-100", text: "text-red-600", stat: "text-accent-jade" },
+                { bg: "bg-emerald-100", text: "text-emerald-600", stat: "text-red-600" },
+              ][i % 6];
+              return (
+                <motion.div
+                  key={title}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  className="bg-white rounded-2xl p-5 sm:p-6 shadow-sm ring-1 ring-black/5 flex flex-col"
+                >
+                  <span className={`flex items-center justify-center w-11 h-11 rounded-xl ${palette.bg} ${palette.text} mb-4 shrink-0`}>
+                    <Icon className="w-5 h-5" />
+                  </span>
+                  <h3 className="font-heading font-bold text-base mb-2">{title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{desc}</p>
+                  {stat && (
+                    <div className="mt-4 pt-4 border-t border-border">
+                      <p className={`font-heading font-extrabold text-lg ${palette.stat}`}>{stat}</p>
+                      <p className="text-xs text-muted-foreground">{statLabel}</p>
+                    </div>
+                  )}
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -420,31 +475,40 @@ function LandingPage({ treatment, relatedDoctors, relatedHospitals, faqs, openLe
       {/* How it works */}
       <section className="py-8 sm:py-10">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="text-center max-w-2xl mx-auto mb-8">
+          <div className="text-center mb-8">
             <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wider uppercase mb-3">
               How It Works
             </span>
-            <h2 className="font-heading font-bold text-xl sm:text-2xl md:text-3xl text-balance">
+            <h2 className="font-heading font-bold text-[clamp(0.85rem,3.2vw,1.75rem)] whitespace-nowrap">
               From your country to {country} — in 4 simple steps
             </h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {PROCESS_STEPS.map((step, i) => (
-              <motion.div
-                key={step.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.05 }}
-                className="bg-white rounded-2xl p-5 shadow-sm ring-1 ring-black/5"
-              >
-                <span className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-gradient-to-r from-primary to-secondary text-white text-sm font-bold mb-3">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <h3 className="font-heading font-bold text-sm sm:text-base mb-1.5">{step.title}</h3>
-                <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">{step.desc}</p>
-              </motion.div>
-            ))}
+            {PROCESS_STEPS.map((step, i) => {
+              const palette = ["bg-emerald-500", "bg-amber-500", "bg-teal-600", "bg-emerald-500"][i % 4];
+              return (
+                <motion.div
+                  key={step.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.05 }}
+                  className="bg-white rounded-2xl p-5 shadow-sm ring-1 ring-black/5"
+                >
+                  <div className="flex items-center gap-3 mb-3">
+                    <span className={`flex items-center justify-center w-11 h-11 rounded-xl ${palette} text-white shrink-0`}>
+                      <step.icon className="w-5 h-5" />
+                    </span>
+                    <div className="flex-1 h-px bg-border" />
+                    <span className="font-heading font-extrabold text-xl text-muted-foreground/40">
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                  </div>
+                  <h3 className="font-heading font-bold text-sm sm:text-base mb-1.5">{step.title}</h3>
+                  <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">{step.desc}</p>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -452,34 +516,43 @@ function LandingPage({ treatment, relatedDoctors, relatedHospitals, faqs, openLe
       {/* Visa & travel */}
       <section className="py-8 sm:py-10 bg-muted">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="text-center max-w-2xl mx-auto mb-8">
+          <div className="text-center mb-8">
             <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wider uppercase mb-3">
               Visa &amp; Travel
             </span>
-            <h2 className="font-heading font-bold text-xl sm:text-2xl md:text-3xl mb-2 text-balance">
+            <h2 className="font-heading font-bold text-[clamp(0.85rem,3.2vw,1.75rem)] whitespace-nowrap mb-2">
               The {country} medical visa process, simplified
             </h2>
-            <p className="text-sm sm:text-base text-muted-foreground">
+            <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto">
               We guide every patient through the entire process — from the hospital letter to landing in {country}.
             </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {visaSteps(country).map((step, i) => (
-              <motion.div
-                key={step.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.05 }}
-                className="bg-white rounded-2xl p-5 shadow-sm ring-1 ring-black/5"
-              >
-                <span className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-gradient-to-r from-primary to-secondary text-white text-sm font-bold mb-3">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <h3 className="font-heading font-bold text-sm sm:text-base mb-1.5">{step.title}</h3>
-                <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">{step.desc}</p>
-              </motion.div>
-            ))}
+            {visaSteps(country).map((step, i) => {
+              const palette = ["bg-teal-600", "bg-rose-500", "bg-amber-500", "bg-emerald-500"][i % 4];
+              return (
+                <motion.div
+                  key={step.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.05 }}
+                  className="bg-white rounded-2xl p-5 shadow-sm ring-1 ring-black/5"
+                >
+                  <div className="flex items-center gap-3 mb-3">
+                    <span className={`flex items-center justify-center w-11 h-11 rounded-xl ${palette} text-white shrink-0`}>
+                      <step.icon className="w-5 h-5" />
+                    </span>
+                    <div className="flex-1 h-px bg-border" />
+                    <span className="font-heading font-extrabold text-xl text-muted-foreground/40">
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                  </div>
+                  <h3 className="font-heading font-bold text-sm sm:text-base mb-1.5">{step.title}</h3>
+                  <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">{step.desc}</p>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -489,11 +562,11 @@ function LandingPage({ treatment, relatedDoctors, relatedHospitals, faqs, openLe
       {faqs.length > 0 && (
         <section className="py-8 sm:py-10 bg-muted">
           <div className="max-w-5xl mx-auto px-4 sm:px-6">
-            <div className="text-center max-w-2xl mx-auto mb-8">
+            <div className="text-center mb-8">
               <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wider uppercase mb-3">
                 Common Questions
               </span>
-              <h2 className="font-heading font-bold text-xl sm:text-2xl md:text-3xl text-balance">
+              <h2 className="font-heading font-bold text-[clamp(0.85rem,3.2vw,1.75rem)] whitespace-nowrap">
                 Frequently asked questions
               </h2>
             </div>
@@ -522,7 +595,7 @@ function LandingPage({ treatment, relatedDoctors, relatedHospitals, faqs, openLe
           <span className="inline-block px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-white/90 text-xs font-semibold tracking-wide mb-4">
             For a Better Life
           </span>
-          <h2 className="font-heading font-bold text-xl sm:text-2xl md:text-3xl text-white mb-3 text-balance">
+          <h2 className="font-heading font-bold text-[clamp(0.85rem,3.2vw,1.75rem)] whitespace-nowrap text-white mb-3">
             Get your personalised treatment plan
           </h2>
           <p className="text-white/80 text-sm sm:text-base mb-7">
