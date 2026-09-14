@@ -6,8 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
 import { Plus, Pencil, Trash2, Loader2, GripVertical, Info, Upload, X } from "lucide-react";
-import * as Icons from "lucide-react";
-import IconOrImage from "@/components/common/IconOrImage";
+import IconOrImage, { ICON_MAP } from "@/components/common/IconOrImage";
 
 const emptyForm = { title: "", description: "", icon: "", link: "", image_url: "", sort_order: 0, status: "active" };
 
@@ -117,7 +116,7 @@ export default function SiteContentManager({ title, description, sections }) {
     if (/^https?:\/\//i.test(name) || name.startsWith("data:")) {
       return <img src={name} alt="" className="w-full h-full object-contain rounded" />;
     }
-    const Cmp = Icons[name];
+    const Cmp = ICON_MAP[name];
     if (!Cmp) return <Info className="w-4 h-4 text-muted-foreground/50" />;
     return <Cmp className="w-4 h-4 text-primary" />;
   };
@@ -245,16 +244,8 @@ export default function SiteContentManager({ title, description, sections }) {
                 )}
               </div>
               <p className="text-xs text-muted-foreground/70 mt-1">
-                Either type an exact{" "}
-                <a
-                  href="https://lucide.dev/icons"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-primary underline"
-                >
-                  lucide-react
-                </a>{" "}
-                icon name (case-sensitive, e.g. "HeartPulse", "Stethoscope") or upload your own icon image.
+                Type one of a curated set of icon names (case-sensitive, e.g. "HeartPulse", "Stethoscope") — the
+                preview above confirms whether a name matches — or upload your own icon image instead.
               </p>
             </div>
 
