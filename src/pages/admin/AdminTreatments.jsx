@@ -32,6 +32,8 @@ const TREATMENT_BULK_COLUMNS = [
   { key: "featured", label: "Featured (yes/no)", type: "boolean", example: "no" },
   { key: "landing_page_enabled", label: "Show as Landing Page (yes/no)", type: "boolean", example: "no" },
   { key: "status", label: "Status (active/inactive)", type: "text", example: "active" },
+  { key: "meta_title", label: "SEO Meta Title (optional)", type: "text", example: "" },
+  { key: "meta_description", label: "SEO Meta Description (optional)", type: "text", example: "" },
 ];
 
 const TREATMENT_BULK_DEFAULTS = {

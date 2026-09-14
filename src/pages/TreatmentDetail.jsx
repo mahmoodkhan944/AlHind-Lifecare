@@ -39,6 +39,8 @@ import { useLeadModal } from "@/lib/LeadModalContext";
 import { COUNTRIES, getDialCode } from "@/lib/countries";
 import { useSiteSettings, DEFAULT_SETTINGS, getWhatsAppLink } from "@/hooks/useSiteSettings";
 import { slugify } from "@/lib/slugify";
+import { useDocumentMeta } from "@/hooks/useDocumentMeta";
+import DetailPageSkeleton from "@/components/common/DetailPageSkeleton";
 
 const parseList = (val) => {
   if (!val) return [];
@@ -164,12 +166,19 @@ export default function TreatmentDetail({ forceLanding = false }) {
       .catch(() => {});
   }, []);
 
+  // Sets the browser tab title / SEO meta description only — nothing from
+  // this renders anywhere on the visible page.
+  useDocumentMeta({
+    title: treatment
+      ? treatment.meta_title || `${treatment.name} | AlHind Lifecare`
+      : undefined,
+    description: treatment
+      ? treatment.meta_description || treatment.description || undefined
+      : undefined,
+  });
+
   if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
-      </div>
-    );
+    return <DetailPageSkeleton />;
   }
 
   if (!treatment) {
@@ -459,7 +468,7 @@ function LandingPage({ treatment, relatedDoctors, relatedHospitals, faqs, openLe
             <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wider uppercase mb-3">
               Why Us
             </span>
-            <h2 className="font-heading font-bold text-[clamp(0.85rem,3.2vw,1.75rem)] whitespace-nowrap mb-2">
+            <h2 className="font-heading font-bold text-[clamp(1.3rem,4.5vw,1.75rem)] whitespace-normal sm:whitespace-nowrap sm:text-[clamp(0.85rem,3.2vw,1.75rem)] mb-2">
               Why international patients choose {country} for healthcare
             </h2>
             <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto">
@@ -510,7 +519,7 @@ function LandingPage({ treatment, relatedDoctors, relatedHospitals, faqs, openLe
             <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wider uppercase mb-3">
               How It Works
             </span>
-            <h2 className="font-heading font-bold text-[clamp(0.85rem,3.2vw,1.75rem)] whitespace-nowrap">
+            <h2 className="font-heading font-bold text-[clamp(1.3rem,4.5vw,1.75rem)] whitespace-normal sm:whitespace-nowrap sm:text-[clamp(0.85rem,3.2vw,1.75rem)]">
               From your country to {country} — in 4 simple steps
             </h2>
           </div>
@@ -551,7 +560,7 @@ function LandingPage({ treatment, relatedDoctors, relatedHospitals, faqs, openLe
             <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wider uppercase mb-3">
               Visa &amp; Travel
             </span>
-            <h2 className="font-heading font-bold text-[clamp(0.85rem,3.2vw,1.75rem)] whitespace-nowrap mb-2">
+            <h2 className="font-heading font-bold text-[clamp(1.3rem,4.5vw,1.75rem)] whitespace-normal sm:whitespace-nowrap sm:text-[clamp(0.85rem,3.2vw,1.75rem)] mb-2">
               The {country} medical visa process, simplified
             </h2>
             <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto">
@@ -597,7 +606,7 @@ function LandingPage({ treatment, relatedDoctors, relatedHospitals, faqs, openLe
               <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wider uppercase mb-3">
                 Common Questions
               </span>
-              <h2 className="font-heading font-bold text-[clamp(0.85rem,3.2vw,1.75rem)] whitespace-nowrap">
+              <h2 className="font-heading font-bold text-[clamp(1.3rem,4.5vw,1.75rem)] whitespace-normal sm:whitespace-nowrap sm:text-[clamp(0.85rem,3.2vw,1.75rem)]">
                 Frequently asked questions
               </h2>
             </div>
@@ -626,7 +635,7 @@ function LandingPage({ treatment, relatedDoctors, relatedHospitals, faqs, openLe
           <span className="inline-block px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-white/90 text-xs font-semibold tracking-wide mb-4">
             For a Better Life
           </span>
-          <h2 className="font-heading font-bold text-[clamp(0.85rem,3.2vw,1.75rem)] whitespace-nowrap text-white mb-3">
+          <h2 className="font-heading font-bold text-[clamp(1.3rem,4.5vw,1.75rem)] whitespace-normal sm:whitespace-nowrap sm:text-[clamp(0.85rem,3.2vw,1.75rem)] text-white mb-3">
             Get your personalised treatment plan
           </h2>
           <p className="text-white/80 text-sm sm:text-base mb-7">
@@ -716,7 +725,7 @@ function ClassicPage({ treatment, relatedDoctors, relatedHospitals, openLeadModa
   const waLink = getWhatsAppLink(settings.whatsapp_number);
 
   return (
-    <div>
+    <div className="pb-20 lg:pb-0">
       <section className="pt-20 sm:pt-24 md:pt-28 pb-8 sm:pb-10 md:pb-12">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <Link
@@ -896,30 +905,6 @@ function ClassicPage({ treatment, relatedDoctors, relatedHospitals, openLeadModa
               {/* "Why India" / "Why Turkey" are intentionally not rendered here —
                   kept as backend-only fields the admin can fill in for internal
                   reference, without showing on the public page. */}
-
-              {/* Mobile/tablet: the fixed desktop panel below is lg-only, so
-                  show the buttons inline here instead. */}
-              <div className="flex flex-col gap-2 lg:hidden">
-                <Button
-                  onClick={() =>
-                    openLeadModal({
-                      title: "Get a Free Quote",
-                      description: `Get a free, no-obligation quote for ${treatment.name}.`,
-                      treatmentInterest: treatment.name,
-                    })
-                  }
-                  className="h-12 bg-gradient-to-r from-primary to-secondary text-white rounded-xl text-base font-heading font-bold"
-                >
-                  Get Quotation
-                </Button>
-                {settings.whatsapp_number && (
-                  <Button variant="outline" asChild className="h-12 rounded-xl gap-2 text-base font-heading font-semibold">
-                    <a href={waLink} target="_blank" rel="noopener noreferrer">
-                      <MessageCircle className="w-4 h-4" /> WhatsApp
-                    </a>
-                  </Button>
-                )}
-              </div>
             </div>
 
             {/* Empty spacer — just reserves the 1/3 column width so the left
@@ -935,6 +920,31 @@ function ClassicPage({ treatment, relatedDoctors, relatedHospitals, openLeadModa
           <RelatedSections relatedDoctors={relatedDoctors} relatedHospitals={relatedHospitals} />
         </div>
       </section>
+
+      {/* Mobile-only persistent bottom CTA bar — stays fixed at the bottom of
+          the screen the whole time on mobile/tablet, so the primary action
+          is always one tap away no matter how far the person has scrolled. */}
+      <div className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-border shadow-[0_-4px_12px_rgba(0,0,0,0.06)] px-3 py-2.5 flex gap-2">
+        <Button
+          onClick={() =>
+            openLeadModal({
+              title: "Get a Free Quote",
+              description: `Get a free, no-obligation quote for ${treatment.name}.`,
+              treatmentInterest: treatment.name,
+            })
+          }
+          className="flex-1 h-11 bg-gradient-to-r from-primary to-secondary text-white rounded-xl text-sm font-heading font-bold"
+        >
+          Get Quotation
+        </Button>
+        {settings.whatsapp_number && (
+          <Button variant="outline" asChild className="h-11 w-11 shrink-0 rounded-xl p-0">
+            <a href={waLink} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
+              <MessageCircle className="w-5 h-5" />
+            </a>
+          </Button>
+        )}
+      </div>
 
       {/* Desktop-only fixed panel — stays hidden until the content section
           (tracked via contentTopRef) has scrolled up near the navbar, so it

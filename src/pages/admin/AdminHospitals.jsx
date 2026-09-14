@@ -35,6 +35,8 @@ const HOSPITAL_BULK_COLUMNS = [
   { key: "parking_available", label: "Parking Available (yes/no)", type: "boolean", example: "yes" },
   { key: "featured", label: "Featured (yes/no)", type: "boolean", example: "no" },
   { key: "status", label: "Status (active/inactive)", type: "text", example: "active" },
+  { key: "meta_title", label: "SEO Meta Title (optional)", type: "text", example: "" },
+  { key: "meta_description", label: "SEO Meta Description (optional)", type: "text", example: "" },
 ];
 
 const HOSPITAL_BULK_DEFAULTS = {

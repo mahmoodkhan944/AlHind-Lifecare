@@ -20,6 +20,8 @@ import {
 import { db } from "@/api/dataClient";
 import { Button } from "@/components/ui/button";
 import { useLeadModal } from "@/lib/LeadModalContext";
+import { useDocumentMeta } from "@/hooks/useDocumentMeta";
+import DetailPageSkeleton from "@/components/common/DetailPageSkeleton";
 
 const parseList = (val) => {
   if (!val) return [];
@@ -75,12 +77,17 @@ export default function HospitalDetail() {
       .catch(() => {});
   }, [hospital?.name]);
 
+  // Sets the browser tab title / SEO meta description only — nothing from
+  // this renders anywhere on the visible page.
+  useDocumentMeta({
+    title: hospital
+      ? hospital.meta_title || `${hospital.name}${hospital.city ? ` — ${hospital.city}` : ""} | AlHind Lifecare`
+      : undefined,
+    description: hospital ? hospital.meta_description || hospital.description || undefined : undefined,
+  });
+
   if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
-      </div>
-    );
+    return <DetailPageSkeleton />;
   }
 
   if (!hospital) {
@@ -105,7 +112,7 @@ export default function HospitalDetail() {
   const awards = parseList(hospital.awards);
 
   return (
-    <div>
+    <div className="pb-20 lg:pb-0">
       {/* Hero */}
       <section className="pt-20 sm:pt-24 md:pt-28 pb-8 sm:pb-10 md:pb-12">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
@@ -442,6 +449,32 @@ export default function HospitalDetail() {
           )}
         </div>
       </section>
+
+      {/* Mobile-only persistent bottom CTA bar — stays fixed at the bottom of
+          the screen the whole time on mobile/tablet. */}
+      <div className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-border shadow-[0_-4px_12px_rgba(0,0,0,0.06)] px-3 py-2.5 flex gap-2">
+        <Button
+          onClick={() =>
+            openLeadModal({
+              title: "Request Appointment",
+              description: `Request an appointment at ${hospital.name}.`,
+              treatmentInterest: hospital.name,
+            })
+          }
+          className="flex-1 h-11 bg-gradient-to-r from-primary to-secondary text-white rounded-xl text-sm font-heading font-bold gap-2"
+        >
+          <Calendar className="w-4 h-4" /> Request Appointment
+        </Button>
+        <a
+          href={`https://wa.me/919876543210?text=I'm interested in ${hospital.name}`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <Button variant="outline" className="h-11 w-11 shrink-0 rounded-xl p-0" aria-label="WhatsApp">
+            <Phone className="w-5 h-5" />
+          </Button>
+        </a>
+      </div>
 
       {/* Desktop-only fixed panel — hidden until contentTopRef has scrolled
           up near the navbar (so it never floats over the hero), then stays

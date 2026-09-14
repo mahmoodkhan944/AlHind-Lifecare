@@ -36,7 +36,7 @@ export default function FeaturedHospitals() {
               <Link to={`/hospitals/${h.id}`} className="group block bg-white rounded-3xl overflow-hidden border border-border/50 hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-1 transition-all duration-300">
                 <div className="relative h-48 bg-gradient-to-br from-sky-100 via-teal-50 to-amber-50 overflow-hidden">
                   {h.cover_image_url ? (
-                    <img src={h.cover_image_url} alt={h.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    <img src={h.cover_image_url} alt={h.name} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
                       <span className="text-6xl font-extrabold bg-clip-text text-transparent bg-gradient-to-br from-primary/30 to-secondary/30">{h.name?.[0]}</span>
@@ -45,7 +45,7 @@ export default function FeaturedHospitals() {
                 </div>
                 <div className="p-6">
                   <div className="flex items-start gap-3 mb-3">
-                    {h.logo_url && <img src={h.logo_url} alt="" className="w-10 h-10 rounded-xl object-contain border" />}
+                    {h.logo_url && <img src={h.logo_url} alt="" loading="lazy" className="w-10 h-10 rounded-xl object-contain border" />}
                     <div>
                       <h3 className="font-heading font-bold text-lg group-hover:text-primary transition-colors">{h.name}</h3>
                       <span className="flex items-center gap-1 text-sm text-muted-foreground">

@@ -260,6 +260,37 @@ export default function HospitalForm({ initialData, onCancel, onSaved }) {
             </Field>
           </div>
         </div>
+
+        {/* SEO Settings — used only for the browser tab title and search-engine
+            meta description. Never rendered anywhere on the live page. */}
+        <div className="bg-white rounded-2xl border border-border p-4 sm:p-5 shadow-sm">
+          <h3 className="font-bold text-foreground text-sm mb-4">SEO Settings</h3>
+          <div className="space-y-4">
+            <Field label="Meta Title (optional)">
+              <Input
+                value={form.meta_title || ""}
+                onChange={(e) => set("meta_title", e.target.value)}
+                placeholder="Custom SEO title for search engines"
+                className="h-10 rounded-lg border-border"
+              />
+              <p className="text-xs text-muted-foreground/70 mt-1">
+                Leave empty to auto-generate from hospital name and city. Recommended: 50-60 characters.
+              </p>
+            </Field>
+            <Field label="Meta Description (optional)">
+              <Textarea
+                value={form.meta_description || ""}
+                onChange={(e) => set("meta_description", e.target.value)}
+                placeholder="Custom SEO description for search engines"
+                className="rounded-lg border-border min-h-[90px]"
+                rows={3}
+              />
+              <p className="text-xs text-muted-foreground/70 mt-1">
+                Leave empty to auto-generate from description. Recommended: 150-160 characters.
+              </p>
+            </Field>
+          </div>
+        </div>
       </div>
 
       {/* Bottom action bar */}
