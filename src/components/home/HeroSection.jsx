@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { Star, ArrowRight, Loader2, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,9 @@ import { useSiteSettings, DEFAULT_SETTINGS } from "@/hooks/useSiteSettings";
 import { useSectionContent } from "@/hooks/useSectionContent";
 
 const BG_VIDEO = `${import.meta.env.BASE_URL}videos/hero-video.mp4`;
+// A static frame shown immediately while the ~2.4MB background video loads
+// in — see the deferred-loading logic below for why.
+const HERO_POSTER = "https://images.unsplash.com/photo-1758691461957-474a7686e388?w=1600&q=75";
 
 const patientPhotos = [
   "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop&crop=face",
@@ -41,6 +44,33 @@ export default function HeroSection() {
   const [form, setForm] = useState({ patient_name: "", country: "Select Country", city: "", phone: "", medical_problem: "", age: "" });
   const [loading, setLoading] = useState(false);
 
+  // The background video is ~2.4MB — fetching and decoding it immediately
+  // competes with the JS/CSS/fonts the page actually needs to become
+  // interactive, which was showing up as a large Speed Index / Total
+  // Blocking Time hit in Lighthouse. Instead: render a lightweight static
+  // image immediately (which is also all that's shown on mobile, where
+  // bandwidth and CPU are more constrained), and only start loading the
+  // video once the browser is idle after first paint.
+  const videoRef = useRef(null);
+  const [videoReady, setVideoReady] = useState(false);
+
+  useEffect(() => {
+    const start = () => setVideoReady(true);
+    if ("requestIdleCallback" in window) {
+      const id = window.requestIdleCallback(start, { timeout: 2000 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const id = setTimeout(start, 1200);
+    return () => clearTimeout(id);
+  }, []);
+
+  useEffect(() => {
+    if (videoReady && videoRef.current) {
+      videoRef.current.load();
+      videoRef.current.play().catch(() => {});
+    }
+  }, [videoReady]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.patient_name || !form.phone) return;
@@ -65,17 +95,25 @@ export default function HeroSection() {
 
   return (
     <section className="relative w-full min-h-[100dvh] flex items-center pt-20 sm:pt-24 lg:pt-20 pb-6 sm:pb-8 overflow-hidden">
-      {/* Background Video */}
+      {/* Background: static image (always, shown immediately) + video (all
+          screen sizes, loaded once the browser is idle — see videoReady
+          above) */}
       <div className="absolute inset-0 z-0 overflow-hidden bg-secondary">
-        <video
+        <img
+          src={HERO_POSTER}
+          alt=""
+          fetchPriority="high"
           className="absolute inset-0 w-full h-full object-cover object-center"
-          autoPlay
+        />
+        <video
+          ref={videoRef}
+          className="absolute inset-0 w-full h-full object-cover object-center"
           muted
           loop
           playsInline
-          preload="metadata"
+          preload="none"
         >
-          <source src={BG_VIDEO} type="video/mp4" />
+          {videoReady && <source src={BG_VIDEO} type="video/mp4" />}
         </video>
 
         <div className="absolute inset-0 bg-black/55 sm:bg-black/50 lg:bg-gradient-to-r lg:from-black/70 lg:via-black/45 lg:to-black/20" />
