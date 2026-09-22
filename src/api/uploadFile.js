@@ -122,3 +122,25 @@ export async function UploadFile({ file }) {
   const { data } = supabase.storage.from(BUCKET).getPublicUrl(path);
   return { file_url: data.publicUrl, ext };
 }
+
+/**
+ * Deletes a file from the "uploads" bucket given its public URL (as stored
+ * in a record's photo_url / cover_image_url / etc. field) — used when an
+ * admin replaces an image or deletes a record, so the old file doesn't sit
+ * around in storage forever. Silently does nothing for a URL that isn't
+ * actually from this bucket (e.g. an external image link), and never
+ * throws — a failed cleanup shouldn't block whatever the admin was doing.
+ */
+export async function deleteFileByUrl(url) {
+  if (!url || typeof url !== 'string') return;
+  const marker = `/storage/v1/object/public/${BUCKET}/`;
+  const idx = url.indexOf(marker);
+  if (idx === -1) return; // not one of our own uploads — nothing to clean up
+  const path = decodeURIComponent(url.slice(idx + marker.length));
+  if (!path) return;
+  try {
+    await supabase.storage.from(BUCKET).remove([path]);
+  } catch {
+    // Best-effort cleanup — ignore failures.
+  }
+}

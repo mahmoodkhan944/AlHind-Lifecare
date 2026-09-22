@@ -83,10 +83,12 @@ export default function BlogForm({ initialData, onCancel, onSaved }) {
   const handleFeaturedImage = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
+    const oldUrl = form.cover_image_url;
     setUploadingFeatured(true);
     try {
       const { file_url } = await db.integrations.Core.UploadFile({ file });
       set("cover_image_url", file_url);
+      if (oldUrl && oldUrl !== file_url) db.integrations.Core.DeleteFile(oldUrl);
       toast({ title: "Featured image uploaded" });
     } catch (err) {
       toast({ title: "Upload failed", description: err?.message, variant: "destructive" });
@@ -111,6 +113,8 @@ export default function BlogForm({ initialData, onCancel, onSaved }) {
   };
 
   const removeAdditionalImage = (idx) => {
+    const urlToRemove = (form.additional_images || [])[idx];
+    if (urlToRemove) db.integrations.Core.DeleteFile(urlToRemove);
     set(
       "additional_images",
       (form.additional_images || []).filter((_, i) => i !== idx)

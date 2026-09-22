@@ -63,10 +63,12 @@ export default function DoctorForm({ initialData, onCancel, onSaved }) {
   const handlePhoto = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
+    const oldUrl = form.photo_url;
     setUploadingPhoto(true);
     try {
       const { file_url } = await db.integrations.Core.UploadFile({ file });
       set("photo_url", file_url);
+      if (oldUrl && oldUrl !== file_url) db.integrations.Core.DeleteFile(oldUrl);
       toast({ title: "Photo uploaded" });
     } catch (err) {
       toast({ title: "Upload failed", description: err?.message, variant: "destructive" });
@@ -77,10 +79,12 @@ export default function DoctorForm({ initialData, onCancel, onSaved }) {
   const handleDoc = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
+    const oldUrl = form.award_document_url;
     setUploadingDoc(true);
     try {
       const { file_url } = await db.integrations.Core.UploadFile({ file });
       set("award_document_url", file_url);
+      if (oldUrl && oldUrl !== file_url) db.integrations.Core.DeleteFile(oldUrl);
       toast({ title: "Document uploaded" });
     } catch (err) {
       toast({ title: "Upload failed", description: err?.message, variant: "destructive" });

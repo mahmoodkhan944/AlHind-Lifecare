@@ -48,7 +48,17 @@ export default function AdminBlog() {
 
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this blog post? This action cannot be undone.")) return;
+    const item = items.find((i) => i.id === id);
     await db.entities.BlogPost.delete(id);
+    if (item?.cover_image_url) db.integrations.Core.DeleteFile(item.cover_image_url);
+    if (item?.additional_images) {
+      try {
+        const gallery = JSON.parse(item.additional_images);
+        if (Array.isArray(gallery)) gallery.forEach((url) => db.integrations.Core.DeleteFile(url));
+      } catch {
+        // not valid JSON — nothing to clean up
+      }
+    }
     setItems((prev) => prev.filter((i) => i.id !== id));
     toast({ title: "Deleted" });
   };

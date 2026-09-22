@@ -76,7 +76,9 @@ export default function AdminHospitals() {
 
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this hospital? This action cannot be undone.")) return;
+    const item = items.find((i) => i.id === id);
     await db.entities.Hospital.delete(id);
+    if (item?.cover_image_url) db.integrations.Core.DeleteFile(item.cover_image_url);
     setItems((prev) => prev.filter((i) => i.id !== id));
     toast({ title: "Deleted" });
   };

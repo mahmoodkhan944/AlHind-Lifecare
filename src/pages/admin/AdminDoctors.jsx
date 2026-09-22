@@ -71,7 +71,10 @@ export default function AdminDoctors() {
 
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this doctor? This action cannot be undone.")) return;
+    const item = items.find((i) => i.id === id);
     await db.entities.Doctor.delete(id);
+    if (item?.photo_url) db.integrations.Core.DeleteFile(item.photo_url);
+    if (item?.award_document_url) db.integrations.Core.DeleteFile(item.award_document_url);
     setItems((prev) => prev.filter((i) => i.id !== id));
     setSelected((prev) => { const next = new Set(prev); next.delete(id); return next; });
     toast({ title: "Deleted" });
@@ -100,7 +103,12 @@ export default function AdminDoctors() {
     if (selected.size === 0) return;
     if (!window.confirm(`Delete ${selected.size} selected doctor${selected.size > 1 ? "s" : ""}? This action cannot be undone.`)) return;
     const ids = Array.from(selected);
+    const toClean = items.filter((i) => selected.has(i.id));
     await Promise.all(ids.map((id) => db.entities.Doctor.delete(id).catch(() => {})));
+    toClean.forEach((item) => {
+      if (item.photo_url) db.integrations.Core.DeleteFile(item.photo_url);
+      if (item.award_document_url) db.integrations.Core.DeleteFile(item.award_document_url);
+    });
     setItems((prev) => prev.filter((i) => !selected.has(i.id)));
     setSelected(new Set());
     toast({ title: `${ids.length} doctor${ids.length > 1 ? "s" : ""} deleted` });

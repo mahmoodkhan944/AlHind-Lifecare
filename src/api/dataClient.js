@@ -1,6 +1,6 @@
 import { createEntity } from '@/api/entityFactory';
 import { auth } from '@/api/authClient';
-import { UploadFile } from '@/api/uploadFile';
+import { UploadFile, deleteFileByUrl } from '@/api/uploadFile';
 
 export const db = {
   entities: {
@@ -21,6 +21,7 @@ export const db = {
   integrations: {
     Core: {
       UploadFile,
+      DeleteFile: deleteFileByUrl,
     },
   },
 };

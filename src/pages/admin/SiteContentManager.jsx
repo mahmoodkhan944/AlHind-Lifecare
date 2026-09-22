@@ -98,10 +98,12 @@ export default function SiteContentManager({ title, description, sections }) {
   const handleIconUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    const oldValue = form.icon;
     setUploadingIcon(true);
     try {
       const { file_url } = await db.integrations.Core.UploadFile({ file });
       setForm((f) => ({ ...f, icon: file_url }));
+      if (oldValue && oldValue !== file_url) db.integrations.Core.DeleteFile(oldValue);
     } catch (err) {
       toast({ title: "Icon upload failed", description: err?.message, variant: "destructive" });
     }
@@ -236,7 +238,10 @@ export default function SiteContentManager({ title, description, sections }) {
                     variant="ghost"
                     size="sm"
                     className="h-10 w-10 p-0 shrink-0 text-muted-foreground"
-                    onClick={() => setForm({ ...form, icon: "" })}
+                    onClick={() => {
+                      db.integrations.Core.DeleteFile(form.icon);
+                      setForm({ ...form, icon: "" });
+                    }}
                     aria-label="Remove icon"
                   >
                     <X className="w-4 h-4" />

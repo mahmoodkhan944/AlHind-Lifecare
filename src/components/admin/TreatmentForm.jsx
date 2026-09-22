@@ -55,10 +55,12 @@ export default function TreatmentForm({ initialData, onCancel, onSaved }) {
   const handleImage = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
+    const oldUrl = form.image_url;
     setUploading(true);
     try {
       const { file_url } = await db.integrations.Core.UploadFile({ file });
       set("image_url", file_url);
+      if (oldUrl && oldUrl !== file_url) db.integrations.Core.DeleteFile(oldUrl);
       toast({ title: "Image uploaded" });
     } catch (err) {
       toast({ title: "Upload failed", description: err?.message, variant: "destructive" });

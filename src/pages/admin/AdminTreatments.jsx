@@ -87,7 +87,9 @@ export default function AdminTreatments() {
 
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this treatment? This action cannot be undone.")) return;
+    const item = items.find((i) => i.id === id);
     await db.entities.Treatment.delete(id);
+    if (item?.image_url) db.integrations.Core.DeleteFile(item.image_url);
     setItems((prev) => prev.filter((i) => i.id !== id));
     toast({ title: "Deleted" });
   };
