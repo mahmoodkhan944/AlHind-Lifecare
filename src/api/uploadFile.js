@@ -25,7 +25,7 @@ function sanitizeFileName(name) {
  * - If anything goes wrong, resolves with the original file — a failed
  *   compression attempt should never block an upload.
  */
-function compressImage(file) {
+export function compressImage(file) {
   return new Promise((resolve) => {
     if (!file.type?.startsWith('image/') || file.type === 'image/gif' || file.type === 'image/svg+xml') {
       resolve(file);

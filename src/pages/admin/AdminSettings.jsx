@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { useInvalidateSettings, DEFAULT_SETTINGS, parseDepartments } from "@/hooks/useSiteSettings";
+import BulkRecompressImages from "@/components/admin/BulkRecompressImages";
 import {
   Globe, Phone, Share2, PhoneCall, Clock, Building2, MapPin,
   Save, RotateCcw, Plus, Trash2, Key, Loader2, ExternalLink, Info, Star
@@ -178,6 +179,8 @@ export default function AdminSettings() {
           <a href="/contact" className="text-sm text-accent-jade hover:underline">Support Center →</a>
         </div>
       </SettingsCard>
+
+      <BulkRecompressImages />
 
       <ChangeCredentials />
     </div>
