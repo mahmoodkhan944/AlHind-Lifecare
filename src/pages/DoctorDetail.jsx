@@ -149,7 +149,7 @@ export default function DoctorDetail() {
               <div className="absolute inset-0 bg-gradient-to-br from-secondary/70 via-secondary/55 to-accent-jade/55" />
             </div>
 
-            {/* Compact white info card */}
+            {/* Compact info card — uses the site's own muted background */}
             <div className="relative bg-muted -mt-8 sm:-mt-10 mx-3 sm:mx-5 md:mx-6 mb-3 sm:mb-5 rounded-2xl shadow-lg p-3 sm:p-4">
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-start">
                 <motion.div
@@ -190,7 +190,7 @@ export default function DoctorDetail() {
                     {doctor.rating > 0 && (
                       <div className="text-right shrink-0">
                         <div className="flex items-center gap-1 justify-end">
-                          <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+                          <Star className="w-4 h-4 fill-[hsl(var(--accent-warm))] text-[hsl(var(--accent-warm))]" />
                           <span className="font-heading font-bold text-sm sm:text-base text-foreground">{doctor.rating}</span>
                         </div>
                         <p className="text-[11px] text-muted-foreground">Patient Rating</p>
