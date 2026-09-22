@@ -21,10 +21,12 @@ import {
   GraduationCap,
   Target,
   Building2,
+  MessageCircle,
 } from "lucide-react";
 import { db } from "@/api/dataClient";
 import { Button } from "@/components/ui/button";
 import { useLeadModal } from "@/lib/LeadModalContext";
+import { useSiteSettings, DEFAULT_SETTINGS, getWhatsAppLink } from "@/hooks/useSiteSettings";
 import { useDocumentMeta } from "@/hooks/useDocumentMeta";
 import DetailPageSkeleton from "@/components/common/DetailPageSkeleton";
 
@@ -393,15 +395,11 @@ export default function DoctorDetail() {
 }
 
 function DoctorSidebarCard({ doctor, openLeadModal }) {
+  const { data: settings = DEFAULT_SETTINGS } = useSiteSettings();
+  const waLink = getWhatsAppLink(settings.whatsapp_number);
+
   return (
-    <div className="bg-white rounded-2xl p-5 sm:p-6 border shadow-lg">
-      <h3 className="font-heading font-bold text-base sm:text-lg mb-3 sm:mb-4">Book Consultation</h3>
-      {doctor.consultation_fee_usd && (
-        <p className="text-xl sm:text-2xl font-bold text-primary mb-4">
-          ${doctor.consultation_fee_usd}{" "}
-          <span className="text-sm font-normal text-muted-foreground">/ consultation</span>
-        </p>
-      )}
+    <div className="flex flex-col gap-2">
       <Button
         onClick={() =>
           openLeadModal({
@@ -410,31 +408,16 @@ function DoctorSidebarCard({ doctor, openLeadModal }) {
             treatmentInterest: doctor.name,
           })
         }
-        className="w-full h-11 bg-gradient-to-r from-primary to-secondary text-white rounded-xl gap-2 mb-3"
+        className="h-12 bg-gradient-to-r from-primary to-secondary text-white rounded-xl text-base font-heading font-bold shadow-lg"
       >
-        <Calendar className="w-4 h-4" /> Book Appointment
+        Book Appointment
       </Button>
-      <a
-        href={`https://wa.me/919876543210?text=I'd like to consult with ${doctor.name}`}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="block"
-      >
-        <Button variant="outline" className="w-full h-11 rounded-xl gap-2">
-          <Phone className="w-4 h-4" /> WhatsApp
+      {settings.whatsapp_number && (
+        <Button variant="outline" asChild className="h-12 rounded-xl gap-2 text-base font-heading font-semibold bg-white shadow-lg">
+          <a href={waLink} target="_blank" rel="noopener noreferrer">
+            <MessageCircle className="w-4 h-4" /> WhatsApp
+          </a>
         </Button>
-      </a>
-      {doctor.hospital_name && (
-        <div className="mt-4 pt-4 border-t">
-          <p className="text-sm text-muted-foreground mb-1">Hospital</p>
-          <p className="font-medium text-sm sm:text-base">{doctor.hospital_name}</p>
-        </div>
-      )}
-      {doctor.languages && (
-        <div className="mt-4 pt-4 border-t">
-          <p className="text-sm text-muted-foreground mb-1">Languages</p>
-          <p className="font-medium text-sm sm:text-base">{doctor.languages}</p>
-        </div>
       )}
     </div>
   );
