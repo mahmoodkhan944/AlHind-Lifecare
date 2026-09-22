@@ -34,6 +34,12 @@ const parseList = (val) => {
   }
 };
 
+const parseObj = (val) => {
+  if (!val) return {};
+  if (typeof val === "object" && !Array.isArray(val)) return val;
+  try { const p = JSON.parse(val); return p && typeof p === "object" && !Array.isArray(p) ? p : {}; } catch { return {}; }
+};
+
 const HERO_IMAGE =
   "https://images.unsplash.com/photo-1587351021355-a479a299d2f9?w=1600&q=80";
 
@@ -404,7 +410,7 @@ function renderHospitalSection(key, rawTitle, hospital) {
     const fullDescription = parseList(hospital.full_description);
     if (!hospital.description && fullDescription.length === 0) return null;
     return (
-      <SectionCard key={key} title={title}>
+      <SectionCard key={key} title={title} subheading={parseObj(hospital.section_subheadings)[key]}>
         {hospital.description && (
           <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-3">{hospital.description}</p>
         )}
@@ -422,9 +428,12 @@ function renderHospitalSection(key, rawTitle, hospital) {
   if (key === "specialities" || key === "area_of_expertise" || key === "infrastructure_details") {
     const items = parseList(hospital[key]);
     if (items.length === 0) return null;
+    const subheading = parseObj(hospital.section_subheadings)[key];
     return (
       <div key={key}>
-        <h2 className="font-heading font-bold text-lg sm:text-xl mb-3">{title}</h2>
+        <h2 className="font-heading font-bold text-lg sm:text-xl mb-1">{title}</h2>
+        {subheading && <p className="font-bold text-base text-foreground/70 mb-3">{subheading}</p>}
+        {!subheading && <div className="mb-2 sm:mb-3" />}
         <div className={`grid sm:grid-cols-2 ${key === "infrastructure_details" ? "" : "md:grid-cols-3"} gap-3`}>
           {items.map((item, idx) => (
             <div key={idx} className="flex items-center gap-2 text-sm text-muted-foreground bg-secondary/5 border border-secondary/15 rounded-xl px-3.5 py-3">
@@ -439,10 +448,13 @@ function renderHospitalSection(key, rawTitle, hospital) {
   if (key === "doctors_list") {
     const items = parseList(hospital.doctors_list);
     if (items.length === 0) return null;
+    const subheading = parseObj(hospital.section_subheadings)[key];
     return (
       <div key={key}>
         <h2 className="font-heading font-bold text-lg sm:text-xl mb-0.5">{title}</h2>
-        <p className="text-sm text-muted-foreground mb-3">Our team of expert medical professionals</p>
+        <p className={subheading ? "font-bold text-base text-foreground/70 mb-3" : "text-sm text-muted-foreground mb-3"}>
+          {subheading || "Our team of expert medical professionals"}
+        </p>
         <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
           {items.map((doc, idx) => (
             <div key={idx} className="flex items-center gap-2 text-sm text-muted-foreground bg-secondary/5 border border-secondary/15 rounded-xl px-3.5 py-3">
@@ -458,9 +470,12 @@ function renderHospitalSection(key, rawTitle, hospital) {
     const facilities = parseList(hospital.facilities);
     const internationalServices = parseList(hospital.international_patient_services);
     if (facilities.length === 0 && internationalServices.length === 0) return null;
+    const subheading = parseObj(hospital.section_subheadings)[key];
     return (
       <div key={key}>
-        <h2 className="font-heading font-bold text-lg sm:text-xl mb-3">{title}</h2>
+        <h2 className="font-heading font-bold text-lg sm:text-xl mb-1">{title}</h2>
+        {subheading && <p className="font-bold text-base text-foreground/70 mb-3">{subheading}</p>}
+        {!subheading && <div className="mb-2 sm:mb-3" />}
         <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
           {[...facilities, ...internationalServices].map((f, idx) => (
             <div key={idx} className="flex items-center gap-2 text-sm text-muted-foreground bg-secondary/5 border border-secondary/15 rounded-xl px-3.5 py-3">
@@ -475,10 +490,13 @@ function renderHospitalSection(key, rawTitle, hospital) {
   if (key === "accreditations") {
     const items = parseList(hospital.accreditations);
     if (items.length === 0) return null;
+    const subheading = parseObj(hospital.section_subheadings)[key];
     return (
       <div key={key}>
         <h2 className="font-heading font-bold text-lg sm:text-xl mb-0.5">{title}</h2>
-        <p className="text-sm text-muted-foreground mb-3">Recognized for excellence in healthcare quality and safety</p>
+        <p className={subheading ? "font-bold text-base text-foreground/70 mb-3" : "text-sm text-muted-foreground mb-3"}>
+          {subheading || "Recognized for excellence in healthcare quality and safety"}
+        </p>
         <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3 mb-4">
           {items.map((a, idx) => (
             <div key={idx} className="relative bg-white border border-border rounded-xl border-t-4 border-t-secondary px-4 py-3.5">
@@ -520,7 +538,12 @@ function renderHospitalSection(key, rawTitle, hospital) {
           <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-[hsl(var(--accent-warm))] text-white shrink-0">
             <Award className="w-4.5 h-4.5" />
           </span>
-          <h2 className="font-heading font-bold text-lg sm:text-xl">{title}</h2>
+          <div>
+            <h2 className="font-heading font-bold text-lg sm:text-xl">{title}</h2>
+            {parseObj(hospital.section_subheadings).awards && (
+              <p className="font-bold text-sm text-foreground/70">{parseObj(hospital.section_subheadings).awards}</p>
+            )}
+          </div>
         </div>
         <ul className="space-y-2.5">
           {awards.map((a, idx) => (
@@ -539,7 +562,7 @@ function renderHospitalSection(key, rawTitle, hospital) {
   if (key === "location") {
     if (!hospital.google_maps_embed_url) return null;
     return (
-      <SectionCard key={key} title={title}>
+      <SectionCard key={key} title={title} subheading={parseObj(hospital.section_subheadings)[key]}>
         <div className="rounded-xl overflow-hidden border">
           <iframe
             src={hospital.google_maps_embed_url}
@@ -559,7 +582,7 @@ function renderHospitalSection(key, rawTitle, hospital) {
   return null;
 }
 
-function SectionCard({ title, children }) {
+function SectionCard({ title, subheading, children }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -567,7 +590,9 @@ function SectionCard({ title, children }) {
       viewport={{ once: true }}
       className="bg-secondary/5 rounded-xl p-5 sm:p-6 border-l-4 border-secondary"
     >
-      <h2 className="font-heading font-bold text-lg sm:text-xl mb-3 sm:mb-4">{title}</h2>
+      <h2 className="font-heading font-bold text-lg sm:text-xl mb-1">{title}</h2>
+      {subheading && <p className="font-bold text-base text-foreground/70 mb-3">{subheading}</p>}
+      {!subheading && <div className="mb-2 sm:mb-3" />}
       {children}
     </motion.div>
   );

@@ -16,6 +16,12 @@ const parseList = (val) => {
   try { const p = JSON.parse(val); return Array.isArray(p) ? p : []; } catch { return []; }
 };
 
+const parseObj = (val) => {
+  if (!val) return {};
+  if (typeof val === "object" && !Array.isArray(val)) return val;
+  try { const p = JSON.parse(val); return p && typeof p === "object" && !Array.isArray(p) ? p : {}; } catch { return {}; }
+};
+
 // FIX: `Number(val) || null` treats 0 as falsy, which would silently null out a
 // legitimately-entered 0. Checks for empty/missing first instead.
 const toNumberOrNull = (val) => (val === "" || val === null || val === undefined ? null : Number(val));
@@ -32,12 +38,15 @@ export default function HospitalForm({ initialData, onCancel, onSaved }) {
     ["full_description","specialities","doctors_list","facilities","international_patient_services","accreditations","area_of_expertise","infrastructure_details","awards","section_config"].forEach((k) => {
       f[k] = parseList(initialData[k]);
     });
+    f.section_subheadings = parseObj(initialData.section_subheadings);
     return f;
   });
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
 
   const set = (key, val) => setForm((p) => ({ ...p, [key]: val }));
+  const setSubheading = (key, val) =>
+    setForm((p) => ({ ...p, section_subheadings: { ...(p.section_subheadings || {}), [key]: val } }));
   const setList = (key, val) => set(key, val);
 
   const handleImage = async (e) => {
@@ -87,6 +96,7 @@ export default function HospitalForm({ initialData, onCancel, onSaved }) {
       infrastructure_details: JSON.stringify(form.infrastructure_details || []),
       awards: JSON.stringify(form.awards || []),
       section_config: JSON.stringify(form.section_config || []),
+      section_subheadings: JSON.stringify(form.section_subheadings || {}),
     };
 
     try {
@@ -238,15 +248,15 @@ export default function HospitalForm({ initialData, onCancel, onSaved }) {
         </div>
 
         {/* Dynamic List Sections */}
-        <DynamicListField label="Full Description" placeholder="Description paragraph" required values={form.full_description} onChange={(v) => setList("full_description", v)} buttonAtTop />
-        <DynamicListField label="Specialities" placeholder="Specialty" required values={form.specialities} onChange={(v) => setList("specialities", v)} buttonAtTop />
-        <DynamicListField label="Doctor's List" placeholder="Doctor name" optional values={form.doctors_list} onChange={(v) => setList("doctors_list", v)} buttonAtTop />
-        <DynamicListField label="Facilities" placeholder="Facility" required values={form.facilities} onChange={(v) => setList("facilities", v)} buttonAtTop />
-        <DynamicListField label="International Patient Services" placeholder="Service" optional values={form.international_patient_services} onChange={(v) => setList("international_patient_services", v)} buttonAtTop />
-        <DynamicListField label="Accreditation" placeholder="Accreditation" required values={form.accreditations} onChange={(v) => setList("accreditations", v)} buttonAtTop />
-        <DynamicListField label="Area of Expertise" placeholder="Expertise" optional values={form.area_of_expertise} onChange={(v) => setList("area_of_expertise", v)} buttonAtTop />
-        <DynamicListField label="Infrastructure Details" placeholder="Infrastructure detail" optional values={form.infrastructure_details} onChange={(v) => setList("infrastructure_details", v)} buttonAtTop />
-        <DynamicListField label="Awards" placeholder="Award" optional values={form.awards} onChange={(v) => setList("awards", v)} buttonAtTop />
+        <DynamicListField label="Full Description" placeholder="Description paragraph" required values={form.full_description} onChange={(v) => setList("full_description", v)} buttonAtTop  subheading={form.section_subheadings?.full_description} onSubheadingChange={(v) => setSubheading("full_description", v)} />
+        <DynamicListField label="Specialities" placeholder="Specialty" required values={form.specialities} onChange={(v) => setList("specialities", v)} buttonAtTop  subheading={form.section_subheadings?.specialities} onSubheadingChange={(v) => setSubheading("specialities", v)} />
+        <DynamicListField label="Doctor's List" placeholder="Doctor name" optional values={form.doctors_list} onChange={(v) => setList("doctors_list", v)} buttonAtTop  subheading={form.section_subheadings?.doctors_list} onSubheadingChange={(v) => setSubheading("doctors_list", v)} />
+        <DynamicListField label="Facilities" placeholder="Facility" required values={form.facilities} onChange={(v) => setList("facilities", v)} buttonAtTop  subheading={form.section_subheadings?.facilities} onSubheadingChange={(v) => setSubheading("facilities", v)} />
+        <DynamicListField label="International Patient Services" placeholder="Service" optional values={form.international_patient_services} onChange={(v) => setList("international_patient_services", v)} buttonAtTop  subheading={form.section_subheadings?.international_patient_services} onSubheadingChange={(v) => setSubheading("international_patient_services", v)} />
+        <DynamicListField label="Accreditation" placeholder="Accreditation" required values={form.accreditations} onChange={(v) => setList("accreditations", v)} buttonAtTop  subheading={form.section_subheadings?.accreditations} onSubheadingChange={(v) => setSubheading("accreditations", v)} />
+        <DynamicListField label="Area of Expertise" placeholder="Expertise" optional values={form.area_of_expertise} onChange={(v) => setList("area_of_expertise", v)} buttonAtTop  subheading={form.section_subheadings?.area_of_expertise} onSubheadingChange={(v) => setSubheading("area_of_expertise", v)} />
+        <DynamicListField label="Infrastructure Details" placeholder="Infrastructure detail" optional values={form.infrastructure_details} onChange={(v) => setList("infrastructure_details", v)} buttonAtTop  subheading={form.section_subheadings?.infrastructure_details} onSubheadingChange={(v) => setSubheading("infrastructure_details", v)} />
+        <DynamicListField label="Awards" placeholder="Award" optional values={form.awards} onChange={(v) => setList("awards", v)} buttonAtTop  subheading={form.section_subheadings?.awards} onSubheadingChange={(v) => setSubheading("awards", v)} />
 
         {/* Contact Information */}
         <div className="bg-white rounded-2xl border border-border p-4 sm:p-5 shadow-sm">

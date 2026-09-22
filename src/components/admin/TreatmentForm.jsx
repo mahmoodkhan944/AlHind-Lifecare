@@ -18,6 +18,12 @@ const parseList = (val) => {
   try { const p = JSON.parse(val); return Array.isArray(p) ? p : []; } catch { return []; }
 };
 
+const parseObj = (val) => {
+  if (!val) return {};
+  if (typeof val === "object" && !Array.isArray(val)) return val;
+  try { const p = JSON.parse(val); return p && typeof p === "object" && !Array.isArray(p) ? p : {}; } catch { return {}; }
+};
+
 export default function TreatmentForm({ initialData, onCancel, onSaved }) {
   const { toast } = useToast();
   const isEdit = !!initialData;
@@ -28,6 +34,7 @@ export default function TreatmentForm({ initialData, onCancel, onSaved }) {
     ["key_benefits","treatment_procedures","overview","additional_information","signs_symptoms","related_conditions","diagnosis","treatment_types","surgery_types","how_its_done","purpose","recovery_details","risks","summary","why_choose_india","why_choose_turkey","hospital_ids","doctor_ids","section_config"].forEach((k) => {
       f[k] = parseList(initialData[k]);
     });
+    f.section_subheadings = parseObj(initialData.section_subheadings);
     return f;
   });
   const [saving, setSaving] = useState(false);
@@ -42,6 +49,8 @@ export default function TreatmentForm({ initialData, onCancel, onSaved }) {
 
   const set = (key, val) => setForm((p) => ({ ...p, [key]: val }));
   const setList = (key, val) => set(key, val);
+  const setSubheading = (key, val) =>
+    setForm((p) => ({ ...p, section_subheadings: { ...(p.section_subheadings || {}), [key]: val } }));
 
   const handleImage = async (e) => {
     const file = e.target.files[0];
@@ -95,6 +104,7 @@ export default function TreatmentForm({ initialData, onCancel, onSaved }) {
       hospital_ids: JSON.stringify(form.hospital_ids || []),
       doctor_ids: JSON.stringify(form.doctor_ids || []),
       section_config: JSON.stringify(form.section_config || []),
+      section_subheadings: JSON.stringify(form.section_subheadings || {}),
     };
 
     try {
@@ -245,33 +255,33 @@ export default function TreatmentForm({ initialData, onCancel, onSaved }) {
             4. KEY BENEFITS
             ================================================================== */}
         <SectionLabel step="Next" title="Key Benefits" desc="Checklist shown right after the description" />
-        <DynamicListField label="Key Benefits" placeholder="Benefit" optional values={form.key_benefits} onChange={(v) => setList("key_benefits", v)} />
+        <DynamicListField label="Key Benefits" placeholder="Benefit" optional values={form.key_benefits} onChange={(v) => setList("key_benefits", v)} subheading={form.section_subheadings?.key_benefits} onSubheadingChange={(v) => setSubheading("key_benefits", v)} />
 
         {/* ==================================================================
             5. DETAILED SECTIONS — rendered on the page in exactly this
             order, each as its own numbered card.
             ================================================================== */}
         <SectionLabel step="Next" title="Detailed Sections" desc="Each of these becomes its own section, in this order" />
-        <DynamicListField label="Overview" placeholder="Overview point" number={1} required values={form.overview} onChange={(v) => setList("overview", v)} />
-        <DynamicListField label="Signs and Symptoms" placeholder="Sign / Symptom" number={2} optional values={form.signs_symptoms} onChange={(v) => setList("signs_symptoms", v)} />
-        <DynamicListField label="Condition" placeholder="Condition" number={3} optional values={form.related_conditions} onChange={(v) => setList("related_conditions", v)} />
-        <DynamicListField label="Diagnosis" placeholder="Diagnosis point" number={4} optional values={form.diagnosis} onChange={(v) => setList("diagnosis", v)} />
-        <DynamicListField label="Types of Treatments" placeholder="Treatment type" number={5} optional values={form.treatment_types} onChange={(v) => setList("treatment_types", v)} />
-        <DynamicListField label="Types of Surgery" placeholder="Surgery type" number={6} optional values={form.surgery_types} onChange={(v) => setList("surgery_types", v)} />
-        <DynamicListField label="How It's Done" placeholder="Step" number={7} optional values={form.how_its_done} onChange={(v) => setList("how_its_done", v)} />
-        <DynamicListField label="Purpose" placeholder="Purpose point" number={8} optional values={form.purpose} onChange={(v) => setList("purpose", v)} />
-        <DynamicListField label="Recovery" placeholder="Recovery detail" number={9} optional values={form.recovery_details} onChange={(v) => setList("recovery_details", v)} />
-        <DynamicListField label="Risk" placeholder="Risk / Complication" number={10} optional values={form.risks} onChange={(v) => setList("risks", v)} />
-        <DynamicListField label="Summary" placeholder="Summary point" number={11} optional values={form.summary} onChange={(v) => setList("summary", v)} />
-        <DynamicListField label="Why Choose India" placeholder="Reason" number={12} optional values={form.why_choose_india} onChange={(v) => setList("why_choose_india", v)} />
-        <DynamicListField label="Why Choose Turkey" placeholder="Reason" number={13} optional values={form.why_choose_turkey} onChange={(v) => setList("why_choose_turkey", v)} />
+        <DynamicListField label="Overview" placeholder="Overview point" number={1} required values={form.overview} onChange={(v) => setList("overview", v)} subheading={form.section_subheadings?.overview} onSubheadingChange={(v) => setSubheading("overview", v)} />
+        <DynamicListField label="Signs and Symptoms" placeholder="Sign / Symptom" number={2} optional values={form.signs_symptoms} onChange={(v) => setList("signs_symptoms", v)} subheading={form.section_subheadings?.signs_symptoms} onSubheadingChange={(v) => setSubheading("signs_symptoms", v)} />
+        <DynamicListField label="Condition" placeholder="Condition" number={3} optional values={form.related_conditions} onChange={(v) => setList("related_conditions", v)} subheading={form.section_subheadings?.related_conditions} onSubheadingChange={(v) => setSubheading("related_conditions", v)} />
+        <DynamicListField label="Diagnosis" placeholder="Diagnosis point" number={4} optional values={form.diagnosis} onChange={(v) => setList("diagnosis", v)} subheading={form.section_subheadings?.diagnosis} onSubheadingChange={(v) => setSubheading("diagnosis", v)} />
+        <DynamicListField label="Types of Treatments" placeholder="Treatment type" number={5} optional values={form.treatment_types} onChange={(v) => setList("treatment_types", v)} subheading={form.section_subheadings?.treatment_types} onSubheadingChange={(v) => setSubheading("treatment_types", v)} />
+        <DynamicListField label="Types of Surgery" placeholder="Surgery type" number={6} optional values={form.surgery_types} onChange={(v) => setList("surgery_types", v)} subheading={form.section_subheadings?.surgery_types} onSubheadingChange={(v) => setSubheading("surgery_types", v)} />
+        <DynamicListField label="How It's Done" placeholder="Step" number={7} optional values={form.how_its_done} onChange={(v) => setList("how_its_done", v)} subheading={form.section_subheadings?.how_its_done} onSubheadingChange={(v) => setSubheading("how_its_done", v)} />
+        <DynamicListField label="Purpose" placeholder="Purpose point" number={8} optional values={form.purpose} onChange={(v) => setList("purpose", v)} subheading={form.section_subheadings?.purpose} onSubheadingChange={(v) => setSubheading("purpose", v)} />
+        <DynamicListField label="Recovery" placeholder="Recovery detail" number={9} optional values={form.recovery_details} onChange={(v) => setList("recovery_details", v)} subheading={form.section_subheadings?.recovery_details} onSubheadingChange={(v) => setSubheading("recovery_details", v)} />
+        <DynamicListField label="Risk" placeholder="Risk / Complication" number={10} optional values={form.risks} onChange={(v) => setList("risks", v)} subheading={form.section_subheadings?.risks} onSubheadingChange={(v) => setSubheading("risks", v)} />
+        <DynamicListField label="Summary" placeholder="Summary point" number={11} optional values={form.summary} onChange={(v) => setList("summary", v)} subheading={form.section_subheadings?.summary} onSubheadingChange={(v) => setSubheading("summary", v)} />
+        <DynamicListField label="Why Choose India" placeholder="Reason" number={12} optional values={form.why_choose_india} onChange={(v) => setList("why_choose_india", v)} subheading={form.section_subheadings?.why_choose_india} onSubheadingChange={(v) => setSubheading("why_choose_india", v)} />
+        <DynamicListField label="Why Choose Turkey" placeholder="Reason" number={13} optional values={form.why_choose_turkey} onChange={(v) => setList("why_choose_turkey", v)} subheading={form.section_subheadings?.why_choose_turkey} onSubheadingChange={(v) => setSubheading("why_choose_turkey", v)} />
 
         {/* ==================================================================
             6. MORE DETAILS — shown after the numbered sections.
             ================================================================== */}
         <SectionLabel step="Next" title="More Details" desc="Shown further down the page, after the sections above" />
-        <DynamicListField label="Treatment Procedures" placeholder="Procedure step" optional values={form.treatment_procedures} onChange={(v) => setList("treatment_procedures", v)} />
-        <DynamicListField label="Additional Information" placeholder="Additional info" optional values={form.additional_information} onChange={(v) => setList("additional_information", v)} />
+        <DynamicListField label="Treatment Procedures" placeholder="Procedure step" optional values={form.treatment_procedures} onChange={(v) => setList("treatment_procedures", v)} subheading={form.section_subheadings?.treatment_procedures} onSubheadingChange={(v) => setSubheading("treatment_procedures", v)} />
+        <DynamicListField label="Additional Information" placeholder="Additional info" optional values={form.additional_information} onChange={(v) => setList("additional_information", v)} subheading={form.section_subheadings?.additional_information} onSubheadingChange={(v) => setSubheading("additional_information", v)} />
 
         {/* ==================================================================
             HOSPITALS & DOCTORS — pick which ones offer/perform this

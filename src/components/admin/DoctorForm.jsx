@@ -17,6 +17,12 @@ const parseList = (val) => {
   try { const p = JSON.parse(val); return Array.isArray(p) ? p : []; } catch { return []; }
 };
 
+const parseObj = (val) => {
+  if (!val) return {};
+  if (typeof val === "object" && !Array.isArray(val)) return val;
+  try { const p = JSON.parse(val); return p && typeof p === "object" && !Array.isArray(p) ? p : {}; } catch { return {}; }
+};
+
 // FIX: `Number(val) || null` treats 0 as falsy and silently turns a legitimate
 // "0" (e.g. a free consultation) into null. This checks for empty/missing first.
 const toNumberOrNull = (val) => (val === "" || val === null || val === undefined ? null : Number(val));
@@ -35,6 +41,7 @@ export default function DoctorForm({ initialData, onCancel, onSaved }) {
     if (!initialData) return {};
     const f = { ...initialData };
     LIST_FIELDS.forEach((k) => { f[k] = parseList(initialData[k]); });
+    f.section_subheadings = parseObj(initialData.section_subheadings);
     return f;
   });
   const [saving, setSaving] = useState(false);
@@ -50,6 +57,8 @@ export default function DoctorForm({ initialData, onCancel, onSaved }) {
 
   const set = (key, val) => setForm((p) => ({ ...p, [key]: val }));
   const setList = (key, val) => set(key, val);
+  const setSubheading = (key, val) =>
+    setForm((p) => ({ ...p, section_subheadings: { ...(p.section_subheadings || {}), [key]: val } }));
 
   const handlePhoto = async (e) => {
     const file = e.target.files[0];
@@ -114,6 +123,7 @@ export default function DoctorForm({ initialData, onCancel, onSaved }) {
       awards_achievements: JSON.stringify(form.awards_achievements || []),
       why_choose_doctor: JSON.stringify(form.why_choose_doctor || []),
       section_config: JSON.stringify(form.section_config || []),
+      section_subheadings: JSON.stringify(form.section_subheadings || {}),
     };
 
     try {
@@ -209,8 +219,8 @@ export default function DoctorForm({ initialData, onCancel, onSaved }) {
         </div>
 
         {/* Specializations & Treatments (unnumbered) */}
-        <DynamicListField label="Specializations" placeholder="e.g., Heart Surgery" optional values={form.specializations} onChange={(v) => setList("specializations", v)} buttonAtTop darkButton />
-        <DynamicListField label="List of Treatments" placeholder="e.g., Knee Replacement Surgery" optional values={form.treatments_list} onChange={(v) => setList("treatments_list", v)} buttonAtTop darkButton />
+        <DynamicListField label="Specializations" placeholder="e.g., Heart Surgery" optional values={form.specializations} onChange={(v) => setList("specializations", v)} buttonAtTop darkButton  subheading={form.section_subheadings?.specializations} onSubheadingChange={(v) => setSubheading("specializations", v)} />
+        <DynamicListField label="List of Treatments" placeholder="e.g., Knee Replacement Surgery" optional values={form.treatments_list} onChange={(v) => setList("treatments_list", v)} buttonAtTop darkButton  subheading={form.section_subheadings?.treatments_list} onSubheadingChange={(v) => setSubheading("treatments_list", v)} />
 
         {/* Section 1: Overview & Detailed Experience */}
         <div className="bg-white rounded-2xl border border-border p-4 sm:p-5 shadow-sm">
@@ -222,19 +232,19 @@ export default function DoctorForm({ initialData, onCancel, onSaved }) {
             <Field label="Overview" required>
               <Textarea value={form.overview || ""} onChange={(e) => set("overview", e.target.value)} placeholder="Brief overview about the doctor..." className="rounded-lg border-border min-h-[80px]" rows={3} />
             </Field>
-            <DynamicListField label="Overview Points" placeholder="Overview point" optional values={form.overview_points} onChange={(v) => setList("overview_points", v)} buttonAtTop darkButton addLabel="Add Point" />
+            <DynamicListField label="Overview Points" placeholder="Overview point" optional values={form.overview_points} onChange={(v) => setList("overview_points", v)} buttonAtTop darkButton addLabel="Add Point"  subheading={form.section_subheadings?.overview_points} onSubheadingChange={(v) => setSubheading("overview_points", v)} />
             <Field label="Detailed Experience" required>
               <Textarea value={form.detailed_experience || ""} onChange={(e) => set("detailed_experience", e.target.value)} placeholder="Detailed experience description..." className="rounded-lg border-border min-h-[80px]" rows={3} />
             </Field>
-            <DynamicListField label="Experience Details" placeholder="Experience detail" optional values={form.experience_details} onChange={(v) => setList("experience_details", v)} buttonAtTop darkButton addLabel="Add Detail" />
+            <DynamicListField label="Experience Details" placeholder="Experience detail" optional values={form.experience_details} onChange={(v) => setList("experience_details", v)} buttonAtTop darkButton addLabel="Add Detail"  subheading={form.section_subheadings?.experience_details} onSubheadingChange={(v) => setSubheading("experience_details", v)} />
           </div>
         </div>
 
         {/* Sections 2-5 */}
-        <DynamicListField label="Qualification" placeholder="e.g., MBBS - AIIMS, New Delhi" number={2} optional values={form.qualifications_list} onChange={(v) => setList("qualifications_list", v)} buttonAtTop darkButton />
-        <DynamicListField label="Clinical Focus" placeholder="e.g., Patient-centered care" number={3} optional values={form.clinical_focus} onChange={(v) => setList("clinical_focus", v)} buttonAtTop darkButton />
-        <DynamicListField label="Additional Information" placeholder="e.g., Fluent in English, Hindi, and Arabic" number={4} optional values={form.additional_info} onChange={(v) => setList("additional_info", v)} buttonAtTop darkButton />
-        <DynamicListField label="Research & Publication" placeholder="e.g., Published in Journal of Medicine" number={5} optional values={form.research_publications} onChange={(v) => setList("research_publications", v)} buttonAtTop darkButton />
+        <DynamicListField label="Qualification" placeholder="e.g., MBBS - AIIMS, New Delhi" number={2} optional values={form.qualifications_list} onChange={(v) => setList("qualifications_list", v)} buttonAtTop darkButton  subheading={form.section_subheadings?.qualifications_list} onSubheadingChange={(v) => setSubheading("qualifications_list", v)} />
+        <DynamicListField label="Clinical Focus" placeholder="e.g., Patient-centered care" number={3} optional values={form.clinical_focus} onChange={(v) => setList("clinical_focus", v)} buttonAtTop darkButton  subheading={form.section_subheadings?.clinical_focus} onSubheadingChange={(v) => setSubheading("clinical_focus", v)} />
+        <DynamicListField label="Additional Information" placeholder="e.g., Fluent in English, Hindi, and Arabic" number={4} optional values={form.additional_info} onChange={(v) => setList("additional_info", v)} buttonAtTop darkButton  subheading={form.section_subheadings?.additional_info} onSubheadingChange={(v) => setSubheading("additional_info", v)} />
+        <DynamicListField label="Research & Publication" placeholder="e.g., Published in Journal of Medicine" number={5} optional values={form.research_publications} onChange={(v) => setList("research_publications", v)} buttonAtTop darkButton  subheading={form.section_subheadings?.research_publications} onSubheadingChange={(v) => setSubheading("research_publications", v)} />
 
         {/* Section 6: Awards (accent card) */}
         <div className="bg-[hsl(var(--accent-warm)/0.08)] rounded-2xl border border-amber-200 p-4 sm:p-5 shadow-sm">
@@ -243,7 +253,7 @@ export default function DoctorForm({ initialData, onCancel, onSaved }) {
             <Trophy className="w-4 h-4 text-[hsl(var(--accent-warm))]" />
             <h3 className="font-bold text-secondary text-sm">Award & Achievement</h3>
           </div>
-          <DynamicListField label="" placeholder="e.g., Best Doctor Award 2023" values={form.awards_achievements} onChange={(v) => setList("awards_achievements", v)} buttonAtTop darkButton accent addLabel="Add" />
+          <DynamicListField label="" placeholder="e.g., Best Doctor Award 2023" values={form.awards_achievements} onChange={(v) => setList("awards_achievements", v)} buttonAtTop darkButton accent addLabel="Add"  subheading={form.section_subheadings?.awards_achievements} onSubheadingChange={(v) => setSubheading("awards_achievements", v)} />
           <div className="mt-3">
             <label className="cursor-pointer block">
               <input type="file" onChange={handleDoc} className="hidden" />
@@ -258,7 +268,7 @@ export default function DoctorForm({ initialData, onCancel, onSaved }) {
         </div>
 
         {/* Section 7 */}
-        <DynamicListField label="Why Choose This Doctor" placeholder="e.g., Internationally trained in robotic surgery" number={7} optional values={form.why_choose_doctor} onChange={(v) => setList("why_choose_doctor", v)} buttonAtTop darkButton />
+        <DynamicListField label="Why Choose This Doctor" placeholder="e.g., Internationally trained in robotic surgery" number={7} optional values={form.why_choose_doctor} onChange={(v) => setList("why_choose_doctor", v)} buttonAtTop darkButton  subheading={form.section_subheadings?.why_choose_doctor} onSubheadingChange={(v) => setSubheading("why_choose_doctor", v)} />
 
         {/* Doctor Image */}
         <div className="bg-white rounded-2xl border border-border p-4 sm:p-5 shadow-sm">

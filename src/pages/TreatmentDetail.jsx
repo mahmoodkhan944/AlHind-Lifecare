@@ -53,6 +53,12 @@ const parseList = (val) => {
   }
 };
 
+const parseObj = (val) => {
+  if (!val) return {};
+  if (typeof val === "object" && !Array.isArray(val)) return val;
+  try { const p = JSON.parse(val); return p && typeof p === "object" && !Array.isArray(p) ? p : {}; } catch { return {}; }
+};
+
 const HERO_IMAGE =
   "https://images.unsplash.com/photo-1758691461957-474a7686e388?w=1600&q=80";
 
@@ -961,7 +967,7 @@ function renderTreatmentSection(key, title, treatment) {
     const items = parseList(treatment[key]);
     if (items.length === 0) return null;
     return (
-      <SectionCard key={key} title={title}>
+      <SectionCard key={key} title={title} subheading={parseObj(treatment.section_subheadings)[key]}>
         <ul className="space-y-2">
           {items.map((item, idx) => (
             <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
@@ -978,7 +984,7 @@ function renderTreatmentSection(key, title, treatment) {
     const items = parseList(treatment[key]);
     if (items.length === 0) return null;
     return (
-      <SectionCard key={key} title={title}>
+      <SectionCard key={key} title={title} subheading={parseObj(treatment.section_subheadings)[key]}>
         <ol className="space-y-3">
           {items.map((item, idx) => (
             <li key={idx} className="flex items-start gap-3">
@@ -997,7 +1003,7 @@ function renderTreatmentSection(key, title, treatment) {
     const text = treatment[key];
     if (!text) return null;
     return (
-      <SectionCard key={key} title={title}>
+      <SectionCard key={key} title={title} subheading={parseObj(treatment.section_subheadings)[key]}>
         <TextAsList text={text} />
       </SectionCard>
     );
@@ -1006,7 +1012,7 @@ function renderTreatmentSection(key, title, treatment) {
   return null;
 }
 
-function SectionCard({ title, children }) {
+function SectionCard({ title, subheading, children }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -1014,7 +1020,9 @@ function SectionCard({ title, children }) {
       viewport={{ once: true }}
       className="bg-secondary/5 rounded-xl p-5 sm:p-6 border-l-4 border-secondary"
     >
-      <h2 className="font-heading font-bold text-lg sm:text-xl mb-3 sm:mb-4">{title}</h2>
+      <h2 className="font-heading font-bold text-lg sm:text-xl mb-1">{title}</h2>
+      {subheading && <p className="font-bold text-base text-foreground/70 mb-3">{subheading}</p>}
+      {!subheading && <div className="mb-2 sm:mb-3" />}
       {children}
     </motion.div>
   );

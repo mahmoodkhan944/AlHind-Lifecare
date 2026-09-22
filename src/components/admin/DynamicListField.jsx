@@ -14,6 +14,9 @@ export default function DynamicListField({
   darkButton = false,
   addLabel,
   accent = false,
+  subheading,
+  onSubheadingChange,
+  subheadingPlaceholder = "Sub-heading (optional)",
 }) {
   const items = Array.isArray(values) ? values : [];
 
@@ -28,11 +31,6 @@ export default function DynamicListField({
   const Header = (
     <div className={`flex items-center gap-2 ${buttonAtTop ? "justify-between mb-3" : "mb-3"}`}>
       <div className="flex items-center gap-2">
-        {number != null && (
-          <span className={`flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold flex-shrink-0 ${accent ? "bg-[hsl(var(--accent-warm)/0.15)] text-[hsl(var(--accent-warm))]" : "bg-accent-jade/15 text-accent-jade"}`}>
-            {number}
-          </span>
-        )}
         <h3 className="font-bold text-foreground text-sm">
           {label}
           {required && <span className="text-destructive"> *</span>}
@@ -50,6 +48,14 @@ export default function DynamicListField({
   return (
     <div className={`rounded-2xl border p-4 sm:p-5 shadow-sm ${accent ? "bg-[hsl(var(--accent-warm)/0.08)] border-amber-200" : "bg-white border-border"}`}>
       {Header}
+      {onSubheadingChange && (
+        <Input
+          value={subheading || ""}
+          onChange={(e) => onSubheadingChange(e.target.value)}
+          placeholder={subheadingPlaceholder}
+          className="mb-3 h-10 rounded-lg border-border bg-white font-bold text-base placeholder:font-normal"
+        />
+      )}
       <div className="space-y-2">
         {items.map((item, idx) => (
           <div key={idx} className="flex items-center gap-2">

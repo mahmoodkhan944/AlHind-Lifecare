@@ -32,6 +32,12 @@ const parseList = (val) => {
   }
 };
 
+const parseObj = (val) => {
+  if (!val) return {};
+  if (typeof val === "object" && !Array.isArray(val)) return val;
+  try { const p = JSON.parse(val); return p && typeof p === "object" && !Array.isArray(p) ? p : {}; } catch { return {}; }
+};
+
 const HERO_IMAGE =
   "https://images.unsplash.com/photo-1516841273335-e39b37888115?w=1600&q=80";
 
@@ -420,7 +426,7 @@ function renderDoctorSection(key, title, doctor) {
     if (!doctor.overview) return null;
     const points = parseList(doctor.overview_points);
     return (
-      <SectionCard key={key} title={title}>
+      <SectionCard key={key} title={title} subheading={parseObj(doctor.section_subheadings)[key]}>
         <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-3">{doctor.overview}</p>
         {points.length > 0 && (
           <ul className="space-y-2">
@@ -439,9 +445,12 @@ function renderDoctorSection(key, title, doctor) {
   if (key === "treatments_list" || key === "specializations") {
     const items = parseList(doctor[key]);
     if (items.length === 0) return null;
+    const subheading = parseObj(doctor.section_subheadings)[key];
     return (
       <div key={key}>
-        <h2 className="font-heading font-bold text-lg sm:text-xl mb-3">{title}</h2>
+        <h2 className="font-heading font-bold text-lg sm:text-xl mb-1">{title}</h2>
+        {subheading && <p className="font-bold text-base text-foreground/70 mb-3">{subheading}</p>}
+        {!subheading && <div className="mb-2 sm:mb-3" />}
         <div className="grid sm:grid-cols-2 gap-3">
           {items.map((t, idx) => (
             <div key={idx} className="flex items-center gap-2 text-sm text-muted-foreground bg-secondary/5 border border-secondary/15 rounded-xl px-3.5 py-3">
@@ -457,7 +466,7 @@ function renderDoctorSection(key, title, doctor) {
     if (!doctor.detailed_experience) return null;
     const points = parseList(doctor.experience_details);
     return (
-      <SectionCard key={key} title={title}>
+      <SectionCard key={key} title={title} subheading={parseObj(doctor.section_subheadings)[key]}>
         <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-3">{doctor.detailed_experience}</p>
         {points.length > 0 && (
           <ul className="space-y-2">
@@ -476,7 +485,7 @@ function renderDoctorSection(key, title, doctor) {
     const items = parseList(doctor[key]);
     if (items.length === 0) return null;
     return (
-      <SectionCard key={key} title={title}>
+      <SectionCard key={key} title={title} subheading={parseObj(doctor.section_subheadings)[key]}>
         <ul className="space-y-2">
           {items.map((item, idx) => (
             <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
@@ -492,7 +501,7 @@ function renderDoctorSection(key, title, doctor) {
     const items = parseList(doctor.additional_info);
     if (items.length === 0) return null;
     return (
-      <SectionCard key={key} title={title}>
+      <SectionCard key={key} title={title} subheading={parseObj(doctor.section_subheadings)[key]}>
         <ul className="space-y-3">
           {items.map((item, idx) => (
             <li key={idx} className="flex items-start gap-2.5 text-sm text-muted-foreground">
@@ -508,7 +517,7 @@ function renderDoctorSection(key, title, doctor) {
     const items = parseList(doctor.research_publications);
     if (items.length === 0) return null;
     return (
-      <SectionCard key={key} title={title}>
+      <SectionCard key={key} title={title} subheading={parseObj(doctor.section_subheadings)[key]}>
         <ul className="space-y-2">
           {items.map((item, idx) => (
             <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
@@ -535,7 +544,12 @@ function renderDoctorSection(key, title, doctor) {
           <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-[hsl(var(--accent-warm))] text-white shrink-0">
             <Trophy className="w-4.5 h-4.5" />
           </span>
-          <h2 className="font-heading font-bold text-lg sm:text-xl">{title}</h2>
+          <div>
+            <h2 className="font-heading font-bold text-lg sm:text-xl">{title}</h2>
+            {parseObj(doctor.section_subheadings).awards_achievements && (
+              <p className="font-bold text-sm text-foreground/70">{parseObj(doctor.section_subheadings).awards_achievements}</p>
+            )}
+          </div>
         </div>
         <ul className="space-y-2.5">
           {awards.map((a, idx) => (
@@ -567,9 +581,12 @@ function renderDoctorSection(key, title, doctor) {
   if (key === "why_choose_doctor") {
     const items = parseList(doctor.why_choose_doctor);
     if (items.length === 0) return null;
+    const subheading = parseObj(doctor.section_subheadings)[key];
     return (
       <div key={key}>
-        <h2 className="font-heading font-bold text-lg sm:text-xl mb-3">{title}</h2>
+        <h2 className="font-heading font-bold text-lg sm:text-xl mb-1">{title}</h2>
+        {subheading && <p className="font-bold text-base text-foreground/70 mb-3">{subheading}</p>}
+        {!subheading && <div className="mb-2 sm:mb-3" />}
         <div className="space-y-2.5">
           {items.map((item, idx) => (
             <div key={idx} className="flex items-start gap-2.5 text-sm text-muted-foreground bg-white border border-border rounded-xl px-4 py-3.5">
@@ -587,7 +604,7 @@ function renderDoctorSection(key, title, doctor) {
   if (key === "bio") {
     if (!doctor.bio) return null;
     return (
-      <SectionCard key={key} title={title}>
+      <SectionCard key={key} title={title} subheading={parseObj(doctor.section_subheadings)[key]}>
         <p className="text-sm sm:text-base text-muted-foreground leading-relaxed whitespace-pre-line">{doctor.bio}</p>
       </SectionCard>
     );
@@ -596,7 +613,7 @@ function renderDoctorSection(key, title, doctor) {
   return null;
 }
 
-function SectionCard({ title, children }) {
+function SectionCard({ title, subheading, children }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -604,7 +621,9 @@ function SectionCard({ title, children }) {
       viewport={{ once: true }}
       className="bg-secondary/5 rounded-xl p-5 sm:p-6 border-l-4 border-secondary"
     >
-      <h2 className="font-heading font-bold text-lg sm:text-xl mb-3 sm:mb-4">{title}</h2>
+      <h2 className="font-heading font-bold text-lg sm:text-xl mb-1">{title}</h2>
+      {subheading && <p className="font-bold text-base text-foreground/70 mb-3">{subheading}</p>}
+      {!subheading && <div className="mb-2 sm:mb-3" />}
       {children}
     </motion.div>
   );
