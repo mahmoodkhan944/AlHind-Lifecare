@@ -16,6 +16,9 @@ import {
   Star,
   Info,
   Medal,
+  Stethoscope,
+  Target,
+  Users,
 } from "lucide-react";
 import { db } from "@/api/dataClient";
 import { Button } from "@/components/ui/button";
@@ -381,6 +384,15 @@ function HospitalSidebarCard({ hospital, openLeadModal }) {
 // hospital.section_config) — this is just the fallback. "{name}" in a
 // title (default or admin-customized) is swapped for the hospital's actual
 // name at render time.
+// A themed icon + color for every checklist section on a hospital's page.
+const SECTION_ICON_THEME = {
+  specialities: { icon: Stethoscope, bg: "bg-teal-100", color: "text-teal-600" },
+  doctors_list: { icon: Users, bg: "bg-indigo-100", color: "text-indigo-500" },
+  facilities: { icon: Building2, bg: "bg-blue-100", color: "text-blue-500" },
+  area_of_expertise: { icon: Target, bg: "bg-orange-100", color: "text-orange-500" },
+  infrastructure_details: { icon: Building2, bg: "bg-violet-100", color: "text-violet-500" },
+};
+
 export const DEFAULT_HOSPITAL_SECTIONS = [
   { key: "about", title: "About {name}" },
   { key: "specialities", title: "Medical Specialties Available At {name}" },
@@ -429,6 +441,7 @@ function renderHospitalSection(key, rawTitle, hospital) {
     const items = parseList(hospital[key]);
     if (items.length === 0) return null;
     const subheading = parseObj(hospital.section_subheadings)[key];
+    const theme = SECTION_ICON_THEME[key];
     return (
       <div key={key}>
         <h2 className="font-heading font-bold text-lg sm:text-xl mb-1">{title}</h2>
@@ -436,8 +449,11 @@ function renderHospitalSection(key, rawTitle, hospital) {
         {!subheading && <div className="mb-2 sm:mb-3" />}
         <div className={`grid sm:grid-cols-2 ${key === "infrastructure_details" ? "" : "md:grid-cols-3"} gap-3`}>
           {items.map((item, idx) => (
-            <div key={idx} className="flex items-center gap-2 text-sm text-muted-foreground bg-secondary/5 border border-secondary/15 rounded-xl px-3.5 py-3">
-              <CheckCircle2 className="w-4 h-4 text-secondary flex-shrink-0" /> {item}
+            <div key={idx} className="flex items-center gap-2.5 text-sm text-muted-foreground bg-secondary/5 border border-secondary/15 rounded-xl px-3.5 py-3">
+              <span className={`flex items-center justify-center w-6 h-6 rounded-full ${theme.bg} ${theme.color} flex-shrink-0`}>
+                <theme.icon className="w-3.5 h-3.5" />
+              </span>
+              {item}
             </div>
           ))}
         </div>
@@ -457,8 +473,11 @@ function renderHospitalSection(key, rawTitle, hospital) {
         </p>
         <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
           {items.map((doc, idx) => (
-            <div key={idx} className="flex items-center gap-2 text-sm text-muted-foreground bg-secondary/5 border border-secondary/15 rounded-xl px-3.5 py-3">
-              <CheckCircle2 className="w-4 h-4 text-secondary flex-shrink-0" /> {doc}
+            <div key={idx} className="flex items-center gap-2.5 text-sm text-muted-foreground bg-secondary/5 border border-secondary/15 rounded-xl px-3.5 py-3">
+              <span className={`flex items-center justify-center w-6 h-6 rounded-full ${SECTION_ICON_THEME.doctors_list.bg} ${SECTION_ICON_THEME.doctors_list.color} flex-shrink-0`}>
+                <Users className="w-3.5 h-3.5" />
+              </span>
+              {doc}
             </div>
           ))}
         </div>
@@ -478,8 +497,11 @@ function renderHospitalSection(key, rawTitle, hospital) {
         {!subheading && <div className="mb-2 sm:mb-3" />}
         <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
           {[...facilities, ...internationalServices].map((f, idx) => (
-            <div key={idx} className="flex items-center gap-2 text-sm text-muted-foreground bg-secondary/5 border border-secondary/15 rounded-xl px-3.5 py-3">
-              <CheckCircle2 className="w-4 h-4 text-secondary flex-shrink-0" /> {f}
+            <div key={idx} className="flex items-center gap-2.5 text-sm text-muted-foreground bg-secondary/5 border border-secondary/15 rounded-xl px-3.5 py-3">
+              <span className={`flex items-center justify-center w-6 h-6 rounded-full ${SECTION_ICON_THEME.facilities.bg} ${SECTION_ICON_THEME.facilities.color} flex-shrink-0`}>
+                <Building2 className="w-3.5 h-3.5" />
+              </span>
+              {f}
             </div>
           ))}
         </div>

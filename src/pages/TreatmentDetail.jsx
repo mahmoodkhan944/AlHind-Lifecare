@@ -27,6 +27,12 @@ import {
   Activity,
   AlertTriangle,
   Heart,
+  Eye,
+  Stethoscope,
+  Pill,
+  Scissors,
+  Target,
+  Info,
 } from "lucide-react";
 import { db } from "@/api/dataClient";
 import { Button } from "@/components/ui/button";
@@ -887,7 +893,7 @@ function ClassicPage({ treatment, relatedDoctors, relatedHospitals, openLeadModa
 // <p>, those line breaks collapse and everything runs together in one
 // paragraph — this renders each line as its own bulleted item instead,
 // falling back to a plain paragraph if there's genuinely just one line.
-function TextAsList({ text }) {
+function TextAsList({ text, theme }) {
   const lines = String(text || "")
     .split("\n")
     .map((l) => l.trim())
@@ -897,12 +903,16 @@ function TextAsList({ text }) {
     return <p className="text-sm text-muted-foreground leading-relaxed">{text}</p>;
   }
 
+  const ItemIcon = theme?.icon || CheckCircle2;
+
   return (
     <ul className="space-y-2">
       {lines.map((line, idx) => (
-        <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
-          <CheckCircle2 className="w-4 h-4 text-secondary flex-shrink-0 mt-0.5" />
-          {line}
+        <li key={idx} className="flex items-start gap-2.5 text-sm text-muted-foreground">
+          <span className={`flex items-center justify-center w-6 h-6 rounded-full flex-shrink-0 ${theme ? `${theme.bg} ${theme.color}` : "bg-secondary/15 text-secondary"}`}>
+            <ItemIcon className="w-3.5 h-3.5" />
+          </span>
+          <span className="pt-0.5">{line}</span>
         </li>
       ))}
     </ul>
@@ -956,6 +966,30 @@ const CHECKLIST_KEYS = [
 const NUMBERED_KEYS = ["how_its_done", "treatment_procedures"];
 const TEXT_BLOCK_KEYS = ["gvhd_info", "gvhd_symptoms", "conditions_treated", "diagnosis_detail"];
 
+// A themed icon + color for every checklist/text-block section except
+// "How It's Done" (numbered, not a checklist) — falls back to a plain
+// checkmark for anything not listed here.
+const SECTION_ICON_THEME = {
+  key_benefits: { icon: Star, bg: "bg-amber-100", color: "text-amber-500" },
+  overview: { icon: Eye, bg: "bg-blue-100", color: "text-blue-500" },
+  signs_symptoms: { icon: Activity, bg: "bg-rose-100", color: "text-rose-500" },
+  related_conditions: { icon: Heart, bg: "bg-pink-100", color: "text-pink-500" },
+  diagnosis: { icon: Stethoscope, bg: "bg-teal-100", color: "text-teal-600" },
+  treatment_types: { icon: Pill, bg: "bg-indigo-100", color: "text-indigo-500" },
+  surgery_types: { icon: Scissors, bg: "bg-purple-100", color: "text-purple-500" },
+  purpose: { icon: Target, bg: "bg-orange-100", color: "text-orange-500" },
+  recovery_details: { icon: RefreshCw, bg: "bg-emerald-100", color: "text-emerald-600" },
+  risks: { icon: AlertTriangle, bg: "bg-red-100", color: "text-red-500" },
+  summary: { icon: FileText, bg: "bg-slate-100", color: "text-slate-600" },
+  why_choose_india: { icon: MapPin, bg: "bg-green-100", color: "text-green-600" },
+  why_choose_turkey: { icon: MapPin, bg: "bg-cyan-100", color: "text-cyan-600" },
+  additional_information: { icon: Info, bg: "bg-sky-100", color: "text-sky-500" },
+  gvhd_info: { icon: FileText, bg: "bg-violet-100", color: "text-violet-500" },
+  gvhd_symptoms: { icon: Activity, bg: "bg-rose-100", color: "text-rose-500" },
+  conditions_treated: { icon: Heart, bg: "bg-pink-100", color: "text-pink-500" },
+  diagnosis_detail: { icon: Stethoscope, bg: "bg-teal-100", color: "text-teal-600" },
+};
+
 // Renders one section's content for the given key, or null if there's
 // nothing to show (no content, or a why-choose-X section that doesn't
 // apply to this treatment's country) — the caller filters out the nulls.
@@ -966,13 +1000,17 @@ function renderTreatmentSection(key, title, treatment) {
   if (key === "key_benefits" || CHECKLIST_KEYS.includes(key) || key === "additional_information") {
     const items = parseList(treatment[key]);
     if (items.length === 0) return null;
+    const theme = SECTION_ICON_THEME[key];
+    const ItemIcon = theme?.icon || CheckCircle2;
     return (
       <SectionCard key={key} title={title} subheading={parseObj(treatment.section_subheadings)[key]}>
         <ul className="space-y-2">
           {items.map((item, idx) => (
-            <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
-              <CheckCircle2 className="w-4 h-4 text-secondary flex-shrink-0 mt-0.5" />
-              {item}
+            <li key={idx} className="flex items-start gap-2.5 text-sm text-muted-foreground">
+              <span className={`flex items-center justify-center w-6 h-6 rounded-full flex-shrink-0 ${theme ? `${theme.bg} ${theme.color}` : "bg-secondary/15 text-secondary"}`}>
+                <ItemIcon className="w-3.5 h-3.5" />
+              </span>
+              <span className="pt-0.5">{item}</span>
             </li>
           ))}
         </ul>
@@ -1004,7 +1042,7 @@ function renderTreatmentSection(key, title, treatment) {
     if (!text) return null;
     return (
       <SectionCard key={key} title={title} subheading={parseObj(treatment.section_subheadings)[key]}>
-        <TextAsList text={text} />
+        <TextAsList text={text} theme={SECTION_ICON_THEME[key]} />
       </SectionCard>
     );
   }

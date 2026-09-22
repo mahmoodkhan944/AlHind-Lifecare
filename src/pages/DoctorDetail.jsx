@@ -14,6 +14,12 @@ import {
   BookOpen,
   Info,
   Medal,
+  Eye,
+  Pill,
+  Stethoscope,
+  Briefcase,
+  GraduationCap,
+  Target,
 } from "lucide-react";
 import { db } from "@/api/dataClient";
 import { Button } from "@/components/ui/button";
@@ -397,6 +403,18 @@ function DoctorSidebarCard({ doctor, openLeadModal }) {
 // page. Admins can override order/title/visibility per doctor via the
 // "Section Order & Titles" editor in the admin form (stored in
 // doctor.section_config) — this is just the fallback.
+// A themed icon + color for every checklist section on a doctor's page.
+const SECTION_ICON_THEME = {
+  overview: { icon: Eye, bg: "bg-blue-100", color: "text-blue-500" },
+  treatments_list: { icon: Pill, bg: "bg-indigo-100", color: "text-indigo-500" },
+  specializations: { icon: Stethoscope, bg: "bg-teal-100", color: "text-teal-600" },
+  detailed_experience: { icon: Briefcase, bg: "bg-amber-100", color: "text-amber-600" },
+  qualifications_list: { icon: GraduationCap, bg: "bg-violet-100", color: "text-violet-500" },
+  clinical_focus: { icon: Target, bg: "bg-orange-100", color: "text-orange-500" },
+  additional_info: { icon: Info, bg: "bg-sky-100", color: "text-sky-500" },
+  research_publications: { icon: BookOpen, bg: "bg-cyan-100", color: "text-cyan-600" },
+};
+
 export const DEFAULT_DOCTOR_SECTIONS = [
   { key: "overview", title: "Overview" },
   { key: "treatments_list", title: "List of Treatments" },
@@ -425,15 +443,18 @@ function renderDoctorSection(key, title, doctor) {
   if (key === "overview") {
     if (!doctor.overview) return null;
     const points = parseList(doctor.overview_points);
+    const theme = SECTION_ICON_THEME.overview;
     return (
       <SectionCard key={key} title={title} subheading={parseObj(doctor.section_subheadings)[key]}>
         <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-3">{doctor.overview}</p>
         {points.length > 0 && (
           <ul className="space-y-2">
             {points.map((p, idx) => (
-              <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
-                <CheckCircle2 className="w-4 h-4 text-secondary flex-shrink-0 mt-0.5" />
-                {p}
+              <li key={idx} className="flex items-start gap-2.5 text-sm text-muted-foreground">
+                <span className={`flex items-center justify-center w-6 h-6 rounded-full ${theme.bg} ${theme.color} flex-shrink-0`}>
+                  <theme.icon className="w-3.5 h-3.5" />
+                </span>
+                <span className="pt-0.5">{p}</span>
               </li>
             ))}
           </ul>
@@ -446,6 +467,7 @@ function renderDoctorSection(key, title, doctor) {
     const items = parseList(doctor[key]);
     if (items.length === 0) return null;
     const subheading = parseObj(doctor.section_subheadings)[key];
+    const theme = SECTION_ICON_THEME[key];
     return (
       <div key={key}>
         <h2 className="font-heading font-bold text-lg sm:text-xl mb-1">{title}</h2>
@@ -453,8 +475,11 @@ function renderDoctorSection(key, title, doctor) {
         {!subheading && <div className="mb-2 sm:mb-3" />}
         <div className="grid sm:grid-cols-2 gap-3">
           {items.map((t, idx) => (
-            <div key={idx} className="flex items-center gap-2 text-sm text-muted-foreground bg-secondary/5 border border-secondary/15 rounded-xl px-3.5 py-3">
-              <CheckCircle2 className="w-4 h-4 text-secondary flex-shrink-0" /> {t}
+            <div key={idx} className="flex items-center gap-2.5 text-sm text-muted-foreground bg-secondary/5 border border-secondary/15 rounded-xl px-3.5 py-3">
+              <span className={`flex items-center justify-center w-6 h-6 rounded-full ${theme.bg} ${theme.color} flex-shrink-0`}>
+                <theme.icon className="w-3.5 h-3.5" />
+              </span>
+              {t}
             </div>
           ))}
         </div>
@@ -465,14 +490,18 @@ function renderDoctorSection(key, title, doctor) {
   if (key === "detailed_experience") {
     if (!doctor.detailed_experience) return null;
     const points = parseList(doctor.experience_details);
+    const theme = SECTION_ICON_THEME.detailed_experience;
     return (
       <SectionCard key={key} title={title} subheading={parseObj(doctor.section_subheadings)[key]}>
         <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-3">{doctor.detailed_experience}</p>
         {points.length > 0 && (
           <ul className="space-y-2">
             {points.map((d, idx) => (
-              <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
-                <CheckCircle2 className="w-4 h-4 text-secondary flex-shrink-0 mt-0.5" /> {d}
+              <li key={idx} className="flex items-start gap-2.5 text-sm text-muted-foreground">
+                <span className={`flex items-center justify-center w-6 h-6 rounded-full ${theme.bg} ${theme.color} flex-shrink-0`}>
+                  <theme.icon className="w-3.5 h-3.5" />
+                </span>
+                <span className="pt-0.5">{d}</span>
               </li>
             ))}
           </ul>
@@ -484,12 +513,16 @@ function renderDoctorSection(key, title, doctor) {
   if (key === "qualifications_list" || key === "clinical_focus") {
     const items = parseList(doctor[key]);
     if (items.length === 0) return null;
+    const theme = SECTION_ICON_THEME[key];
     return (
       <SectionCard key={key} title={title} subheading={parseObj(doctor.section_subheadings)[key]}>
         <ul className="space-y-2">
           {items.map((item, idx) => (
-            <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
-              <CheckCircle2 className="w-4 h-4 text-secondary flex-shrink-0 mt-0.5" /> {item}
+            <li key={idx} className="flex items-start gap-2.5 text-sm text-muted-foreground">
+              <span className={`flex items-center justify-center w-6 h-6 rounded-full ${theme.bg} ${theme.color} flex-shrink-0`}>
+                <theme.icon className="w-3.5 h-3.5" />
+              </span>
+              <span className="pt-0.5">{item}</span>
             </li>
           ))}
         </ul>
@@ -500,12 +533,16 @@ function renderDoctorSection(key, title, doctor) {
   if (key === "additional_info") {
     const items = parseList(doctor.additional_info);
     if (items.length === 0) return null;
+    const theme = SECTION_ICON_THEME.additional_info;
     return (
       <SectionCard key={key} title={title} subheading={parseObj(doctor.section_subheadings)[key]}>
-        <ul className="space-y-3">
+        <ul className="space-y-2.5">
           {items.map((item, idx) => (
             <li key={idx} className="flex items-start gap-2.5 text-sm text-muted-foreground">
-              <Info className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" /> {item}
+              <span className={`flex items-center justify-center w-6 h-6 rounded-full ${theme.bg} ${theme.color} flex-shrink-0`}>
+                <theme.icon className="w-3.5 h-3.5" />
+              </span>
+              <span className="pt-0.5">{item}</span>
             </li>
           ))}
         </ul>
@@ -516,12 +553,16 @@ function renderDoctorSection(key, title, doctor) {
   if (key === "research_publications") {
     const items = parseList(doctor.research_publications);
     if (items.length === 0) return null;
+    const theme = SECTION_ICON_THEME.research_publications;
     return (
       <SectionCard key={key} title={title} subheading={parseObj(doctor.section_subheadings)[key]}>
         <ul className="space-y-2">
           {items.map((item, idx) => (
-            <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
-              <BookOpen className="w-4 h-4 text-secondary flex-shrink-0 mt-0.5" /> {item}
+            <li key={idx} className="flex items-start gap-2.5 text-sm text-muted-foreground">
+              <span className={`flex items-center justify-center w-6 h-6 rounded-full ${theme.bg} ${theme.color} flex-shrink-0`}>
+                <theme.icon className="w-3.5 h-3.5" />
+              </span>
+              <span className="pt-0.5">{item}</span>
             </li>
           ))}
         </ul>
