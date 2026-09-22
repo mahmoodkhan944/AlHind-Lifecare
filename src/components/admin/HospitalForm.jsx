@@ -7,6 +7,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
 import DynamicListField from "@/components/admin/DynamicListField";
+import SectionOrderEditor from "@/components/admin/SectionOrderEditor";
+import { DEFAULT_HOSPITAL_SECTIONS } from "@/pages/HospitalDetail";
 
 const parseList = (val) => {
   if (!val) return [];
@@ -27,7 +29,7 @@ export default function HospitalForm({ initialData, onCancel, onSaved }) {
   const [form, setForm] = useState(() => {
     if (!initialData) return {};
     const f = { ...initialData };
-    ["full_description","specialities","doctors_list","facilities","international_patient_services","accreditations","area_of_expertise","infrastructure_details","awards"].forEach((k) => {
+    ["full_description","specialities","doctors_list","facilities","international_patient_services","accreditations","area_of_expertise","infrastructure_details","awards","section_config"].forEach((k) => {
       f[k] = parseList(initialData[k]);
     });
     return f;
@@ -84,6 +86,7 @@ export default function HospitalForm({ initialData, onCancel, onSaved }) {
       area_of_expertise: JSON.stringify(form.area_of_expertise || []),
       infrastructure_details: JSON.stringify(form.infrastructure_details || []),
       awards: JSON.stringify(form.awards || []),
+      section_config: JSON.stringify(form.section_config || []),
     };
 
     try {
@@ -260,6 +263,12 @@ export default function HospitalForm({ initialData, onCancel, onSaved }) {
             </Field>
           </div>
         </div>
+
+        <SectionOrderEditor
+          defaultSections={DEFAULT_HOSPITAL_SECTIONS}
+          value={form.section_config}
+          onChange={(v) => setList("section_config", v)}
+        />
 
         {/* SEO Settings — used only for the browser tab title and search-engine
             meta description. Never rendered anywhere on the live page. */}

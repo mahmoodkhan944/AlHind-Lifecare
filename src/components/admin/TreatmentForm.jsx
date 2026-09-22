@@ -9,6 +9,8 @@ import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/components/ui/use-toast";
 import DynamicListField from "@/components/admin/DynamicListField";
 import SearchableCheckboxList from "@/components/admin/SearchableCheckboxList";
+import SectionOrderEditor from "@/components/admin/SectionOrderEditor";
+import { DEFAULT_TREATMENT_SECTIONS } from "@/pages/TreatmentDetail";
 
 const parseList = (val) => {
   if (!val) return [];
@@ -23,7 +25,7 @@ export default function TreatmentForm({ initialData, onCancel, onSaved }) {
   const [form, setForm] = useState(() => {
     if (!initialData) return {};
     const f = { ...initialData };
-    ["key_benefits","treatment_procedures","overview","additional_information","signs_symptoms","related_conditions","diagnosis","treatment_types","surgery_types","how_its_done","purpose","recovery_details","risks","summary","why_choose_india","why_choose_turkey","hospital_ids","doctor_ids"].forEach((k) => {
+    ["key_benefits","treatment_procedures","overview","additional_information","signs_symptoms","related_conditions","diagnosis","treatment_types","surgery_types","how_its_done","purpose","recovery_details","risks","summary","why_choose_india","why_choose_turkey","hospital_ids","doctor_ids","section_config"].forEach((k) => {
       f[k] = parseList(initialData[k]);
     });
     return f;
@@ -92,6 +94,7 @@ export default function TreatmentForm({ initialData, onCancel, onSaved }) {
       why_choose_turkey: JSON.stringify(form.why_choose_turkey || []),
       hospital_ids: JSON.stringify(form.hospital_ids || []),
       doctor_ids: JSON.stringify(form.doctor_ids || []),
+      section_config: JSON.stringify(form.section_config || []),
     };
 
     try {
@@ -293,6 +296,12 @@ export default function TreatmentForm({ initialData, onCancel, onSaved }) {
           onChange={(v) => setList("doctor_ids", v)}
           searchPlaceholder="Search Doctors..."
           emptyText="No doctors added yet."
+        />
+
+        <SectionOrderEditor
+          defaultSections={DEFAULT_TREATMENT_SECTIONS}
+          value={form.section_config}
+          onChange={(v) => setList("section_config", v)}
         />
 
         {/* SEO Settings — used only for the browser tab title and search-engine

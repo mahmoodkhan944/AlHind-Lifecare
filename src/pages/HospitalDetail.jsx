@@ -101,16 +101,6 @@ export default function HospitalDetail() {
     );
   }
 
-  const fullDescription = parseList(hospital.full_description);
-  const specialities = parseList(hospital.specialities);
-  const doctorsList = parseList(hospital.doctors_list);
-  const facilities = parseList(hospital.facilities);
-  const internationalServices = parseList(hospital.international_patient_services);
-  const accreditations = parseList(hospital.accreditations);
-  const expertise = parseList(hospital.area_of_expertise);
-  const infrastructure = parseList(hospital.infrastructure_details);
-  const awards = parseList(hospital.awards);
-
   return (
     <div className="pb-20 lg:pb-0">
       {/* Hero */}
@@ -198,179 +188,9 @@ export default function HospitalDetail() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div ref={contentTopRef} className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
             <div className="lg:col-span-2 space-y-4 sm:space-y-5">
-              {(hospital.description || fullDescription.length > 0) && (
-                <SectionCard title={`About ${hospital.name}`}>
-                  {hospital.description && (
-                    <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-3">
-                      {hospital.description}
-                    </p>
-                  )}
-                  {fullDescription.length > 0 && (
-                    <div className="space-y-3">
-                      {fullDescription.map((p, idx) => (
-                        <p key={idx} className="text-sm text-muted-foreground leading-relaxed">
-                          {p}
-                        </p>
-                      ))}
-                    </div>
-                  )}
-                </SectionCard>
-              )}
-
-              {specialities.length > 0 && (
-                <div>
-                  <h2 className="font-heading font-bold text-lg sm:text-xl mb-3">
-                    Medical Specialties Available At {hospital.name}
-                  </h2>
-                  <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
-                    {specialities.map((s, idx) => (
-                      <div
-                        key={idx}
-                        className="flex items-center gap-2 text-sm text-muted-foreground bg-secondary/5 border border-secondary/15 rounded-xl px-3.5 py-3"
-                      >
-                        <CheckCircle2 className="w-4 h-4 text-secondary flex-shrink-0" /> {s}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {doctorsList.length > 0 && (
-                <div>
-                  <h2 className="font-heading font-bold text-lg sm:text-xl mb-0.5">Doctor's List</h2>
-                  <p className="text-sm text-muted-foreground mb-3">Our team of expert medical professionals</p>
-                  <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
-                    {doctorsList.map((doc, idx) => (
-                      <div
-                        key={idx}
-                        className="flex items-center gap-2 text-sm text-muted-foreground bg-secondary/5 border border-secondary/15 rounded-xl px-3.5 py-3"
-                      >
-                        <CheckCircle2 className="w-4 h-4 text-secondary flex-shrink-0" /> {doc}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {(facilities.length > 0 || internationalServices.length > 0) && (
-                <div>
-                  <h2 className="font-heading font-bold text-lg sm:text-xl mb-3">Facilities &amp; Patient Services</h2>
-                  <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
-                    {[...facilities, ...internationalServices].map((f, idx) => (
-                      <div
-                        key={idx}
-                        className="flex items-center gap-2 text-sm text-muted-foreground bg-secondary/5 border border-secondary/15 rounded-xl px-3.5 py-3"
-                      >
-                        <CheckCircle2 className="w-4 h-4 text-secondary flex-shrink-0" /> {f}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {accreditations.length > 0 && (
-                <div>
-                  <h2 className="font-heading font-bold text-lg sm:text-xl mb-0.5">Accreditations &amp; Certifications</h2>
-                  <p className="text-sm text-muted-foreground mb-3">Recognized for excellence in healthcare quality and safety</p>
-                  <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3 mb-4">
-                    {accreditations.map((a, idx) => (
-                      <div key={idx} className="relative bg-white border border-border rounded-xl border-t-4 border-t-secondary px-4 py-3.5">
-                        <Star className="absolute top-3 right-3 w-4 h-4 text-secondary/20" />
-                        <p className="font-heading font-bold text-sm text-foreground pr-5">{a}</p>
-                        <p className="flex items-center gap-1 text-xs text-secondary font-medium mt-1">
-                          <CheckCircle2 className="w-3.5 h-3.5" /> Certified Excellence
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="flex items-start gap-2.5 bg-blue-50 border border-blue-100 rounded-xl px-4 py-3.5">
-                    <Info className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
-                    <div>
-                      <p className="font-heading font-bold text-sm text-foreground mb-0.5">Quality Commitment</p>
-                      <p className="text-sm text-muted-foreground leading-relaxed">
-                        Our accreditations demonstrate our commitment to providing the highest standards of patient
-                        care, safety protocols, and clinical excellence. We undergo rigorous evaluations to maintain
-                        these certifications.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {expertise.length > 0 && (
-                <div>
-                  <h2 className="font-heading font-bold text-lg sm:text-xl mb-3">Area of Expertise</h2>
-                  <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
-                    {expertise.map((e, idx) => (
-                      <div
-                        key={idx}
-                        className="flex items-center gap-2 text-sm text-muted-foreground bg-secondary/5 border border-secondary/15 rounded-xl px-3.5 py-3"
-                      >
-                        <CheckCircle2 className="w-4 h-4 text-secondary flex-shrink-0" /> {e}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {infrastructure.length > 0 && (
-                <div>
-                  <h2 className="font-heading font-bold text-lg sm:text-xl mb-3">Infrastructure Details</h2>
-                  <div className="grid sm:grid-cols-2 gap-3">
-                    {infrastructure.map((i, idx) => (
-                      <div
-                        key={idx}
-                        className="flex items-center gap-2 text-sm text-muted-foreground bg-secondary/5 border border-secondary/15 rounded-xl px-3.5 py-3"
-                      >
-                        <CheckCircle2 className="w-4 h-4 text-secondary flex-shrink-0" /> {i}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {awards.length > 0 && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  className="bg-amber-50 border border-amber-200 rounded-2xl p-5 sm:p-6"
-                >
-                  <div className="flex items-center gap-2.5 mb-4">
-                    <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-[hsl(var(--accent-warm))] text-white shrink-0">
-                      <Award className="w-4.5 h-4.5" />
-                    </span>
-                    <h2 className="font-heading font-bold text-lg sm:text-xl">Awards &amp; Recognition</h2>
-                  </div>
-                  <ul className="space-y-2.5">
-                    {awards.map((a, idx) => (
-                      <li key={idx} className="flex items-start gap-2.5 text-sm text-muted-foreground bg-white/70 rounded-lg px-3.5 py-3">
-                        <span className="flex items-center justify-center w-6 h-6 rounded-full bg-[hsl(var(--accent-warm)/0.15)] text-[hsl(var(--accent-warm))] shrink-0">
-                          <Medal className="w-3.5 h-3.5" />
-                        </span>
-                        {a}
-                      </li>
-                    ))}
-                  </ul>
-                </motion.div>
-              )}
-
-              {hospital.google_maps_embed_url && (
-                <SectionCard title="Location">
-                  <div className="rounded-xl overflow-hidden border">
-                    <iframe
-                      src={hospital.google_maps_embed_url}
-                      width="100%"
-                      height="300"
-                      style={{ border: 0 }}
-                      allowFullScreen=""
-                      loading="lazy"
-                      referrerPolicy="no-referrer-when-downgrade"
-                      title="Hospital Location"
-                    />
-                  </div>
-                </SectionCard>
-              )}
+              {resolveHospitalSectionConfig(hospital.section_config)
+                .filter((s) => s.visible !== false)
+                .map((s) => renderHospitalSection(s.key, s.title, hospital))}
             </div>
 
             {/* Sidebar — mobile/tablet: shown inline here. Desktop: this is
@@ -547,6 +367,196 @@ function HospitalSidebarCard({ hospital, openLeadModal }) {
       )}
     </div>
   );
+}
+
+// The built-in order and titles for every section on a hospital's detail
+// page. Admins can override order/title/visibility per hospital via the
+// "Section Order & Titles" editor in the admin form (stored in
+// hospital.section_config) — this is just the fallback. "{name}" in a
+// title (default or admin-customized) is swapped for the hospital's actual
+// name at render time.
+export const DEFAULT_HOSPITAL_SECTIONS = [
+  { key: "about", title: "About {name}" },
+  { key: "specialities", title: "Medical Specialties Available At {name}" },
+  { key: "doctors_list", title: "Doctor's List" },
+  { key: "facilities", title: "Facilities & Patient Services" },
+  { key: "accreditations", title: "Accreditations & Certifications" },
+  { key: "area_of_expertise", title: "Area of Expertise" },
+  { key: "infrastructure_details", title: "Infrastructure Details" },
+  { key: "awards", title: "Awards & Recognition" },
+  { key: "location", title: "Location" },
+];
+
+function resolveHospitalSectionConfig(raw) {
+  const saved = parseList(raw);
+  if (saved.length === 0) return DEFAULT_HOSPITAL_SECTIONS.map((s) => ({ ...s, visible: true }));
+  const known = new Set(saved.map((s) => s.key));
+  const missing = DEFAULT_HOSPITAL_SECTIONS.filter((s) => !known.has(s.key)).map((s) => ({ ...s, visible: true }));
+  return [...saved, ...missing];
+}
+
+// Renders one section's content for the given key, or null if there's
+// nothing to show — the caller filters out the nulls.
+function renderHospitalSection(key, rawTitle, hospital) {
+  const title = rawTitle.replace("{name}", hospital.name);
+
+  if (key === "about") {
+    const fullDescription = parseList(hospital.full_description);
+    if (!hospital.description && fullDescription.length === 0) return null;
+    return (
+      <SectionCard key={key} title={title}>
+        {hospital.description && (
+          <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-3">{hospital.description}</p>
+        )}
+        {fullDescription.length > 0 && (
+          <div className="space-y-3">
+            {fullDescription.map((p, idx) => (
+              <p key={idx} className="text-sm text-muted-foreground leading-relaxed">{p}</p>
+            ))}
+          </div>
+        )}
+      </SectionCard>
+    );
+  }
+
+  if (key === "specialities" || key === "area_of_expertise" || key === "infrastructure_details") {
+    const items = parseList(hospital[key]);
+    if (items.length === 0) return null;
+    return (
+      <div key={key}>
+        <h2 className="font-heading font-bold text-lg sm:text-xl mb-3">{title}</h2>
+        <div className={`grid sm:grid-cols-2 ${key === "infrastructure_details" ? "" : "md:grid-cols-3"} gap-3`}>
+          {items.map((item, idx) => (
+            <div key={idx} className="flex items-center gap-2 text-sm text-muted-foreground bg-secondary/5 border border-secondary/15 rounded-xl px-3.5 py-3">
+              <CheckCircle2 className="w-4 h-4 text-secondary flex-shrink-0" /> {item}
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (key === "doctors_list") {
+    const items = parseList(hospital.doctors_list);
+    if (items.length === 0) return null;
+    return (
+      <div key={key}>
+        <h2 className="font-heading font-bold text-lg sm:text-xl mb-0.5">{title}</h2>
+        <p className="text-sm text-muted-foreground mb-3">Our team of expert medical professionals</p>
+        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
+          {items.map((doc, idx) => (
+            <div key={idx} className="flex items-center gap-2 text-sm text-muted-foreground bg-secondary/5 border border-secondary/15 rounded-xl px-3.5 py-3">
+              <CheckCircle2 className="w-4 h-4 text-secondary flex-shrink-0" /> {doc}
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (key === "facilities") {
+    const facilities = parseList(hospital.facilities);
+    const internationalServices = parseList(hospital.international_patient_services);
+    if (facilities.length === 0 && internationalServices.length === 0) return null;
+    return (
+      <div key={key}>
+        <h2 className="font-heading font-bold text-lg sm:text-xl mb-3">{title}</h2>
+        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
+          {[...facilities, ...internationalServices].map((f, idx) => (
+            <div key={idx} className="flex items-center gap-2 text-sm text-muted-foreground bg-secondary/5 border border-secondary/15 rounded-xl px-3.5 py-3">
+              <CheckCircle2 className="w-4 h-4 text-secondary flex-shrink-0" /> {f}
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (key === "accreditations") {
+    const items = parseList(hospital.accreditations);
+    if (items.length === 0) return null;
+    return (
+      <div key={key}>
+        <h2 className="font-heading font-bold text-lg sm:text-xl mb-0.5">{title}</h2>
+        <p className="text-sm text-muted-foreground mb-3">Recognized for excellence in healthcare quality and safety</p>
+        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3 mb-4">
+          {items.map((a, idx) => (
+            <div key={idx} className="relative bg-white border border-border rounded-xl border-t-4 border-t-secondary px-4 py-3.5">
+              <Star className="absolute top-3 right-3 w-4 h-4 text-secondary/20" />
+              <p className="font-heading font-bold text-sm text-foreground pr-5">{a}</p>
+              <p className="flex items-center gap-1 text-xs text-secondary font-medium mt-1">
+                <CheckCircle2 className="w-3.5 h-3.5" /> Certified Excellence
+              </p>
+            </div>
+          ))}
+        </div>
+        <div className="flex items-start gap-2.5 bg-blue-50 border border-blue-100 rounded-xl px-4 py-3.5">
+          <Info className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
+          <div>
+            <p className="font-heading font-bold text-sm text-foreground mb-0.5">Quality Commitment</p>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Our accreditations demonstrate our commitment to providing the highest standards of patient care,
+              safety protocols, and clinical excellence. We undergo rigorous evaluations to maintain these
+              certifications.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (key === "awards") {
+    const awards = parseList(hospital.awards);
+    if (awards.length === 0) return null;
+    return (
+      <motion.div
+        key={key}
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        className="bg-amber-50 border border-amber-200 rounded-2xl p-5 sm:p-6"
+      >
+        <div className="flex items-center gap-2.5 mb-4">
+          <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-[hsl(var(--accent-warm))] text-white shrink-0">
+            <Award className="w-4.5 h-4.5" />
+          </span>
+          <h2 className="font-heading font-bold text-lg sm:text-xl">{title}</h2>
+        </div>
+        <ul className="space-y-2.5">
+          {awards.map((a, idx) => (
+            <li key={idx} className="flex items-start gap-2.5 text-sm text-muted-foreground bg-white/70 rounded-lg px-3.5 py-3">
+              <span className="flex items-center justify-center w-6 h-6 rounded-full bg-[hsl(var(--accent-warm)/0.15)] text-[hsl(var(--accent-warm))] shrink-0">
+                <Medal className="w-3.5 h-3.5" />
+              </span>
+              {a}
+            </li>
+          ))}
+        </ul>
+      </motion.div>
+    );
+  }
+
+  if (key === "location") {
+    if (!hospital.google_maps_embed_url) return null;
+    return (
+      <SectionCard key={key} title={title}>
+        <div className="rounded-xl overflow-hidden border">
+          <iframe
+            src={hospital.google_maps_embed_url}
+            width="100%"
+            height="300"
+            style={{ border: 0 }}
+            allowFullScreen=""
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            title="Hospital Location"
+          />
+        </div>
+      </SectionCard>
+    );
+  }
+
+  return null;
 }
 
 function SectionCard({ title, children }) {

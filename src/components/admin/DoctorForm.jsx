@@ -8,6 +8,8 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 import { useToast } from "@/components/ui/use-toast";
 import DynamicListField from "@/components/admin/DynamicListField";
 import AutocompleteInput from "@/components/admin/AutocompleteInput";
+import SectionOrderEditor from "@/components/admin/SectionOrderEditor";
+import { DEFAULT_DOCTOR_SECTIONS } from "@/pages/DoctorDetail";
 
 const parseList = (val) => {
   if (!val) return [];
@@ -22,7 +24,7 @@ const toNumberOrNull = (val) => (val === "" || val === null || val === undefined
 const LIST_FIELDS = [
   "specializations","treatments_list","overview_points","experience_details",
   "qualifications_list","clinical_focus","additional_info","research_publications",
-  "awards_achievements","why_choose_doctor"
+  "awards_achievements","why_choose_doctor","section_config"
 ];
 
 export default function DoctorForm({ initialData, onCancel, onSaved }) {
@@ -111,6 +113,7 @@ export default function DoctorForm({ initialData, onCancel, onSaved }) {
       research_publications: JSON.stringify(form.research_publications || []),
       awards_achievements: JSON.stringify(form.awards_achievements || []),
       why_choose_doctor: JSON.stringify(form.why_choose_doctor || []),
+      section_config: JSON.stringify(form.section_config || []),
     };
 
     try {
@@ -294,6 +297,12 @@ export default function DoctorForm({ initialData, onCancel, onSaved }) {
 
         {/* SEO Settings — used only for the browser tab title and search-engine
             meta description. Never rendered anywhere on the live page. */}
+        <SectionOrderEditor
+          defaultSections={DEFAULT_DOCTOR_SECTIONS}
+          value={form.section_config}
+          onChange={(v) => setList("section_config", v)}
+        />
+
         <div className="bg-white rounded-2xl border border-border p-4 sm:p-5 shadow-sm">
           <h3 className="font-bold text-foreground text-sm mb-4">SEO Settings</h3>
           <div className="space-y-4">

@@ -697,31 +697,6 @@ function ClassicPage({ treatment, relatedDoctors, relatedHospitals, openLeadModa
     { icon: RefreshCw, label: "Recovery Time", value: treatment.recovery_time },
   ].filter((c) => c.value);
 
-  // Rendered as checkmark bullets, in this order.
-  const checklistSections = [
-    { key: "overview", title: "Overview" },
-    { key: "signs_symptoms", title: "Signs & Symptoms" },
-    { key: "related_conditions", title: "Conditions Treated" },
-    { key: "diagnosis", title: "Diagnosis & Evaluation" },
-    { key: "treatment_types", title: "Types of Treatment" },
-    { key: "surgery_types", title: "Types of Surgery" },
-    { key: "purpose", title: "Purpose" },
-    { key: "recovery_details", title: "Recovery" },
-    { key: "risks", title: "Risks & Complications" },
-    { key: "summary", title: "Summary" },
-    ...(treatment.country !== "Turkey" ? [{ key: "why_choose_india", title: "Why Choose India?" }] : []),
-    ...(treatment.country !== "India" ? [{ key: "why_choose_turkey", title: "Why Choose Turkey?" }] : []),
-  ]
-    .map((s) => ({ ...s, items: parseList(treatment[s.key]) }))
-    .filter((s) => s.items.length > 0);
-
-  // "How It's Done" is the one section rendered as a numbered list, not checkmarks.
-  const howItsDone = parseList(treatment.how_its_done);
-
-  const keyBenefits = parseList(treatment.key_benefits);
-  const procedures = parseList(treatment.treatment_procedures);
-  const additionalInfo = parseList(treatment.additional_information);
-
   const waLink = getWhatsAppLink(settings.whatsapp_number);
 
   return (
@@ -813,98 +788,12 @@ function ClassicPage({ treatment, relatedDoctors, relatedHospitals, openLeadModa
                 </div>
               )}
 
-              {keyBenefits.length > 0 && (
-                <SectionCard title="Key Benefits">
-                  <ul className="space-y-2">
-                    {keyBenefits.map((item, idx) => (
-                      <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
-                        <CheckCircle2 className="w-4 h-4 text-secondary flex-shrink-0 mt-0.5" />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                </SectionCard>
-              )}
-
-              {checklistSections.map((section) => (
-                <SectionCard key={section.key} title={section.title}>
-                  <ul className="space-y-2">
-                    {section.items.map((item, idx) => (
-                      <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
-                        <CheckCircle2 className="w-4 h-4 text-secondary flex-shrink-0 mt-0.5" />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                </SectionCard>
-              ))}
-
-              {howItsDone.length > 0 && (
-                <SectionCard title="How It Is Done">
-                  <ol className="space-y-3">
-                    {howItsDone.map((item, idx) => (
-                      <li key={idx} className="flex items-start gap-3">
-                        <span className="flex items-center justify-center w-6 h-6 rounded-full bg-accent-jade text-white text-xs font-bold flex-shrink-0">
-                          {idx + 1}
-                        </span>
-                        <p className="text-sm text-muted-foreground pt-0.5">{item}</p>
-                      </li>
-                    ))}
-                  </ol>
-                </SectionCard>
-              )}
-
-              {procedures.length > 0 && (
-                <SectionCard title="Treatment Procedures">
-                  <ol className="space-y-3">
-                    {procedures.map((item, idx) => (
-                      <li key={idx} className="flex items-start gap-3">
-                        <span className="flex items-center justify-center w-6 h-6 rounded-full bg-accent-jade text-white text-xs font-bold flex-shrink-0">
-                          {idx + 1}
-                        </span>
-                        <p className="text-sm text-muted-foreground pt-0.5">{item}</p>
-                      </li>
-                    ))}
-                  </ol>
-                </SectionCard>
-              )}
-
-              {additionalInfo.length > 0 && (
-                <SectionCard title="Additional Information">
-                  <ul className="space-y-2">
-                    {additionalInfo.map((item, idx) => (
-                      <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
-                        <CheckCircle2 className="w-4 h-4 text-secondary flex-shrink-0 mt-0.5" />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                </SectionCard>
-              )}
-
-              {treatment.gvhd_info && (
-                <SectionCard title="GVHD Information">
-                  <TextAsList text={treatment.gvhd_info} />
-                </SectionCard>
-              )}
-              {treatment.gvhd_symptoms && (
-                <SectionCard title="GVHD Symptoms">
-                  <TextAsList text={treatment.gvhd_symptoms} />
-                </SectionCard>
-              )}
-              {treatment.conditions_treated && (
-                <SectionCard title="Conditions Treated">
-                  <TextAsList text={treatment.conditions_treated} />
-                </SectionCard>
-              )}
-              {treatment.diagnosis_detail && (
-                <SectionCard title="Diagnosis Details">
-                  <TextAsList text={treatment.diagnosis_detail} />
-                </SectionCard>
-              )}
-              {/* "Why India" / "Why Turkey" are intentionally not rendered here —
-                  kept as backend-only fields the admin can fill in for internal
-                  reference, without showing on the public page. */}
+              {resolveSectionConfig(treatment.section_config, DEFAULT_TREATMENT_SECTIONS)
+                .filter((s) => s.visible !== false)
+                .map((s) => renderTreatmentSection(s.key, s.title, treatment))}
+              {/* "Why India" / "Why Turkey" (the free-text fields) are intentionally
+                  not rendered here — kept as backend-only fields the admin can fill
+                  in for internal reference, without showing on the public page. */}
             </div>
 
             {/* Empty spacer — just reserves the 1/3 column width so the left
@@ -1012,6 +901,109 @@ function TextAsList({ text }) {
       ))}
     </ul>
   );
+}
+
+// The built-in order and titles for every section on a treatment's
+// classic detail page. Admins can override order/title/visibility per
+// treatment via the "Section Order & Titles" editor in the admin form
+// (stored in treatment.section_config) — this is just the fallback.
+export const DEFAULT_TREATMENT_SECTIONS = [
+  { key: "key_benefits", title: "Key Benefits" },
+  { key: "overview", title: "Overview" },
+  { key: "signs_symptoms", title: "Signs & Symptoms" },
+  { key: "related_conditions", title: "Conditions Treated" },
+  { key: "diagnosis", title: "Diagnosis & Evaluation" },
+  { key: "treatment_types", title: "Types of Treatment" },
+  { key: "surgery_types", title: "Types of Surgery" },
+  { key: "purpose", title: "Purpose" },
+  { key: "recovery_details", title: "Recovery" },
+  { key: "risks", title: "Risks & Complications" },
+  { key: "summary", title: "Summary" },
+  { key: "why_choose_india", title: "Why Choose India?" },
+  { key: "why_choose_turkey", title: "Why Choose Turkey?" },
+  { key: "how_its_done", title: "How It Is Done" },
+  { key: "treatment_procedures", title: "Treatment Procedures" },
+  { key: "additional_information", title: "Additional Information" },
+  { key: "gvhd_info", title: "GVHD Information" },
+  { key: "gvhd_symptoms", title: "GVHD Symptoms" },
+  { key: "conditions_treated", title: "Conditions Treated" },
+  { key: "diagnosis_detail", title: "Diagnosis Details" },
+];
+
+// Merges the admin's saved section_config with the built-in defaults — any
+// section key the admin's saved config doesn't know about yet (e.g. one
+// added after they last saved) is appended at the end, visible by default,
+// so new sections never silently disappear for existing records.
+export function resolveSectionConfig(raw, defaults) {
+  const saved = parseList(raw);
+  if (saved.length === 0) return defaults.map((s) => ({ ...s, visible: true }));
+  const known = new Set(saved.map((s) => s.key));
+  const missing = defaults.filter((s) => !known.has(s.key)).map((s) => ({ ...s, visible: true }));
+  return [...saved, ...missing];
+}
+
+const CHECKLIST_KEYS = [
+  "overview", "signs_symptoms", "related_conditions", "diagnosis", "treatment_types",
+  "surgery_types", "purpose", "recovery_details", "risks", "summary",
+  "why_choose_india", "why_choose_turkey",
+];
+const NUMBERED_KEYS = ["how_its_done", "treatment_procedures"];
+const TEXT_BLOCK_KEYS = ["gvhd_info", "gvhd_symptoms", "conditions_treated", "diagnosis_detail"];
+
+// Renders one section's content for the given key, or null if there's
+// nothing to show (no content, or a why-choose-X section that doesn't
+// apply to this treatment's country) — the caller filters out the nulls.
+function renderTreatmentSection(key, title, treatment) {
+  if (key === "why_choose_india" && treatment.country === "Turkey") return null;
+  if (key === "why_choose_turkey" && treatment.country === "India") return null;
+
+  if (key === "key_benefits" || CHECKLIST_KEYS.includes(key) || key === "additional_information") {
+    const items = parseList(treatment[key]);
+    if (items.length === 0) return null;
+    return (
+      <SectionCard key={key} title={title}>
+        <ul className="space-y-2">
+          {items.map((item, idx) => (
+            <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
+              <CheckCircle2 className="w-4 h-4 text-secondary flex-shrink-0 mt-0.5" />
+              {item}
+            </li>
+          ))}
+        </ul>
+      </SectionCard>
+    );
+  }
+
+  if (NUMBERED_KEYS.includes(key)) {
+    const items = parseList(treatment[key]);
+    if (items.length === 0) return null;
+    return (
+      <SectionCard key={key} title={title}>
+        <ol className="space-y-3">
+          {items.map((item, idx) => (
+            <li key={idx} className="flex items-start gap-3">
+              <span className="flex items-center justify-center w-6 h-6 rounded-full bg-accent-jade text-white text-xs font-bold flex-shrink-0">
+                {idx + 1}
+              </span>
+              <p className="text-sm text-muted-foreground pt-0.5">{item}</p>
+            </li>
+          ))}
+        </ol>
+      </SectionCard>
+    );
+  }
+
+  if (TEXT_BLOCK_KEYS.includes(key)) {
+    const text = treatment[key];
+    if (!text) return null;
+    return (
+      <SectionCard key={key} title={title}>
+        <TextAsList text={text} />
+      </SectionCard>
+    );
+  }
+
+  return null;
 }
 
 function SectionCard({ title, children }) {

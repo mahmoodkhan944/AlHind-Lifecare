@@ -117,17 +117,6 @@ export default function DoctorDetail() {
     );
   }
 
-  const specializations = parseList(doctor.specializations);
-  const treatmentsList = parseList(doctor.treatments_list);
-  const overviewPoints = parseList(doctor.overview_points);
-  const experienceDetails = parseList(doctor.experience_details);
-  const qualificationsList = parseList(doctor.qualifications_list);
-  const clinicalFocus = parseList(doctor.clinical_focus);
-  const additionalInfo = parseList(doctor.additional_info);
-  const researchPubs = parseList(doctor.research_publications);
-  const awards = parseList(doctor.awards_achievements);
-  const whyChoose = parseList(doctor.why_choose_doctor);
-
   return (
     <div className="pb-20 lg:pb-0">
       {/* Hero */}
@@ -208,184 +197,9 @@ export default function DoctorDetail() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div ref={contentTopRef} className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
             <div className="lg:col-span-2 space-y-4 sm:space-y-5">
-              {doctor.overview && (
-                <SectionCard title="Overview">
-                  <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-3">{doctor.overview}</p>
-                  {overviewPoints.length > 0 && (
-                    <ul className="space-y-2">
-                      {overviewPoints.map((p, idx) => (
-                        <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
-                          <CheckCircle2 className="w-4 h-4 text-secondary flex-shrink-0 mt-0.5" />
-                          {p}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </SectionCard>
-              )}
-
-              {treatmentsList.length > 0 && (
-                <div>
-                  <h2 className="font-heading font-bold text-lg sm:text-xl mb-3">List of Treatments</h2>
-                  <div className="grid sm:grid-cols-2 gap-3">
-                    {treatmentsList.map((t, idx) => (
-                      <div
-                        key={idx}
-                        className="flex items-center gap-2 text-sm text-muted-foreground bg-secondary/5 border border-secondary/15 rounded-xl px-3.5 py-3"
-                      >
-                        <CheckCircle2 className="w-4 h-4 text-secondary flex-shrink-0" /> {t}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {specializations.length > 0 && (
-                <div>
-                  <h2 className="font-heading font-bold text-lg sm:text-xl mb-3">Specializations</h2>
-                  <div className="grid sm:grid-cols-2 gap-3">
-                    {specializations.map((s, idx) => (
-                      <div
-                        key={idx}
-                        className="flex items-center gap-2 text-sm text-muted-foreground bg-secondary/5 border border-secondary/15 rounded-xl px-3.5 py-3"
-                      >
-                        <CheckCircle2 className="w-4 h-4 text-secondary flex-shrink-0" /> {s}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {doctor.detailed_experience && (
-                <SectionCard title="Detailed Experience">
-                  <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-3">
-                    {doctor.detailed_experience}
-                  </p>
-                  {experienceDetails.length > 0 && (
-                    <ul className="space-y-2">
-                      {experienceDetails.map((d, idx) => (
-                        <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
-                          <CheckCircle2 className="w-4 h-4 text-secondary flex-shrink-0 mt-0.5" /> {d}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </SectionCard>
-              )}
-
-              {qualificationsList.length > 0 && (
-                <SectionCard title="Qualifications">
-                  <ul className="space-y-2">
-                    {qualificationsList.map((item, idx) => (
-                      <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
-                        <CheckCircle2 className="w-4 h-4 text-secondary flex-shrink-0 mt-0.5" /> {item}
-                      </li>
-                    ))}
-                  </ul>
-                </SectionCard>
-              )}
-
-              {clinicalFocus.length > 0 && (
-                <SectionCard title="Clinical Focus">
-                  <ul className="space-y-2">
-                    {clinicalFocus.map((item, idx) => (
-                      <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
-                        <CheckCircle2 className="w-4 h-4 text-secondary flex-shrink-0 mt-0.5" /> {item}
-                      </li>
-                    ))}
-                  </ul>
-                </SectionCard>
-              )}
-
-              {additionalInfo.length > 0 && (
-                <SectionCard title="Additional Information">
-                  <ul className="space-y-3">
-                    {additionalInfo.map((item, idx) => (
-                      <li key={idx} className="flex items-start gap-2.5 text-sm text-muted-foreground">
-                        <Info className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" /> {item}
-                      </li>
-                    ))}
-                  </ul>
-                </SectionCard>
-              )}
-
-              {researchPubs.length > 0 && (
-                <SectionCard title="Research & Publications">
-                  <ul className="space-y-2">
-                    {researchPubs.map((item, idx) => (
-                      <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
-                        <BookOpen className="w-4 h-4 text-secondary flex-shrink-0 mt-0.5" /> {item}
-                      </li>
-                    ))}
-                  </ul>
-                </SectionCard>
-              )}
-
-              {awards.length > 0 && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  className="bg-amber-50 border border-amber-200 rounded-2xl p-5 sm:p-6"
-                >
-                  <div className="flex items-center gap-2.5 mb-4">
-                    <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-[hsl(var(--accent-warm))] text-white shrink-0">
-                      <Trophy className="w-4.5 h-4.5" />
-                    </span>
-                    <h2 className="font-heading font-bold text-lg sm:text-xl">Awards & Achievements</h2>
-                  </div>
-                  <ul className="space-y-2.5">
-                    {awards.map((a, idx) => (
-                      <li key={idx} className="flex items-start gap-2.5 text-sm text-muted-foreground bg-white/70 rounded-lg px-3.5 py-3">
-                        <span className="flex items-center justify-center w-6 h-6 rounded-full bg-[hsl(var(--accent-warm)/0.15)] text-[hsl(var(--accent-warm))] shrink-0">
-                          <Medal className="w-3.5 h-3.5" />
-                        </span>
-                        {a}
-                      </li>
-                    ))}
-                  </ul>
-                  {doctor.award_document_url && (
-                    <a
-                      href={doctor.award_document_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 mt-3 text-sm text-primary font-medium hover:underline"
-                    >
-                      <Award className="w-4 h-4" /> View Certificate/Document
-                    </a>
-                  )}
-                  <p className="flex items-center gap-1.5 justify-center mt-4 pt-4 border-t border-amber-200/70 text-xs font-medium text-[hsl(var(--accent-warm))]">
-                    <Trophy className="w-3.5 h-3.5" /> {awards.length} Professional Achievement{awards.length !== 1 ? "s" : ""}
-                  </p>
-                </motion.div>
-              )}
-
-              {whyChoose.length > 0 && (
-                <div>
-                  <h2 className="font-heading font-bold text-lg sm:text-xl mb-3">Why Choose Dr.?</h2>
-                  <div className="space-y-2.5">
-                    {whyChoose.map((item, idx) => (
-                      <div
-                        key={idx}
-                        className="flex items-start gap-2.5 text-sm text-muted-foreground bg-white border border-border rounded-xl px-4 py-3.5"
-                      >
-                        <span className="flex items-center justify-center w-5 h-5 rounded-full bg-accent-jade/15 text-accent-jade shrink-0 mt-0.5">
-                          <CheckCircle2 className="w-3.5 h-3.5" />
-                        </span>
-                        {item}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {doctor.bio && (
-                <SectionCard title="About">
-                  <p className="text-sm sm:text-base text-muted-foreground leading-relaxed whitespace-pre-line">
-                    {doctor.bio}
-                  </p>
-                </SectionCard>
-              )}
+              {resolveDoctorSectionConfig(doctor.section_config)
+                .filter((s) => s.visible !== false)
+                .map((s) => renderDoctorSection(s.key, s.title, doctor))}
             </div>
 
             {/* Sidebar — mobile/tablet: shown inline here. Desktop: this is
@@ -571,6 +385,215 @@ function DoctorSidebarCard({ doctor, openLeadModal }) {
       )}
     </div>
   );
+}
+
+// The built-in order and titles for every section on a doctor's detail
+// page. Admins can override order/title/visibility per doctor via the
+// "Section Order & Titles" editor in the admin form (stored in
+// doctor.section_config) — this is just the fallback.
+export const DEFAULT_DOCTOR_SECTIONS = [
+  { key: "overview", title: "Overview" },
+  { key: "treatments_list", title: "List of Treatments" },
+  { key: "specializations", title: "Specializations" },
+  { key: "detailed_experience", title: "Detailed Experience" },
+  { key: "qualifications_list", title: "Qualifications" },
+  { key: "clinical_focus", title: "Clinical Focus" },
+  { key: "additional_info", title: "Additional Information" },
+  { key: "research_publications", title: "Research & Publications" },
+  { key: "awards_achievements", title: "Awards & Achievements" },
+  { key: "why_choose_doctor", title: "Why Choose Dr.?" },
+  { key: "bio", title: "About" },
+];
+
+function resolveDoctorSectionConfig(raw) {
+  const saved = parseList(raw);
+  if (saved.length === 0) return DEFAULT_DOCTOR_SECTIONS.map((s) => ({ ...s, visible: true }));
+  const known = new Set(saved.map((s) => s.key));
+  const missing = DEFAULT_DOCTOR_SECTIONS.filter((s) => !known.has(s.key)).map((s) => ({ ...s, visible: true }));
+  return [...saved, ...missing];
+}
+
+// Renders one section's content for the given key, or null if there's
+// nothing to show — the caller filters out the nulls.
+function renderDoctorSection(key, title, doctor) {
+  if (key === "overview") {
+    if (!doctor.overview) return null;
+    const points = parseList(doctor.overview_points);
+    return (
+      <SectionCard key={key} title={title}>
+        <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-3">{doctor.overview}</p>
+        {points.length > 0 && (
+          <ul className="space-y-2">
+            {points.map((p, idx) => (
+              <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
+                <CheckCircle2 className="w-4 h-4 text-secondary flex-shrink-0 mt-0.5" />
+                {p}
+              </li>
+            ))}
+          </ul>
+        )}
+      </SectionCard>
+    );
+  }
+
+  if (key === "treatments_list" || key === "specializations") {
+    const items = parseList(doctor[key]);
+    if (items.length === 0) return null;
+    return (
+      <div key={key}>
+        <h2 className="font-heading font-bold text-lg sm:text-xl mb-3">{title}</h2>
+        <div className="grid sm:grid-cols-2 gap-3">
+          {items.map((t, idx) => (
+            <div key={idx} className="flex items-center gap-2 text-sm text-muted-foreground bg-secondary/5 border border-secondary/15 rounded-xl px-3.5 py-3">
+              <CheckCircle2 className="w-4 h-4 text-secondary flex-shrink-0" /> {t}
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (key === "detailed_experience") {
+    if (!doctor.detailed_experience) return null;
+    const points = parseList(doctor.experience_details);
+    return (
+      <SectionCard key={key} title={title}>
+        <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-3">{doctor.detailed_experience}</p>
+        {points.length > 0 && (
+          <ul className="space-y-2">
+            {points.map((d, idx) => (
+              <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
+                <CheckCircle2 className="w-4 h-4 text-secondary flex-shrink-0 mt-0.5" /> {d}
+              </li>
+            ))}
+          </ul>
+        )}
+      </SectionCard>
+    );
+  }
+
+  if (key === "qualifications_list" || key === "clinical_focus") {
+    const items = parseList(doctor[key]);
+    if (items.length === 0) return null;
+    return (
+      <SectionCard key={key} title={title}>
+        <ul className="space-y-2">
+          {items.map((item, idx) => (
+            <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
+              <CheckCircle2 className="w-4 h-4 text-secondary flex-shrink-0 mt-0.5" /> {item}
+            </li>
+          ))}
+        </ul>
+      </SectionCard>
+    );
+  }
+
+  if (key === "additional_info") {
+    const items = parseList(doctor.additional_info);
+    if (items.length === 0) return null;
+    return (
+      <SectionCard key={key} title={title}>
+        <ul className="space-y-3">
+          {items.map((item, idx) => (
+            <li key={idx} className="flex items-start gap-2.5 text-sm text-muted-foreground">
+              <Info className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" /> {item}
+            </li>
+          ))}
+        </ul>
+      </SectionCard>
+    );
+  }
+
+  if (key === "research_publications") {
+    const items = parseList(doctor.research_publications);
+    if (items.length === 0) return null;
+    return (
+      <SectionCard key={key} title={title}>
+        <ul className="space-y-2">
+          {items.map((item, idx) => (
+            <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
+              <BookOpen className="w-4 h-4 text-secondary flex-shrink-0 mt-0.5" /> {item}
+            </li>
+          ))}
+        </ul>
+      </SectionCard>
+    );
+  }
+
+  if (key === "awards_achievements") {
+    const awards = parseList(doctor.awards_achievements);
+    if (awards.length === 0) return null;
+    return (
+      <motion.div
+        key={key}
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        className="bg-amber-50 border border-amber-200 rounded-2xl p-5 sm:p-6"
+      >
+        <div className="flex items-center gap-2.5 mb-4">
+          <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-[hsl(var(--accent-warm))] text-white shrink-0">
+            <Trophy className="w-4.5 h-4.5" />
+          </span>
+          <h2 className="font-heading font-bold text-lg sm:text-xl">{title}</h2>
+        </div>
+        <ul className="space-y-2.5">
+          {awards.map((a, idx) => (
+            <li key={idx} className="flex items-start gap-2.5 text-sm text-muted-foreground bg-white/70 rounded-lg px-3.5 py-3">
+              <span className="flex items-center justify-center w-6 h-6 rounded-full bg-[hsl(var(--accent-warm)/0.15)] text-[hsl(var(--accent-warm))] shrink-0">
+                <Medal className="w-3.5 h-3.5" />
+              </span>
+              {a}
+            </li>
+          ))}
+        </ul>
+        {doctor.award_document_url && (
+          <a
+            href={doctor.award_document_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 mt-3 text-sm text-primary font-medium hover:underline"
+          >
+            <Award className="w-4 h-4" /> View Certificate/Document
+          </a>
+        )}
+        <p className="flex items-center gap-1.5 justify-center mt-4 pt-4 border-t border-amber-200/70 text-xs font-medium text-[hsl(var(--accent-warm))]">
+          <Trophy className="w-3.5 h-3.5" /> {awards.length} Professional Achievement{awards.length !== 1 ? "s" : ""}
+        </p>
+      </motion.div>
+    );
+  }
+
+  if (key === "why_choose_doctor") {
+    const items = parseList(doctor.why_choose_doctor);
+    if (items.length === 0) return null;
+    return (
+      <div key={key}>
+        <h2 className="font-heading font-bold text-lg sm:text-xl mb-3">{title}</h2>
+        <div className="space-y-2.5">
+          {items.map((item, idx) => (
+            <div key={idx} className="flex items-start gap-2.5 text-sm text-muted-foreground bg-white border border-border rounded-xl px-4 py-3.5">
+              <span className="flex items-center justify-center w-5 h-5 rounded-full bg-accent-jade/15 text-accent-jade shrink-0 mt-0.5">
+                <CheckCircle2 className="w-3.5 h-3.5" />
+              </span>
+              {item}
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (key === "bio") {
+    if (!doctor.bio) return null;
+    return (
+      <SectionCard key={key} title={title}>
+        <p className="text-sm sm:text-base text-muted-foreground leading-relaxed whitespace-pre-line">{doctor.bio}</p>
+      </SectionCard>
+    );
+  }
+
+  return null;
 }
 
 function SectionCard({ title, children }) {
