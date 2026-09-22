@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { useInvalidateSettings, DEFAULT_SETTINGS, parseDepartments } from "@/hooks/useSiteSettings";
 import BulkRecompressImages from "@/components/admin/BulkRecompressImages";
+import OrphanedFilesFinder from "@/components/admin/OrphanedFilesFinder";
 import {
   Globe, Phone, Share2, PhoneCall, Clock, Building2, MapPin,
   Save, RotateCcw, Plus, Trash2, Key, Loader2, ExternalLink, Info, Star
@@ -181,6 +182,8 @@ export default function AdminSettings() {
       </SettingsCard>
 
       <BulkRecompressImages />
+
+      <OrphanedFilesFinder />
 
       <ChangeCredentials />
     </div>
