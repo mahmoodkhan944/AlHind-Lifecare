@@ -20,6 +20,7 @@ import {
   Briefcase,
   GraduationCap,
   Target,
+  Building2,
 } from "lucide-react";
 import { db } from "@/api/dataClient";
 import { Button } from "@/components/ui/button";
@@ -142,63 +143,103 @@ export default function DoctorDetail() {
           </Link>
 
           <div className="relative rounded-3xl overflow-hidden shadow-xl">
-            <div className="relative py-10 sm:py-12">
+            {/* Background image strip — kept thin, just a visible accent above the card */}
+            <div className="relative h-16 sm:h-20 md:h-24">
               <img src={HERO_IMAGE} alt="" className="absolute inset-0 w-full h-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-br from-secondary/95 via-secondary/90 to-accent-jade/90" />
+              <div className="absolute inset-0 bg-gradient-to-br from-secondary/70 via-secondary/55 to-accent-jade/55" />
+            </div>
 
-              {/* Top badges */}
-              {doctor.rating > 0 && (
-                <span className="absolute top-4 sm:top-5 left-4 sm:left-5 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/95 backdrop-blur-sm text-xs sm:text-sm font-bold text-foreground shadow-sm z-10">
-                  {doctor.rating}
-                  <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                </span>
-              )}
-              {doctor.experience_years > 0 && (
-                <span className="absolute top-4 sm:top-5 right-4 sm:right-5 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/95 backdrop-blur-sm text-xs sm:text-sm font-bold text-foreground shadow-sm z-10">
-                  <Clock className="w-3.5 h-3.5" />
-                  {doctor.experience_years}+ yrs
-                </span>
-              )}
+            {/* Compact white info card */}
+            <div className="relative bg-muted -mt-8 sm:-mt-10 mx-3 sm:mx-5 md:mx-6 mb-3 sm:mb-5 rounded-2xl shadow-lg p-3 sm:p-4">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-start">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 rounded-xl overflow-hidden border-4 border-white shadow-md shrink-0 mx-auto sm:mx-0 bg-white"
+                >
+                  {doctor.photo_url ? (
+                    <img src={doctor.photo_url} alt={doctor.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-3xl sm:text-4xl font-bold">
+                      {doctor.name?.[0]}
+                    </div>
+                  )}
+                </motion.div>
 
-              <div className="relative max-w-3xl mx-auto px-4 sm:px-6">
-                <div className="flex flex-col md:flex-row gap-5 sm:gap-6 md:gap-8 items-center md:items-start text-center md:text-left">
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="w-28 h-28 sm:w-36 sm:h-36 md:w-44 md:h-44 rounded-2xl overflow-hidden border-4 border-white/20 shadow-xl flex-shrink-0"
-                  >
-                    {doctor.photo_url ? (
-                      <img src={doctor.photo_url} alt={doctor.name} className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-4xl sm:text-5xl font-bold">
-                        {doctor.name?.[0]}
-                      </div>
-                    )}
-                  </motion.div>
-                  <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-white">
-                    <h1 className="font-heading font-bold text-[clamp(1.4rem,4.5vw,2.5rem)] mb-2 text-balance">
-                      {doctor.name}
-                    </h1>
-                    {doctor.speciality && (
-                      <p className="text-[hsl(var(--accent-warm))] text-base sm:text-lg font-medium mb-1">{doctor.speciality}</p>
-                    )}
-                    {doctor.designation && <p className="text-white/60 mb-3 sm:mb-4 text-sm sm:text-base">{doctor.designation}</p>}
-                    <div className="flex flex-wrap justify-center md:justify-start gap-3 sm:gap-4 text-sm text-white/70">
-                      {doctor.city && (
-                        <span className="flex items-center gap-1">
-                          <MapPin className="w-4 h-4 shrink-0" />
-                          {doctor.city}, {doctor.country}
-                        </span>
+                <div className="flex-1 min-w-0 w-full">
+                  <div className="flex items-start justify-between gap-3 flex-wrap">
+                    <div>
+                      <h1 className="flex items-center gap-2 font-heading font-bold text-base sm:text-lg md:text-xl text-foreground text-balance">
+                        {doctor.name}
+                        <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-accent-jade fill-accent-jade/15 shrink-0" />
+                      </h1>
+                      {(doctor.designation || doctor.speciality) && (
+                        <p className="text-accent-jade font-semibold text-sm mt-0.5">
+                          {doctor.designation || doctor.speciality}
+                        </p>
                       )}
-                      {doctor.reviews_count > 0 && (
-                        <span className="flex items-center gap-1">
-                          ({doctor.reviews_count} reviews)
-                        </span>
+                      {(doctor.hospital_name || doctor.city) && (
+                        <p className="flex items-center gap-1.5 text-xs sm:text-sm text-muted-foreground mt-1">
+                          <Building2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+                          {doctor.hospital_name}
+                          {doctor.hospital_name && doctor.city ? ", " : ""}
+                          {doctor.city}
+                        </p>
                       )}
                     </div>
-                  </motion.div>
+                    {doctor.rating > 0 && (
+                      <div className="text-right shrink-0">
+                        <div className="flex items-center gap-1 justify-end">
+                          <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+                          <span className="font-heading font-bold text-sm sm:text-base text-foreground">{doctor.rating}</span>
+                        </div>
+                        <p className="text-[11px] text-muted-foreground">Patient Rating</p>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
+
+              {/* Stat row — compact, icon + text side by side */}
+              {(doctor.experience_years > 0 || parseList(doctor.specializations).length > 0 || doctor.city) && (
+                <div className="flex flex-wrap gap-x-5 gap-y-2 mt-3 pt-3 border-t border-border">
+                  {doctor.experience_years > 0 && (
+                    <div className="flex items-center gap-2">
+                      <span className="flex items-center justify-center w-7 h-7 rounded-md bg-accent-jade/10 text-accent-jade shrink-0">
+                        <Briefcase className="w-3.5 h-3.5" />
+                      </span>
+                      <div className="leading-tight">
+                        <p className="text-[10px] text-muted-foreground">Experience</p>
+                        <p className="font-heading font-bold text-xs sm:text-sm text-foreground">{doctor.experience_years}+</p>
+                      </div>
+                    </div>
+                  )}
+                  {parseList(doctor.specializations).length > 0 && (
+                    <div className="flex items-center gap-2">
+                      <span className="flex items-center justify-center w-7 h-7 rounded-md bg-accent-jade/10 text-accent-jade shrink-0">
+                        <Medal className="w-3.5 h-3.5" />
+                      </span>
+                      <div className="leading-tight">
+                        <p className="text-[10px] text-muted-foreground">Specializations</p>
+                        <p className="font-heading font-bold text-xs sm:text-sm text-foreground">
+                          {parseList(doctor.specializations).length}+ areas
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                  {doctor.city && (
+                    <div className="flex items-center gap-2">
+                      <span className="flex items-center justify-center w-7 h-7 rounded-md bg-accent-jade/10 text-accent-jade shrink-0">
+                        <MapPin className="w-3.5 h-3.5" />
+                      </span>
+                      <div className="leading-tight">
+                        <p className="text-[10px] text-muted-foreground">Location</p>
+                        <p className="font-heading font-bold text-xs sm:text-sm text-foreground">{doctor.city}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>
