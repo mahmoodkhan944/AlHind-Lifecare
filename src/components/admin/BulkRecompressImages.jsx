@@ -44,7 +44,7 @@ export default function BulkRecompressImages() {
     setSummary(null);
     let compressed = 0;
     let skipped = 0;
-    let failed = 0;
+    const failedItems = [];
     let bytesSaved = 0;
 
     try {
@@ -57,7 +57,7 @@ export default function BulkRecompressImages() {
         try {
           const { data: blob, error: downloadError } = await supabase.storage.from(BUCKET).download(entry.name);
           if (downloadError || !blob) {
-            failed++;
+            failedItems.push({ name: entry.name, reason: downloadError?.message || "Couldn't download" });
             continue;
           }
           const originalSize = blob.size;
@@ -77,19 +77,19 @@ export default function BulkRecompressImages() {
             cacheControl: "3600",
           });
           if (uploadError) {
-            failed++;
+            failedItems.push({ name: entry.name, reason: uploadError.message || "Couldn't re-upload" });
             continue;
           }
 
           compressed++;
           bytesSaved += originalSize - result.size;
-        } catch {
-          failed++;
+        } catch (err) {
+          failedItems.push({ name: entry.name, reason: err?.message || "Unexpected error" });
         }
       }
 
       setProgress({ done: files.length, total: files.length, currentName: "" });
-      setSummary({ compressed, skipped, failed, bytesSaved, total: files.length });
+      setSummary({ compressed, skipped, failed: failedItems.length, failedItems, bytesSaved, total: files.length });
       toast({ title: "Re-compression complete", description: `${compressed} image(s) compressed, ${formatBytes(bytesSaved)} saved.` });
     } catch (err) {
       toast({ title: "Couldn't list storage files", description: err?.message, variant: "destructive" });
@@ -150,6 +150,23 @@ export default function BulkRecompressImages() {
               </p>
             </div>
           </div>
+
+          {summary.failedItems?.length > 0 && (
+            <div className="border border-destructive/20 bg-destructive/5 rounded-lg p-3">
+              <p className="text-xs font-medium text-destructive mb-2">
+                {summary.failedItems.length} file{summary.failedItems.length !== 1 ? "s" : ""} couldn't be processed:
+              </p>
+              <ul className="space-y-1 max-h-48 overflow-y-auto">
+                {summary.failedItems.map((item, idx) => (
+                  <li key={idx} className="text-xs text-muted-foreground flex items-start gap-1.5">
+                    <span className="font-mono text-foreground/80 shrink-0">{item.name}</span>
+                    <span className="text-muted-foreground/70">— {item.reason}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           <Button onClick={run} variant="outline" size="sm" className="gap-2">
             <ImageDown className="w-3.5 h-3.5" /> Run Again
           </Button>
