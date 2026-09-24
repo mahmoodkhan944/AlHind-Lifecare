@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Globe } from "lucide-react";
 import { Select, SelectTrigger, SelectContent, SelectItem } from "@/components/ui/select";
+import FlagIcon from "@/components/common/FlagIcon";
 
 const LANGUAGES = [
   { code: "en", name: "English", flag: "🇬🇧" },
@@ -119,12 +120,18 @@ export default function LanguageSelector({ light = false }) {
         }`}
       >
         <Globe className="w-3.5 h-3.5 flex-shrink-0" />
-        <span className="truncate">{current.flag} {current.code.toUpperCase()}</span>
+        <span className="inline-flex items-center gap-1.5 truncate">
+          <FlagIcon emoji={current.flag} />
+          {current.code.toUpperCase()}
+        </span>
       </SelectTrigger>
       <SelectContent className="max-h-72">
         {LANGUAGES.map((lang) => (
           <SelectItem key={lang.code} value={lang.code}>
-            <span className="mr-2">{lang.flag}</span> {lang.name}
+            <span className="inline-flex items-center gap-2">
+              <FlagIcon emoji={lang.flag} />
+              {lang.name}
+            </span>
           </SelectItem>
         ))}
       </SelectContent>

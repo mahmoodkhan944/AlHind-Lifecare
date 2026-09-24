@@ -248,9 +248,22 @@ export default function HeroSection() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="max-h-64">
-                  {COUNTRIES.map((c) => (
-                    <SelectItem key={c.code} value={c.name}>
-                      <span className="mr-2">{c.flag}</span> {c.name}
+                                    {COUNTRIES.map((c) => (
+                    <SelectItem key={c.code || "none"} value={c.name}>
+                      <span className="inline-flex items-center gap-2">
+                        {c.code && (
+                          <img
+                            src={`https://flagcdn.com/w20/${c.code.toLowerCase()}.png`}
+                            srcSet={`https://flagcdn.com/w40/${c.code.toLowerCase()}.png 2x`}
+                            width={20}
+                            height={15}
+                            alt=""
+                            loading="lazy"
+                            className="inline-block w-5 h-[15px] rounded-[2px] object-cover shrink-0"
+                          />
+                        )}
+                        {c.name}
+                      </span>
                     </SelectItem>
                   ))}
                 </SelectContent>

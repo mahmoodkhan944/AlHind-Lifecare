@@ -7,6 +7,7 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 import { db } from "@/api/dataClient";
 import { useToast } from "@/components/ui/use-toast";
 import { COUNTRIES, getDialCode } from "@/lib/countries";
+import FlagIcon from "@/components/common/FlagIcon";
 import { validatePhone, friendlyError } from "@/lib/formValidation";
 import { useLeadModal } from "@/lib/LeadModalContext";
 
@@ -91,8 +92,11 @@ export default function LeadModal() {
                 </SelectTrigger>
                 <SelectContent className="max-h-64">
                   {COUNTRIES.map((c) => (
-                    <SelectItem key={c.code} value={c.name}>
-                      <span className="mr-2">{c.flag}</span> {c.name}
+                                        <SelectItem key={c.code || "none"} value={c.name}>
+                      <span className="inline-flex items-center gap-2">
+                        <FlagIcon code={c.code} />
+                        {c.name}
+                      </span>
                     </SelectItem>
                   ))}
                 </SelectContent>

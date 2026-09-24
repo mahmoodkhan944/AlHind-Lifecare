@@ -43,6 +43,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { useToast } from "@/components/ui/use-toast";
 import { useLeadModal } from "@/lib/LeadModalContext";
 import { COUNTRIES, getDialCode } from "@/lib/countries";
+import FlagIcon from "@/components/common/FlagIcon";
 import { validatePhone, friendlyError } from "@/lib/formValidation";
 import { useSiteSettings, DEFAULT_SETTINGS, getWhatsAppLink } from "@/hooks/useSiteSettings";
 import { slugify } from "@/lib/slugify";
@@ -395,8 +396,11 @@ function LandingPage({ treatment, relatedDoctors, relatedHospitals, faqs, openLe
                   </SelectTrigger>
                   <SelectContent className="max-h-64">
                     {COUNTRIES.map((c) => (
-                      <SelectItem key={c.code} value={c.name}>
-                        <span className="mr-2">{c.flag}</span> {c.name}
+                      <SelectItem key={c.code || "none"} value={c.name}>
+                        <span className="inline-flex items-center gap-2">
+                          <FlagIcon code={c.code} />
+                          {c.name}
+                        </span>
                       </SelectItem>
                     ))}
                   </SelectContent>
