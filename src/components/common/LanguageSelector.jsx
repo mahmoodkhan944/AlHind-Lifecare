@@ -1,6 +1,15 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Globe } from "lucide-react";
-import { Select, SelectTrigger, SelectContent, SelectItem } from "@/components/ui/select";
+import { Check, ChevronDown, Languages, Loader2 } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
+} from "@/components/ui/command";
 import FlagIcon from "@/components/common/FlagIcon";
 
 const LANGUAGES = [
@@ -47,10 +56,21 @@ const LANGUAGES = [
   { code: "km", name: "ខ្មែរ (Khmer)", flag: "🇰🇭" },
 ];
 
+// Shown first — the languages most of our international patients use
+const POPULAR = ["en", "ar", "hi", "ur", "bn", "fr", "ru"];
+
 const SOURCE_LANG = "en";
+
+// "العربية (Arabic)" -> { native: "العربية", english: "Arabic" }
+function splitName(name) {
+  const m = name.match(/^(.*?)\s*\(([^)]+)\)$/);
+  return m ? { native: m[1], english: m[2] } : { native: name, english: "" };
+}
 
 export default function LanguageSelector({ light = false }) {
   const [currentLang, setCurrentLang] = useState(SOURCE_LANG);
+  const [open, setOpen] = useState(false);
+  const [switching, setSwitching] = useState(false);
   const initialized = useRef(false);
 
   useEffect(() => {
@@ -95,7 +115,10 @@ export default function LanguageSelector({ light = false }) {
   }, []);
 
   const handleChange = (langCode) => {
+    setOpen(false);
+    if (langCode === currentLang) return;
     setCurrentLang(langCode);
+    setSwitching(true);
     if (langCode === SOURCE_LANG) {
       // Reset to original language
       document.cookie = "googtrans=;path=/;expires=Thu, 01 Jan 1970 00:00:00 GMT";
@@ -109,32 +132,80 @@ export default function LanguageSelector({ light = false }) {
   };
 
   const current = LANGUAGES.find((l) => l.code === currentLang) || LANGUAGES[0];
+  const popular = POPULAR.map((c) => LANGUAGES.find((l) => l.code === c)).filter(Boolean);
+  const others = LANGUAGES.filter((l) => !POPULAR.includes(l.code));
 
-  return (
-    <Select value={currentLang} onValueChange={handleChange}>
-      <SelectTrigger
-        className={`h-8 w-auto gap-1.5 border-none px-2.5 text-xs font-semibold rounded-full focus:ring-0 ${
-          light
-            ? "text-white bg-white/10 hover:bg-white/20"
-            : "text-foreground bg-muted/60 hover:bg-muted"
+  const renderItem = (lang) => {
+    const { native, english } = splitName(lang.name);
+    const selected = lang.code === currentLang;
+    return (
+      <CommandItem
+        key={lang.code}
+        value={`${lang.code} ${native} ${english}`}
+        onSelect={() => handleChange(lang.code)}
+        className={`gap-3 rounded-lg px-2.5 py-2 cursor-pointer ${
+          selected ? "bg-primary/10 data-[selected=true]:bg-primary/15" : ""
         }`}
       >
-        <Globe className="w-3.5 h-3.5 flex-shrink-0" />
-        <span className="inline-flex items-center gap-1.5 truncate">
-          <FlagIcon emoji={current.flag} />
-          {current.code.toUpperCase()}
+        <FlagIcon emoji={lang.flag} />
+        <span className="flex min-w-0 flex-1 flex-col leading-tight">
+          <span dir="auto" className={`truncate text-left text-sm ${selected ? "font-semibold text-primary" : "font-medium"}`}>
+            {native}
+          </span>
+          {english && <span className="truncate text-[11px] text-muted-foreground">{english}</span>}
         </span>
-      </SelectTrigger>
-      <SelectContent className="max-h-72">
-        {LANGUAGES.map((lang) => (
-          <SelectItem key={lang.code} value={lang.code}>
-            <span className="inline-flex items-center gap-2">
-              <FlagIcon emoji={lang.flag} />
-              {lang.name}
+        {selected && <Check className="text-primary" />}
+      </CommandItem>
+    );
+  };
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          aria-label={`Language: ${splitName(current.name).english || current.name}`}
+          className={`notranslate group inline-flex h-9 items-center gap-2 rounded-full border pl-2 pr-2.5 text-xs font-semibold tracking-wide transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+            light
+              ? "border-white/25 bg-white/10 text-white hover:bg-white/20"
+              : "border-border bg-muted/60 text-foreground hover:bg-muted"
+          }`}
+        >
+          {switching ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <span className="flex h-5 w-5 items-center justify-center overflow-hidden rounded-full ring-1 ring-black/10">
+              <FlagIcon emoji={current.flag} className="!h-5 !w-7 !rounded-none" />
             </span>
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+          )}
+          <span>{current.code.split("-")[0].toUpperCase()}</span>
+          <ChevronDown
+            className={`h-3.5 w-3.5 opacity-70 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+          />
+        </button>
+      </PopoverTrigger>
+
+      <PopoverContent align="end" sideOffset={8} className="notranslate w-72 overflow-hidden rounded-2xl p-0 shadow-xl">
+        <div className="flex items-center gap-2.5 border-b bg-muted/40 px-4 py-3">
+          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <Languages className="h-4 w-4" />
+          </span>
+          <div className="leading-tight">
+            <p className="text-sm font-semibold text-foreground">Choose language</p>
+            <p className="text-[11px] text-muted-foreground">Page is translated automatically</p>
+          </div>
+        </div>
+
+        <Command filter={(value, search) => (value.toLowerCase().includes(search.trim().toLowerCase()) ? 1 : 0)}>
+          <CommandInput placeholder="Search language..." className="h-10 text-sm" />
+          <CommandList className="max-h-72 p-1">
+            <CommandEmpty>No language found.</CommandEmpty>
+            <CommandGroup heading="Popular">{popular.map(renderItem)}</CommandGroup>
+            <CommandSeparator className="my-1" />
+            <CommandGroup heading="All languages">{others.map(renderItem)}</CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   );
 }
