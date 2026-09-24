@@ -10,6 +10,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { COUNTRIES, getDialCode } from "@/lib/countries";
 import { validatePhone, friendlyError } from "@/lib/formValidation";
 import { useLeadModal } from "@/lib/LeadModalContext";
+import FlagIcon from "@/components/common/FlagIcon";
 import { Link } from "react-router-dom";
 import { useSiteSettings, DEFAULT_SETTINGS } from "@/hooks/useSiteSettings";
 import { useSectionContent } from "@/hooks/useSectionContent";
@@ -42,7 +43,7 @@ export default function HeroSection() {
     heading: "Let Us Help You",
     subtitle: "Get a free quote from our medical team within 24 hours",
   });
-  const [form, setForm] = useState({ patient_name: "", country: "Select Country", city: "", phone: "", medical_problem: "", age: "" });
+  const [form, setForm] = useState({ patient_name: "", country: "Select Country", phone: "", medical_problem: "", age: "" });
   const [loading, setLoading] = useState(false);
 
   // The background video is ~2.4MB — fetching and decoding it immediately
@@ -88,12 +89,12 @@ export default function HeroSection() {
         email: "",
         phone: check.formatted,
         country: form.country,
-        message: `City: ${form.city || "N/A"} | Age/DOB: ${form.age || "N/A"} | Problem: ${form.medical_problem}`,
+        message: `Age/DOB: ${form.age || "N/A"} | Problem: ${form.medical_problem}`,
         source: "website",
         status: "new",
       });
       toast({ title: "Thank you! Our team will contact you shortly." });
-      setForm({ patient_name: "", country: "Select Country", city: "", phone: "", medical_problem: "", age: "" });
+      setForm({ patient_name: "", country: "Select Country", phone: "", medical_problem: "", age: "" });
     } catch (err) {
       toast({ title: friendlyError(err), variant: "destructive" });
     }
@@ -248,32 +249,16 @@ export default function HeroSection() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="max-h-64">
-                                    {COUNTRIES.map((c) => (
+                  {COUNTRIES.map((c) => (
                     <SelectItem key={c.code || "none"} value={c.name}>
                       <span className="inline-flex items-center gap-2">
-                        {c.code && (
-                          <img
-                            src={`https://flagcdn.com/w20/${c.code.toLowerCase()}.png`}
-                            srcSet={`https://flagcdn.com/w40/${c.code.toLowerCase()}.png 2x`}
-                            width={20}
-                            height={15}
-                            alt=""
-                            loading="lazy"
-                            className="inline-block w-5 h-[15px] rounded-[2px] object-cover shrink-0"
-                          />
-                        )}
+                        <FlagIcon code={c.code} />
                         {c.name}
                       </span>
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-              <Input
-                placeholder="Select City"
-                value={form.city}
-                onChange={(e) => setForm({ ...form, city: e.target.value })}
-                className="h-9 rounded-lg text-sm"
-              />
               <div className="flex gap-2">
                 <div className="flex items-center justify-center px-2.5 h-9 rounded-lg border border-input bg-muted/50 text-xs font-semibold whitespace-nowrap min-w-[56px] shrink-0">
                   {getDialCode(form.country)}
