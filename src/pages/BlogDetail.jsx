@@ -5,6 +5,7 @@ import { ArrowLeft, Calendar, User, CheckCircle2 } from "lucide-react";
 import { db } from "@/api/dataClient";
 import { Button } from "@/components/ui/button";
 import moment from "moment";
+import { toBlogHtml } from "@/lib/blogContent";
 
 const parseList = (val) => {
   if (!val) return [];
@@ -109,12 +110,12 @@ export default function BlogDetail() {
             </div>
           )}
           <article
-            className="bg-white rounded-2xl p-6 sm:p-8 md:p-12 border border-border/50 shadow-sm prose prose-sm sm:prose-base md:prose-lg max-w-none prose-headings:font-heading prose-a:text-primary prose-img:rounded-xl"
+            className="blog-content bg-white rounded-2xl p-6 sm:p-8 md:p-12 border border-border/50 shadow-sm"
             // FIX: content now comes from a WYSIWYG editor (Quill) which outputs HTML,
             // not Markdown — <ReactMarkdown> would have shown raw HTML tags as plain
             // text instead of rendering them. This content is admin-authored only
             // (behind the protected /admin route), not public user input.
-            dangerouslySetInnerHTML={{ __html: post.content }}
+            dangerouslySetInnerHTML={{ __html: toBlogHtml(post.content) }}
           />
 
           {parseList(post.key_points).length > 0 && (

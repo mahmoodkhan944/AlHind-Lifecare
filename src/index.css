@@ -254,3 +254,121 @@ body { top: 0 !important; }
 }
 iframe.goog-te-banner-frame { display: none !important; }
 .skiptranslate iframe { display: none !important; }
+
+
+/* ==========================================================================
+   Blog content — used on the public blog page (.blog-content) and inside the
+   admin editor (.blog-editor) so what you write is what visitors see.
+   ========================================================================== */
+.blog-content,
+.blog-editor .ql-editor {
+  color: hsl(var(--foreground));
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+@media (min-width: 768px) {
+  .blog-content,
+  .blog-editor .ql-editor {
+    font-size: 1.0625rem;
+  }
+}
+
+.blog-content > * + *,
+.blog-editor .ql-editor > * + * {
+  margin-top: 0.9em;
+}
+
+.blog-content h1,
+.blog-content h2,
+.blog-content h3,
+.blog-content h4,
+.blog-editor .ql-editor h1,
+.blog-editor .ql-editor h2,
+.blog-editor .ql-editor h3,
+.blog-editor .ql-editor h4 {
+  font-family: var(--font-heading);
+  color: hsl(var(--secondary));
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+.blog-content h1, .blog-editor .ql-editor h1 { font-size: 2em; font-weight: 800; }
+.blog-content h2, .blog-editor .ql-editor h2 { font-size: 1.6em; font-weight: 700; }
+.blog-content h3, .blog-editor .ql-editor h3 { font-size: 1.3em; font-weight: 700; }
+.blog-content h4, .blog-editor .ql-editor h4 { font-size: 1.1em; font-weight: 700; }
+
+.blog-content h1, .blog-content h2,
+.blog-editor .ql-editor h1, .blog-editor .ql-editor h2 { margin-top: 1.6em; }
+.blog-content h3, .blog-content h4,
+.blog-editor .ql-editor h3, .blog-editor .ql-editor h4 { margin-top: 1.3em; }
+.blog-content > :first-child,
+.blog-editor .ql-editor > :first-child { margin-top: 0; }
+
+.blog-content strong, .blog-content b { font-weight: 700; }
+.blog-content em, .blog-content i { font-style: italic; }
+.blog-content u { text-decoration: underline; }
+.blog-content s { text-decoration: line-through; }
+
+.blog-content a,
+.blog-editor .ql-editor a {
+  color: hsl(var(--primary));
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* Lists (the editor draws its own bullets; this is for the public page) */
+.blog-content ul { list-style: disc; padding-left: 1.5em; }
+.blog-content ol { list-style: decimal; padding-left: 1.5em; }
+.blog-content li { padding-left: 0.25em; }
+.blog-content li + li { margin-top: 0.35em; }
+.blog-content li::marker { color: hsl(var(--primary)); font-weight: 600; }
+.blog-content li.ql-indent-1 { margin-left: 1.5em; list-style-type: circle; }
+.blog-content li.ql-indent-2 { margin-left: 3em; list-style-type: square; }
+.blog-content li.ql-indent-3 { margin-left: 4.5em; }
+.blog-content ol li.ql-indent-1,
+.blog-content ol li.ql-indent-2 { list-style-type: lower-alpha; }
+
+.blog-content blockquote,
+.blog-editor .ql-container .ql-editor blockquote {
+  border-left: 4px solid hsl(var(--primary));
+  background: hsl(var(--muted) / 0.5);
+  padding: 0.75em 1em;
+  border-radius: 0 0.75rem 0.75rem 0;
+  font-style: italic;
+  color: hsl(var(--foreground) / 0.85);
+}
+
+.blog-content img,
+.blog-editor .ql-editor img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.75rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.blog-content .ql-align-center { text-align: center; }
+.blog-content .ql-align-right { text-align: right; }
+.blog-content .ql-align-justify { text-align: justify; }
+
+/* Admin editor frame */
+.blog-editor .ql-toolbar.ql-snow {
+  background: hsl(var(--muted) / 0.6);
+  border: 0;
+  border-bottom: 1px solid hsl(var(--border));
+  padding: 8px 10px;
+}
+.blog-editor .ql-container.ql-snow {
+  border: 0;
+  font-family: var(--font-body);
+}
+.blog-editor .ql-editor {
+  min-height: 420px;
+  padding: 20px 24px;
+}
+.blog-editor .ql-editor.ql-blank::before {
+  font-style: normal;
+  color: hsl(var(--muted-foreground));
+  left: 24px;
+}

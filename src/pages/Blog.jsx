@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Calendar, User, ArrowUpRight, Newspaper } from "lucide-react";
+import { Calendar, User, ArrowUpRight, ArrowRight, Newspaper } from "lucide-react";
 import { db } from "@/api/dataClient";
 import moment from "moment";
 
@@ -127,8 +127,14 @@ export default function Blog() {
                           <span className="flex items-center gap-1 text-primary font-semibold opacity-0 group-hover:opacity-100 transition-opacity">
                             Read <ArrowUpRight className="w-3.5 h-3.5" />
                           </span>
-                        )}
+                                                )}
                       </div>
+
+                      {/* Read button — the whole card is already a link, so this is styled as a button */}
+                      <span className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full border border-primary/30 bg-primary/5 px-4 py-2.5 text-sm font-semibold text-primary transition-colors group-hover:bg-primary group-hover:text-white">
+                        Read Full Article
+                        <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                      </span>
                     </div>
                   </Link>
                 </motion.div>

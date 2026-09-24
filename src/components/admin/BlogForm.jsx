@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { ArrowLeft, Loader2, Upload, ImageIcon, Save, X } from "lucide-react";
@@ -10,6 +10,8 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/components/ui/use-toast";
 import DynamicListField from "@/components/admin/DynamicListField";
+import AutocompleteInput from "@/components/admin/AutocompleteInput";
+import { toBlogHtml } from "@/lib/blogContent";
 
 const parseList = (val) => {
   if (!val) return [];
@@ -22,7 +24,9 @@ const parseList = (val) => {
   }
 };
 
-const CATEGORIES = [
+// Starter suggestions. Any category typed in the form is saved with the post
+// and automatically shows up in the suggestions next time.
+const STARTER_CATEGORIES = [
   "General Health",
   "Cardiology",
   "Oncology",
@@ -34,16 +38,60 @@ const CATEGORIES = [
   "Medical Tourism Tips",
 ];
 
+// Trim, drop blanks and case-insensitive duplicates, sort A→Z
+function uniqueCategories(list) {
+  const seen = new Map();
+  list.forEach((c) => {
+    const name = String(c || "").trim().replace(/\s+/g, " ");
+    if (name && !seen.has(name.toLowerCase())) seen.set(name.toLowerCase(), name);
+  });
+  return [...seen.values()].sort((a, b) => a.localeCompare(b));
+}
+
+// "cardiology " -> "Cardiology" if that category already exists
+function matchCategory(value, options) {
+  const name = String(value || "").trim().replace(/\s+/g, " ");
+  return options.find((o) => o.toLowerCase() === name.toLowerCase()) || name;
+}
+
+// Toolbar "image" button: uploads the picture to storage and inserts its URL
+// (instead of Quill's default, which stuffs the whole image into the text).
+function uploadImageIntoEditor() {
+  const quill = this.quill;
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "image/*";
+  input.onchange = async () => {
+    const file = input.files?.[0];
+    if (!file) return;
+    const range = quill.getSelection(true);
+    try {
+      const { file_url } = await db.integrations.Core.UploadFile({ file });
+      quill.insertEmbed(range.index, "image", file_url, "user");
+      quill.setSelection(range.index + 1, 0);
+    } catch (err) {
+      window.alert(`Image upload failed: ${err?.message || "please try again"}`);
+    }
+  };
+  input.click();
+}
+
 const QUILL_MODULES = {
-  toolbar: [
-    [{ header: [1, 2, 3, false] }],
-    ["bold", "italic", "underline", "strike"],
-    [{ align: [] }],
-    [{ list: "ordered" }, { list: "bullet" }],
-    ["blockquote"],
-    ["link"],
-    ["clean"],
-  ],
+  toolbar: {
+    container: [
+      [{ header: [1, 2, 3, 4, false] }],
+      ["bold", "italic", "underline", "strike"],
+      [{ color: [] }, { background: [] }],
+      [{ list: "ordered" }, { list: "bullet" }, { indent: "-1" }, { indent: "+1" }],
+      [{ align: [] }],
+      ["blockquote", "link", "image"],
+      ["clean"],
+    ],
+    handlers: { image: uploadImageIntoEditor },
+  },
+  // Stops Quill adding extra empty lines when content is loaded or pasted,
+  // so a post looks the same after "Edit" -> "Update".
+  clipboard: { matchVisual: false },
 };
 
 const slugify = (str) =>
@@ -67,6 +115,8 @@ export default function BlogForm({ initialData, onCancel, onSaved }) {
     }
     return {
       ...initialData,
+      // Older posts may be Markdown — convert so the editor shows headings/bold/lists
+      content: toBlogHtml(initialData.content),
       key_points: parseList(initialData.key_points),
       additional_images: parseList(initialData.additional_images),
       publication_date: initialData.publication_date
@@ -77,6 +127,14 @@ export default function BlogForm({ initialData, onCancel, onSaved }) {
   const [saving, setSaving] = useState(false);
   const [uploadingFeatured, setUploadingFeatured] = useState(false);
   const [uploadingAdditional, setUploadingAdditional] = useState(false);
+  const [categoryOptions, setCategoryOptions] = useState(STARTER_CATEGORIES);
+
+  // Categories already used by any blog post (published or draft)
+  useEffect(() => {
+    db.entities.BlogPost.list("-created_date", 1000)
+      .then((posts) => setCategoryOptions(uniqueCategories([...posts.map((p) => p.category), ...STARTER_CATEGORIES])))
+      .catch(() => {});
+  }, []);
 
   const set = (key, val) => setForm((p) => ({ ...p, [key]: val }));
 
@@ -131,7 +189,7 @@ export default function BlogForm({ initialData, onCancel, onSaved }) {
       toast({ title: "Excerpt is required", variant: "destructive" });
       return;
     }
-    if (!form.category) {
+      if (!String(form.category || "").trim()) {
       toast({ title: "Category is required", variant: "destructive" });
       return;
     }
@@ -154,6 +212,7 @@ export default function BlogForm({ initialData, onCancel, onSaved }) {
     const data = {
       ...form,
       slug,
+      category: matchCategory(form.category, categoryOptions),
       status: form.status || "draft",
       featured: !!form.featured,
       key_points: JSON.stringify(form.key_points || []),
@@ -240,18 +299,12 @@ export default function BlogForm({ initialData, onCancel, onSaved }) {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <Field label="Category" required>
-                <Select value={form.category || ""} onValueChange={(v) => set("category", v)}>
-                  <SelectTrigger className="h-10 rounded-lg border-border">
-                    <SelectValue placeholder="Select category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {CATEGORIES.map((c) => (
-                      <SelectItem key={c} value={c}>
-                        {c}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <AutocompleteInput
+                  value={form.category || ""}
+                  onChange={(v) => set("category", v)}
+                  options={categoryOptions}
+                  placeholder="Select or type a new category"
+                />
               </Field>
               <Field label="Author">
                 <Input
@@ -282,7 +335,7 @@ export default function BlogForm({ initialData, onCancel, onSaved }) {
             or a PDF — headings, bold, lists, and other formatting will be preserved automatically.
           </p>
           <Field label="Main Content" required>
-            <div className="rounded-lg border border-border overflow-hidden bg-white">
+            <div className="blog-editor rounded-lg border border-border overflow-hidden bg-white">
               <ReactQuill
                 theme="snow"
                 value={form.content || ""}
