@@ -113,32 +113,7 @@ export default function Doctors() {
             Browse our network of world-renowned specialists across leading hospitals in India and
             Turkey, and get matched with the right expert for your treatment.
           </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15 }}
-            className="grid grid-cols-3 gap-4 sm:gap-8 max-w-xl"
-          >
-            <div>
-              <p className="font-heading font-extrabold text-3xl sm:text-4xl text-white leading-tight">
-                {doctors.length > 0 ? formatCountApprox(doctors.length) : "500+"}
-              </p>
-              <p className="text-white/70 text-xs sm:text-sm mt-1">Expert Doctors</p>
-            </div>
-            <div>
-              <p className="font-heading font-extrabold text-3xl sm:text-4xl text-white leading-tight">
-                {specialities.length > 0 ? formatCountApprox(specialities.length) : "50+"}
-              </p>
-              <p className="text-white/70 text-xs sm:text-sm mt-1">Specialities</p>
-            </div>
-            <div>
-              <p className="font-heading font-extrabold text-3xl sm:text-4xl text-white leading-tight">
-                {avgRating}
-              </p>
-              <p className="text-white/70 text-xs sm:text-sm mt-1">Average Rating</p>
-            </div>
-          </motion.div>
+          
         </div>
 
       </section>

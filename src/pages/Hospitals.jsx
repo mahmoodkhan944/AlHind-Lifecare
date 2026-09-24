@@ -97,32 +97,6 @@ export default function Hospitals() {
             Discover top-rated hospitals and medical centers equipped with advanced technology, expert
             staff, and comprehensive healthcare services.
           </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15 }}
-            className="grid grid-cols-3 gap-4 sm:gap-8 max-w-xl"
-          >
-            <div>
-              <p className="font-heading font-extrabold text-3xl sm:text-4xl text-white leading-tight">
-                {hospitals.length > 0 ? formatCountApprox(hospitals.length) : "50+"}
-              </p>
-              <p className="text-white/70 text-xs sm:text-sm mt-1">Medical Facilities</p>
-            </div>
-            <div>
-              <p className="font-heading font-extrabold text-3xl sm:text-4xl text-white leading-tight">
-                {totalBeds > 0 ? formatCountApprox(totalBeds) : "2500+"}
-              </p>
-              <p className="text-white/70 text-xs sm:text-sm mt-1">Total Beds</p>
-            </div>
-            <div>
-              <p className="font-heading font-extrabold text-3xl sm:text-4xl text-white leading-tight">
-                {avgRating}
-              </p>
-              <p className="text-white/70 text-xs sm:text-sm mt-1">Average Rating</p>
-            </div>
-          </motion.div>
         </div>
       </section>
 
