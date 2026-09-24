@@ -35,17 +35,28 @@ export default function Navbar() {
 
   useEffect(() => setMobileOpen(false), [location]);
 
+  // Detail pages (a doctor, hospital or treatment) start with a light
+  // background, so white navbar text would be invisible there. On those
+  // pages the navbar is always solid; elsewhere it's transparent over the
+  // dark hero until the user scrolls.
+  const lightTopPage = /^\/(doctors|hospitals|treatments)\/[^/]+/.test(location.pathname);
+  const solid = scrolled || lightTopPage;
+
+  // "Treatments" stays highlighted on /treatments/Neurology too
+  const isActive = (path) =>
+    path === "/" ? location.pathname === "/" : location.pathname === path || location.pathname.startsWith(path + "/");
+
   return (
     <motion.header
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        scrolled ? "bg-white/90 backdrop-blur-xl shadow-lg shadow-primary/5" : "bg-transparent"
+        solid ? "bg-white/90 backdrop-blur-xl shadow-lg shadow-primary/5" : "bg-transparent"
       }`}
     >
-      {/* Subtle brand accent line — only visible once scrolled, ties the nav to
+      {/* Subtle brand accent line — only visible once solid (scrolled or detail page), ties the nav to
           the same coral CTA color used everywhere else on the site. */}
-      {scrolled && (
+      {solid && (
         <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
       )}
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
@@ -64,9 +75,9 @@ export default function Navbar() {
                 key={link.path}
                 to={link.path}
                 className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                  location.pathname === link.path
-                    ? scrolled ? "text-primary bg-primary/10" : "text-white bg-white/20"
-                    : scrolled ? "text-foreground/70 hover:text-primary hover:bg-primary/5" : "text-white/80 hover:text-white hover:bg-white/10"
+                  isActive(link.path)
+                    ? solid ? "text-primary bg-primary/10" : "text-white bg-white/20"
+                    : solid ? "text-foreground/70 hover:text-primary hover:bg-primary/5" : "text-white/80 hover:text-white hover:bg-white/10"
                 }`}
               >
                 {link.label}
@@ -75,8 +86,8 @@ export default function Navbar() {
           </nav>
 
           <div className="hidden lg:flex items-center gap-3">
-            <SmartSearch scrolled={scrolled} />
-            <LanguageSelector light={!scrolled} />
+            <SmartSearch scrolled={solid} />
+            <LanguageSelector light={!solid} />
             
             <Button
               onClick={() => openLeadModal({ title: "Free Consultation" })}
@@ -87,8 +98,8 @@ export default function Navbar() {
           </div>
 
           <div className="lg:hidden flex items-center gap-1">
-            <SmartSearch scrolled={scrolled} />
-            <button onClick={() => setMobileOpen(!mobileOpen)} className={`p-2 rounded-lg ${scrolled ? "text-foreground" : "text-white"}`}>
+            <SmartSearch scrolled={solid} />
+            <button onClick={() => setMobileOpen(!mobileOpen)} className={`p-2 rounded-lg ${solid ? "text-foreground" : "text-white"}`}>
             {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
@@ -112,7 +123,7 @@ export default function Navbar() {
                   key={link.path}
                   to={link.path}
                   className={`block px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
-                    location.pathname === link.path ? "text-primary bg-primary/10" : "text-foreground/70 hover:bg-muted"
+                    isActive(link.path) ? "text-primary bg-primary/10" : "text-foreground/70 hover:bg-muted"
                   }`}
                 >
                   {link.label}

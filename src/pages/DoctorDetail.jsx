@@ -190,8 +190,8 @@ export default function DoctorDetail() {
                       )}
                     </div>
                     {doctor.rating > 0 && (
-                      <div className="text-right shrink-0">
-                        <div className="flex items-center gap-1 justify-end">
+                      <div className="inline-flex flex-col items-center text-center shrink-0 self-start">
+                        <div className="flex items-center justify-center gap-1">
                           <Star className="w-4 h-4 fill-[hsl(var(--accent-warm))] text-[hsl(var(--accent-warm))]" />
                           <span className="font-heading font-bold text-sm sm:text-base text-foreground">{doctor.rating}</span>
                         </div>
@@ -204,7 +204,7 @@ export default function DoctorDetail() {
 
               {/* Stat row — compact, icon + text side by side */}
               {(doctor.experience_years > 0 || parseList(doctor.specializations).length > 0 || doctor.city) && (
-                <div className="flex flex-wrap gap-x-5 gap-y-2 mt-3 pt-3 border-t border-border">
+                                <div className="flex flex-wrap gap-x-10 sm:gap-x-16 gap-y-3 mt-3 pt-3 border-t border-border">
                   {doctor.experience_years > 0 && (
                     <div className="flex items-center gap-2">
                       <span className="flex items-center justify-center w-7 h-7 rounded-md bg-accent-jade/10 text-accent-jade shrink-0">
