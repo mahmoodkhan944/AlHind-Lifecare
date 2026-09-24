@@ -29,7 +29,9 @@ function throwIfError(error) {
  *   entity.update(id, data)
  *   entity.delete(id)
  */
-export function createEntity(tableName) {
+export function createEntity(tableName, options = {}) {
+  const { publicInsert = false, ignoreDuplicates = false } = options;
+
   return {
     async list(sort, limit) {
       let query = supabase.from(tableName).select('*');
@@ -61,6 +63,17 @@ export function createEntity(tableName) {
     },
 
     async create(payload) {
+      // Public form tables (leads, newsletter, appointments): visitors may
+      // INSERT but not SELECT (RLS), so `.select()` after insert would fail
+      // with "new row violates row-level security policy". Insert without
+      // reading the row back.
+      if (publicInsert) {
+        const { error } = await supabase.from(tableName).insert(payload);
+        // 23505 = unique violation (e.g. already-subscribed email) — treat as success
+        if (error && !(ignoreDuplicates && error.code === '23505')) throwIfError(error);
+        return { ...payload };
+      }
+
       const { data, error } = await supabase.from(tableName).insert(payload).select().single();
       throwIfError(error);
       return data;
