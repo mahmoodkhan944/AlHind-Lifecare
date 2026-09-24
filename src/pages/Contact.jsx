@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Phone, Mail, MapPin, MessageCircle, Send, Clock, Building2 } from "lucide-react";
 import { db } from "@/api/dataClient";
+import { validatePhone, friendlyError } from "@/lib/formValidation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -25,15 +26,21 @@ export default function Contact() {
     message: "",
   });
 
-  const handleSubmit = async (e) => {
+    const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
+    const check = await validatePhone(form.phone, form.country);
+    if (!check.valid) {
+      toast({ title: "Invalid phone number", description: check.error, variant: "destructive" });
+      setSubmitting(false);
+      return;
+    }
     try {
-      await db.entities.Lead.create({ ...form, email: "", source: "website" });
+      await db.entities.Lead.create({ ...form, phone: check.formatted, email: "", source: "website" });
       toast({ title: "Thank you!", description: "We'll get back to you within 24 hours." });
       setForm({ patient_name: "", phone: "", country: "", treatment_interest: "", message: "" });
-    } catch {
-      toast({ title: "Error", description: "Something went wrong. Please try again.", variant: "destructive" });
+    } catch (err) {
+      toast({ title: "Error", description: friendlyError(err), variant: "destructive" });
     } finally {
       setSubmitting(false);
     }
@@ -90,11 +97,13 @@ export default function Contact() {
                       />
                     </div>
                     <div>
-                      <label className="text-sm font-medium mb-1.5 block">Phone</label>
+                      <label className="text-sm font-medium mb-1.5 block">Phone *</label>
                       <Input
+                        required
+                        type="tel"
                         value={form.phone}
                         onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                        placeholder="+1 234 567 8900"
+                        placeholder="+91 98765 43210"
                         className="h-11 rounded-xl"
                       />
                     </div>

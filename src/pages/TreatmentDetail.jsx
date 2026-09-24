@@ -43,6 +43,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { useToast } from "@/components/ui/use-toast";
 import { useLeadModal } from "@/lib/LeadModalContext";
 import { COUNTRIES, getDialCode } from "@/lib/countries";
+import { validatePhone, friendlyError } from "@/lib/formValidation";
 import { useSiteSettings, DEFAULT_SETTINGS, getWhatsAppLink } from "@/hooks/useSiteSettings";
 import { slugify } from "@/lib/slugify";
 import { useDocumentMeta } from "@/hooks/useDocumentMeta";
@@ -236,15 +237,21 @@ function LandingPage({ treatment, relatedDoctors, relatedHospitals, faqs, openLe
   const country = offersBoth ? selectedDestination : countryLabel(treatment.country);
   const keyBenefits = parseList(treatment.key_benefits);
 
-  const handleSubmit = async (e) => {
+    const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.patient_name || !form.phone) return;
     setSubmitting(true);
+    const check = await validatePhone(form.phone, form.country);
+    if (!check.valid) {
+      toast({ title: check.error, variant: "destructive" });
+      setSubmitting(false);
+      return;
+    }
     try {
       await db.entities.Lead.create({
         patient_name: form.patient_name,
         email: form.email || "",
-        phone: `${getDialCode(form.country)} ${form.phone}`,
+        phone: check.formatted,
         country: form.country,
         treatment_interest: offersBoth ? `${treatment.name} (${selectedDestination})` : treatment.name,
         message: `Preferred destination: ${country}${form.message ? `\n\n${form.message}` : ""}`,
@@ -253,8 +260,8 @@ function LandingPage({ treatment, relatedDoctors, relatedHospitals, faqs, openLe
       });
       toast({ title: "Thank you! Our team will contact you shortly." });
       setForm({ patient_name: "", email: "", country: "Select Country", phone: "", message: "" });
-    } catch {
-      toast({ title: "Something went wrong. Please try again.", variant: "destructive" });
+    } catch (err) {
+      toast({ title: friendlyError(err), variant: "destructive" });
     }
     setSubmitting(false);
   };

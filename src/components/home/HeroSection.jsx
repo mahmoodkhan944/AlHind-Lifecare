@@ -8,6 +8,7 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 import { db } from "@/api/dataClient";
 import { useToast } from "@/components/ui/use-toast";
 import { COUNTRIES, getDialCode } from "@/lib/countries";
+import { validatePhone, friendlyError } from "@/lib/formValidation";
 import { useLeadModal } from "@/lib/LeadModalContext";
 import { Link } from "react-router-dom";
 import { useSiteSettings, DEFAULT_SETTINGS } from "@/hooks/useSiteSettings";
@@ -71,15 +72,21 @@ export default function HeroSection() {
     }
   }, [videoReady]);
 
-  const handleSubmit = async (e) => {
+    const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.patient_name || !form.phone) return;
     setLoading(true);
+    const check = await validatePhone(form.phone, form.country);
+    if (!check.valid) {
+      toast({ title: check.error, variant: "destructive" });
+      setLoading(false);
+      return;
+    }
     try {
       await db.entities.Lead.create({
         patient_name: form.patient_name,
         email: "",
-        phone: `${getDialCode(form.country)} ${form.phone}`,
+        phone: check.formatted,
         country: form.country,
         message: `City: ${form.city || "N/A"} | Age/DOB: ${form.age || "N/A"} | Problem: ${form.medical_problem}`,
         source: "website",
@@ -87,8 +94,8 @@ export default function HeroSection() {
       });
       toast({ title: "Thank you! Our team will contact you shortly." });
       setForm({ patient_name: "", country: "Select Country", city: "", phone: "", medical_problem: "", age: "" });
-    } catch {
-      toast({ title: "Something went wrong. Please try again.", variant: "destructive" });
+    } catch (err) {
+      toast({ title: friendlyError(err), variant: "destructive" });
     }
     setLoading(false);
   };
