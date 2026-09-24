@@ -72,7 +72,7 @@ export default function HeroSection() {
     }
   }, [videoReady]);
 
-    const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.patient_name || !form.phone) return;
     setLoading(true);
