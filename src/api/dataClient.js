@@ -11,6 +11,7 @@ export const db = {
     Hospital: createEntity('hospitals'),
     Lead: createEntity('leads', { publicInsert: true }),
     Newsletter: createEntity('newsletter_subscribers', { publicInsert: true, ignoreDuplicates: true }),
+    Package: createEntity('packages'),
     Quote: createEntity('quotes'),
     SiteSettings: createEntity('site_settings'),
     SiteContent: createEntity('site_content_items'),

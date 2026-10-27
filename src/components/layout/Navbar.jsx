@@ -13,6 +13,7 @@ const navLinks = [
   { label: "Home", path: "/" },
   { label: "About", path: "/about" },
   { label: "Treatments", path: "/treatments" },
+  { label: "Packages", path: "/packages" },
   { label: "Doctors", path: "/doctors" },
   { label: "Hospitals", path: "/hospitals" },
   { label: "Blog", path: "/blog" },
@@ -39,7 +40,7 @@ export default function Navbar() {
   // background, so white navbar text would be invisible there. On those
   // pages the navbar is always solid; elsewhere it's transparent over the
   // dark hero until the user scrolls.
-  const lightTopPage = /^\/(doctors|hospitals|treatments)\/[^/]+/.test(location.pathname);
+  const lightTopPage = /^\/(doctors|hospitals|treatments|packages)\/[^/]+/.test(location.pathname);
   const solid = scrolled || lightTopPage;
 
   // "Treatments" stays highlighted on /treatments/Neurology too
@@ -69,12 +70,12 @@ export default function Navbar() {
             />
           </Link>
 
-          <nav className="hidden lg:flex items-center gap-1">
+          <nav className="hidden lg:flex items-center gap-0.5 xl:gap-1">
             {navLinks.map((link) => (
               <Link
                 key={link.path}
                 to={link.path}
-                className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                className={`px-2 xl:px-3 py-2 rounded-lg text-[13px] xl:text-sm font-medium whitespace-nowrap transition-all duration-200 ${
                   isActive(link.path)
                     ? solid ? "text-primary bg-primary/10" : "text-white bg-white/20"
                     : solid ? "text-foreground/70 hover:text-primary hover:bg-primary/5" : "text-white/80 hover:text-white hover:bg-white/10"
@@ -85,13 +86,13 @@ export default function Navbar() {
             ))}
           </nav>
 
-          <div className="hidden lg:flex items-center gap-3">
+          <div className="hidden lg:flex items-center gap-2 xl:gap-3">
             <SmartSearch scrolled={solid} />
             <LanguageSelector light={!solid} />
             
             <Button
               onClick={() => openLeadModal({ title: "Free Consultation" })}
-              className="bg-gradient-to-r from-primary to-secondary text-white rounded-full px-6 shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 hover:scale-105 transition-all font-semibold"
+              className="bg-gradient-to-r from-primary to-secondary text-white rounded-full px-4 xl:px-6 shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 hover:scale-105 transition-all font-semibold"
             >
               Free Consultation
             </Button>

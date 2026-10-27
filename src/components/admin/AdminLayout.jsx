@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { LayoutDashboard, Stethoscope, Building2, Heart, FileText, MessageSquare, Users, CalendarDays, HelpCircle, Mail, Settings, Menu, X, ChevronLeft, ClipboardList, LayoutList, LogOut, Info } from "lucide-react";
+import { LayoutDashboard, Stethoscope, Building2, Heart, FileText, MessageSquare, Users, CalendarDays, HelpCircle, Mail, Settings, Menu, X, ChevronLeft, ClipboardList, LayoutList, LogOut, Info, Package } from "lucide-react";
 import LanguageSelector from "@/components/common/LanguageSelector";
 import { LOGO_URL } from "@/lib/brand-assets";
 import { useAuth } from "@/lib/AuthContext";
@@ -12,6 +12,7 @@ const navItems = [
   { icon: Stethoscope, label: "Doctors", path: "/admin/doctors" },
   { icon: Building2, label: "Hospitals", path: "/admin/hospitals" },
   { icon: Heart, label: "Treatments", path: "/admin/treatments" },
+  { icon: Package, label: "Packages", path: "/admin/packages" },
   { icon: CalendarDays, label: "Appointments", path: "/admin/appointments" },
   { icon: FileText, label: "Blog Posts", path: "/admin/blog" },
   { icon: MessageSquare, label: "Testimonials", path: "/admin/testimonials" },

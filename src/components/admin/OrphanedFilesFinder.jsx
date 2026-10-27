@@ -35,6 +35,7 @@ function pathFromUrl(url) {
 // else is a plain text column.
 const SOURCES = [
   { entity: "Treatment", fields: ["image_url"] },
+  { entity: "Package", fields: ["image_url"], listFields: ["gallery_images"] },
   { entity: "Hospital", fields: ["cover_image_url"] },
   { entity: "Doctor", fields: ["photo_url", "award_document_url"] },
   { entity: "BlogPost", fields: ["cover_image_url"], listFields: ["additional_images"] },

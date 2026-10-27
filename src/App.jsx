@@ -20,6 +20,8 @@ const Hospitals = lazy(() => import('@/pages/Hospitals'));
 const HospitalDetail = lazy(() => import('@/pages/HospitalDetail'));
 const Treatments = lazy(() => import('@/pages/Treatments'));
 const TreatmentDetail = lazy(() => import('@/pages/TreatmentDetail'));
+const Packages = lazy(() => import('@/pages/Packages'));
+const PackageDetail = lazy(() => import('@/pages/PackageDetail'));
 const Blog = lazy(() => import('@/pages/Blog'));
 const BlogDetail = lazy(() => import('@/pages/BlogDetail'));
 const Testimonials = lazy(() => import('@/pages/Testimonials'));
@@ -43,6 +45,7 @@ const TreatmentRequests = lazy(() => import('@/pages/admin/TreatmentRequests'));
 const AdminDoctors = lazy(() => import('@/pages/admin/AdminDoctors'));
 const AdminHospitals = lazy(() => import('@/pages/admin/AdminHospitals'));
 const AdminTreatments = lazy(() => import('@/pages/admin/AdminTreatments'));
+const AdminPackages = lazy(() => import('@/pages/admin/AdminPackages'));
 const AdminBlog = lazy(() => import('@/pages/admin/AdminBlog'));
 const AdminTestimonials = lazy(() => import('@/pages/admin/AdminTestimonials'));
 const AdminAppointments = lazy(() => import('@/pages/admin/AdminAppointments'));
@@ -77,6 +80,8 @@ const AuthenticatedApp = () => {
         <Route path="/treatments" element={<Treatments />} />
         <Route path="/treatments/:slug" element={<TreatmentDetail />} />
         <Route path="/landing/:slug" element={<TreatmentDetail forceLanding />} />
+        <Route path="/packages" element={<Packages />} />
+        <Route path="/packages/:slug" element={<PackageDetail />} />
         <Route path="/blog" element={<Blog />} />
         <Route path="/blog/:id" element={<BlogDetail />} />
         <Route path="/testimonials" element={<Testimonials />} />
@@ -104,6 +109,7 @@ const AuthenticatedApp = () => {
           <Route path="/admin/doctors" element={<AdminDoctors />} />
           <Route path="/admin/hospitals" element={<AdminHospitals />} />
           <Route path="/admin/treatments" element={<AdminTreatments />} />
+          <Route path="/admin/packages" element={<AdminPackages />} />
           <Route path="/admin/blog" element={<AdminBlog />} />
           <Route path="/admin/testimonials" element={<AdminTestimonials />} />
           <Route path="/admin/appointments" element={<AdminAppointments />} />

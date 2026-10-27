@@ -45,6 +45,7 @@ export default function Footer() {
   const quickLinks = [
     { label: "Home", path: "/" },
     { label: "About Us", path: "/about" },
+    { label: "Treatment Packages", path: "/packages" },
     { label: "Privacy Policy", path: "/privacy-policy" },
     { label: "Terms & Conditions", path: "/terms" },
     { label: "Disclaimer", path: "/terms" },
