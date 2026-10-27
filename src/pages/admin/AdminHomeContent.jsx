@@ -40,6 +40,17 @@ const SECTIONS = [
     titleLabel: "Heading",
   },
   {
+    key: "home_packages_header",
+    label: "Packages Header",
+    singleton: true,
+    hasDescription: true,
+    descLabel: "Subtitle",
+    hasLink: true,
+    linkLabel: "Eyebrow Badge Text",
+    linkPlaceholder: "Treatment Packages",
+    titleLabel: "Heading",
+  },
+  {
     key: "home_doctors_header",
     label: "Doctors Header",
     singleton: true,
@@ -143,7 +154,7 @@ export default function AdminHomeContent() {
   return (
     <SiteContentManager
       title="Homepage"
-      description="Every editable block on the homepage, top to bottom — hero headline, the quote form card, every section's heading/subtitle, and the item lists under them (specialties, process steps, services). Doctors, Hospitals, Treatments, Testimonials, Blog Posts, and FAQs are managed from their own tabs in the sidebar."
+      description="Every editable block on the homepage, top to bottom — hero headline, the quote form card, every section's heading/subtitle, and the item lists under them (specialties, process steps, services). Doctors, Hospitals, Treatments, Packages, Testimonials, Blog Posts, and FAQs are managed from their own tabs in the sidebar."
       sections={SECTIONS}
     />
   );

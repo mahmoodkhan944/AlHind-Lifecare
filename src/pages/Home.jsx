@@ -2,6 +2,7 @@ import React from "react";
 import HeroSection from "@/components/home/HeroSection";
 import HospitalsByCountry from "@/components/home/HospitalsByCountry";
 import TopDoctors from "@/components/home/TopDoctors";
+import FeaturedPackages from "@/components/home/FeaturedPackages";
 import MultiSpecialtyFocus from "@/components/home/MultiSpecialtyFocus";
 import LowestQuotes from "@/components/home/LowestQuotes";
 import AboutUs from "@/components/home/AboutUs";
@@ -16,6 +17,7 @@ export default function Home() {
     <div className="mesh-bg">
       <HeroSection />
       <HospitalsByCountry />
+      <FeaturedPackages />
       <TopDoctors />
       <MultiSpecialtyFocus />
       <LowestQuotes />
