@@ -10,15 +10,22 @@ import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover
 import { Command, CommandInput, CommandList, CommandEmpty, CommandItem } from "@/components/ui/command";
 import { useToast } from "@/components/ui/use-toast";
 import DynamicListField from "@/components/admin/DynamicListField";
+import SectionOrderEditor from "@/components/admin/SectionOrderEditor";
+import { PackageDetailsEditor, TreatmentInfoEditor } from "@/components/admin/PackageDetailsEditor";
 import { slugify } from "@/lib/slugify";
 import {
   PACKAGE_COUNTRIES,
   parseList,
   toNumber,
   discountPercent,
+  uid,
+  DEFAULT_PACKAGE_SECTIONS,
+  defaultPackageDetails,
+  resolvePackageDetails,
+  cleanDetails,
 } from "@/lib/packageUtils";
 
-const LIST_FIELDS = ["inclusions", "exclusions", "highlights", "itinerary", "gallery_images", "faqs"];
+const LIST_FIELDS = ["highlights", "itinerary", "gallery_images", "faqs", "section_config"];
 
 const DEFAULT_INCLUSIONS = [
   "Treatment / surgery fees",
@@ -38,8 +45,9 @@ export default function PackageForm({ initialData, onCancel, onSaved }) {
       return {
         status: "active",
         currency: "USD",
-        inclusions: DEFAULT_INCLUSIONS,
-        exclusions: [],
+        package_details: defaultPackageDetails(DEFAULT_INCLUSIONS),
+        treatment_info: [],
+        section_config: [],
         highlights: [],
         itinerary: [],
         gallery_images: [],
@@ -50,6 +58,10 @@ export default function PackageForm({ initialData, onCancel, onSaved }) {
     LIST_FIELDS.forEach((k) => {
       f[k] = parseList(initialData[k]);
     });
+    // Older packages keep their Overview / Included / Not Included text: it's
+    // moved into the matching Package Details items here.
+    f.package_details = resolvePackageDetails(initialData);
+    f.treatment_info = parseList(initialData.treatment_info).map((t) => ({ id: uid(), question: t?.question || "", answer: t?.answer || "" }));
     return f;
   });
   const [slugTouched, setSlugTouched] = useState(isEdit && !!initialData?.slug);
@@ -187,8 +199,17 @@ export default function PackageForm({ initialData, onCancel, onSaved }) {
       currency: form.currency || "USD",
       featured: !!form.featured,
       status: form.status || "active",
-      inclusions: JSON.stringify((form.inclusions || []).filter((s) => String(s).trim())),
-      exclusions: JSON.stringify((form.exclusions || []).filter((s) => String(s).trim())),
+      package_details: JSON.stringify(cleanDetails(form.package_details)),
+      treatment_info: JSON.stringify(
+        (form.treatment_info || [])
+          .map((t) => ({ question: t.question.trim(), answer: t.answer.trim() }))
+          .filter((t) => t.question || t.answer)
+      ),
+      section_config: JSON.stringify(form.section_config || []),
+      // Replaced by Package Details — cleared so old copies can't come back.
+      description: null,
+      inclusions: null,
+      exclusions: null,
       highlights: JSON.stringify((form.highlights || []).filter((s) => String(s).trim())),
       itinerary: JSON.stringify((form.itinerary || []).filter((s) => String(s).trim())),
       gallery_images: JSON.stringify(form.gallery_images || []),
@@ -388,17 +409,22 @@ export default function PackageForm({ initialData, onCancel, onSaved }) {
           <Field label="Short Description" hint="One or two lines, shown on the details page header">
             <Input value={form.short_description || ""} onChange={(e) => set("short_description", e.target.value)} placeholder="Short summary" className="h-10 rounded-lg" />
           </Field>
-          <Field label="Package Overview">
-            <Textarea value={form.description || ""} onChange={(e) => set("description", e.target.value)} placeholder="Full description of the package" className="rounded-lg min-h-[120px]" rows={5} />
-          </Field>
         </Card>
 
         <DynamicListField label="Highlights" placeholder="e.g. FUE technique, up to 4000 grafts" optional values={form.highlights} onChange={(v) => set("highlights", v)} />
-        <DynamicListField label="What's Included" placeholder="Included item" values={form.inclusions} onChange={(v) => set("inclusions", v)} />
-        <DynamicListField label="Not Included" placeholder="Excluded item" optional values={form.exclusions} onChange={(v) => set("exclusions", v)} />
+        <PackageDetailsEditor value={form.package_details} onChange={(v) => set("package_details", v)} />
         <DynamicListField label="Day-by-Day Plan" placeholder="e.g. Day 1: Arrival, airport pick-up and hotel check-in" optional values={form.itinerary} onChange={(v) => set("itinerary", v)} />
 
+        <TreatmentInfoEditor value={form.treatment_info} onChange={(v) => set("treatment_info", v)} />
+
         <FaqEditor values={form.faqs || []} onChange={(v) => set("faqs", v)} />
+
+        <SectionOrderEditor
+          label="Page Section Order"
+          defaultSections={DEFAULT_PACKAGE_SECTIONS}
+          value={form.section_config}
+          onChange={(v) => set("section_config", v)}
+        />
 
         <Card title="SEO Settings">
           <Field label="Meta Title (optional)">

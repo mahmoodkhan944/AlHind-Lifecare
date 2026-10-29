@@ -31,6 +31,9 @@ import {
   formatPrice,
   discountPercent,
   pluralize,
+  resolvePackageDetails,
+  resolvePackageSections,
+  detailHasContent,
 } from "@/lib/packageUtils";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -149,10 +152,97 @@ export default function PackageDetail() {
   const label = pkg.category || treatment?.name;
   const location = [pkg.city || hospital?.city, pkg.country || hospital?.country].filter(Boolean).join(", ");
   const highlights = parseList(pkg.highlights);
-  const inclusions = parseList(pkg.inclusions);
-  const exclusions = parseList(pkg.exclusions);
+  const details = resolvePackageDetails(pkg).filter(detailHasContent);
+  const treatmentInfo = parseList(pkg.treatment_info).filter((t) => t?.question || t?.answer);
   const itinerary = parseList(pkg.itinerary);
   const faqs = parseList(pkg.faqs).filter((f) => f?.question);
+
+  // Sections in the order the admin chose (Admin → Package → Page Section Order).
+  const sections = resolvePackageSections(pkg.section_config).filter((sec) => sec.visible !== false);
+  const renderSection = ({ key, title }) => {
+    switch (key) {
+      case "highlights":
+        return highlights.length > 0 ? (
+          <Section title={title}>
+            <div className="grid sm:grid-cols-2 gap-2.5">
+              {highlights.map((h, i) => (
+                <div key={i} className="flex items-start gap-2.5 bg-accent-warm/10 rounded-xl px-3.5 py-3 text-sm">
+                  <Sparkles className="w-4 h-4 text-accent-warm shrink-0 mt-0.5" /> {h}
+                </div>
+              ))}
+            </div>
+          </Section>
+        ) : null;
+      case "package_details":
+        return details.length > 0 ? (
+          <Section title={title}>
+            <Accordion type="multiple" defaultValue={[details[0].id]} className="space-y-2.5">
+              {details.map((item) => (
+                <AccordionItem key={item.id} value={item.id} className="border border-border rounded-xl px-4 sm:px-5 bg-white">
+                  <AccordionTrigger className="text-left font-heading font-bold text-[15px] hover:no-underline py-4">
+                    {item.title}
+                  </AccordionTrigger>
+                  <AccordionContent className="pb-5">
+                    <DetailBlocks item={item} />
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </Section>
+        ) : null;
+      case "itinerary":
+        return itinerary.length > 0 ? (
+          <Section title={title}>
+            <ol className="relative border-l-2 border-dashed border-secondary/20 ml-3 space-y-5">
+              {itinerary.map((step, i) => (
+                <li key={i} className="pl-6 relative">
+                  <span className="absolute -left-[13px] top-0 w-6 h-6 rounded-full bg-secondary text-white text-[11px] font-bold flex items-center justify-center">
+                    {i + 1}
+                  </span>
+                  <p className="text-sm leading-relaxed">{step}</p>
+                </li>
+              ))}
+            </ol>
+          </Section>
+        ) : null;
+      case "hospital":
+        return hospital ? <HospitalCard hospital={hospital} title={title} /> : null;
+      case "doctor":
+        return doctor ? <DoctorCard doctor={doctor} title={title} /> : null;
+      case "treatment_info":
+        return treatmentInfo.length > 0 ? (
+          <Section title={title}>
+            <div className="space-y-3">
+              {treatmentInfo.map((t, i) => (
+                <div key={i} className="rounded-xl border border-border px-4 sm:px-5 py-4">
+                  {t.question && <h3 className="font-heading font-bold text-[15px] text-secondary">{t.question}</h3>}
+                  {t.answer && (
+                    <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line mt-1.5">{t.answer}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </Section>
+        ) : null;
+      case "faqs":
+        return faqs.length > 0 ? (
+          <Section title={title}>
+            <Accordion type="single" collapsible className="w-full">
+              {faqs.map((f, i) => (
+                <AccordionItem key={i} value={`faq-${i}`}>
+                  <AccordionTrigger className="text-left text-sm font-semibold">{f.question}</AccordionTrigger>
+                  <AccordionContent className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
+                    {f.answer}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </Section>
+        ) : null;
+      default:
+        return null;
+    }
+  };
 
   const book = () =>
     openLeadModal({
@@ -255,83 +345,9 @@ export default function PackageDetail() {
                 <PriceCard pkg={pkg} discount={discount} facts={facts} onBook={book} onQuote={quote} whatsappHref={whatsappHref} />
               </div>
 
-              {highlights.length > 0 && (
-                <Section title="Package Highlights">
-                  <div className="grid sm:grid-cols-2 gap-2.5">
-                    {highlights.map((h, i) => (
-                      <div key={i} className="flex items-start gap-2.5 bg-accent-warm/10 rounded-xl px-3.5 py-3 text-sm">
-                        <Sparkles className="w-4 h-4 text-accent-warm shrink-0 mt-0.5" /> {h}
-                      </div>
-                    ))}
-                  </div>
-                </Section>
-              )}
-
-              {pkg.description && (
-                <Section title="Package Overview">
-                  <p className="text-muted-foreground leading-relaxed whitespace-pre-line">{pkg.description}</p>
-                </Section>
-              )}
-
-              {(inclusions.length > 0 || exclusions.length > 0) && (
-                <div className={`grid gap-5 ${inclusions.length > 0 && exclusions.length > 0 ? "md:grid-cols-2" : ""}`}>
-                  {inclusions.length > 0 && (
-                    <Section title="What's Included">
-                      <ul className="space-y-2.5">
-                        {inclusions.map((item, i) => (
-                          <li key={i} className="flex items-start gap-2.5 text-sm">
-                            <CheckCircle2 className="w-4 h-4 text-accent-jade shrink-0 mt-0.5" /> {item}
-                          </li>
-                        ))}
-                      </ul>
-                    </Section>
-                  )}
-                  {exclusions.length > 0 && (
-                    <Section title="Not Included">
-                      <ul className="space-y-2.5">
-                        {exclusions.map((item, i) => (
-                          <li key={i} className="flex items-start gap-2.5 text-sm text-muted-foreground">
-                            <XCircle className="w-4 h-4 text-destructive/70 shrink-0 mt-0.5" /> {item}
-                          </li>
-                        ))}
-                      </ul>
-                    </Section>
-                  )}
-                </div>
-              )}
-
-              {itinerary.length > 0 && (
-                <Section title="Day-by-Day Plan">
-                  <ol className="relative border-l-2 border-dashed border-secondary/20 ml-3 space-y-5">
-                    {itinerary.map((step, i) => (
-                      <li key={i} className="pl-6 relative">
-                        <span className="absolute -left-[13px] top-0 w-6 h-6 rounded-full bg-secondary text-white text-[11px] font-bold flex items-center justify-center">
-                          {i + 1}
-                        </span>
-                        <p className="text-sm leading-relaxed">{step}</p>
-                      </li>
-                    ))}
-                  </ol>
-                </Section>
-              )}
-
-              {hospital && <HospitalCard hospital={hospital} />}
-              {doctor && <DoctorCard doctor={doctor} />}
-
-              {faqs.length > 0 && (
-                <Section title="Frequently Asked Questions">
-                  <Accordion type="single" collapsible className="w-full">
-                    {faqs.map((f, i) => (
-                      <AccordionItem key={i} value={`faq-${i}`}>
-                        <AccordionTrigger className="text-left text-sm font-semibold">{f.question}</AccordionTrigger>
-                        <AccordionContent className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
-                          {f.answer}
-                        </AccordionContent>
-                      </AccordionItem>
-                    ))}
-                  </Accordion>
-                </Section>
-              )}
+              {sections.map((sec) => (
+                <React.Fragment key={sec.key}>{renderSection(sec)}</React.Fragment>
+              ))}
             </div>
 
             {/* Desktop price card: shown in place at the top; once scrolled,
@@ -458,10 +474,10 @@ function Section({ title, children }) {
   );
 }
 
-function HospitalCard({ hospital }) {
+function HospitalCard({ hospital, title = "Your Hospital" }) {
   const accreditations = splitList(hospital.accreditations).slice(0, 4);
   return (
-    <Section title="Your Hospital">
+    <Section title={title}>
       <Link to={`/hospitals/${hospital.id}`} className="group flex flex-col sm:flex-row gap-4">
         <div className="w-full sm:w-40 h-36 sm:h-28 rounded-xl overflow-hidden bg-muted shrink-0">
           {hospital.cover_image_url ? (
@@ -498,9 +514,9 @@ function HospitalCard({ hospital }) {
   );
 }
 
-function DoctorCard({ doctor }) {
+function DoctorCard({ doctor, title = "Your Doctor" }) {
   return (
-    <Section title="Your Doctor">
+    <Section title={title}>
       <Link to={`/doctors/${doctor.id}`} className="group flex items-center gap-4">
         <div className="w-20 h-20 rounded-full overflow-hidden bg-muted shrink-0">
           {doctor.photo_url ? (
@@ -521,5 +537,41 @@ function DoctorCard({ doctor }) {
         </div>
       </Link>
     </Section>
+  );
+}
+
+// One accordion item's content: optional sub-headings, paragraphs and bullet
+// points. Inclusions get ticks, Exclusions get crosses, everything else dots.
+function DetailBlocks({ item }) {
+  const kind = /exclu|not\s*includ/i.test(item.title) ? "no" : /inclu/i.test(item.title) ? "yes" : "dot";
+  return (
+    <div className="space-y-4">
+      {item.blocks.map((b) => {
+        const points = (b.points || []).filter((p) => String(p).trim());
+        if (!b.subheading?.trim() && !b.text?.trim() && points.length === 0) return null;
+        return (
+          <div key={b.id}>
+            {b.subheading?.trim() && <h4 className="font-heading font-bold text-sm text-secondary mb-1.5">{b.subheading}</h4>}
+            {b.text?.trim() && <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">{b.text}</p>}
+            {points.length > 0 && (
+              <ul className={`space-y-2 ${b.text?.trim() ? "mt-2.5" : ""}`}>
+                {points.map((p, i) => (
+                  <li key={i} className={`flex items-start gap-2.5 text-sm ${kind === "no" ? "text-muted-foreground" : "text-foreground/85"}`}>
+                    {kind === "yes" ? (
+                      <CheckCircle2 className="w-4 h-4 text-accent-jade shrink-0 mt-0.5" />
+                    ) : kind === "no" ? (
+                      <XCircle className="w-4 h-4 text-destructive/70 shrink-0 mt-0.5" />
+                    ) : (
+                      <span className="w-1.5 h-1.5 rounded-full bg-accent-jade shrink-0 mt-[7px]" />
+                    )}
+                    {p}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        );
+      })}
+    </div>
   );
 }
