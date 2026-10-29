@@ -11,7 +11,6 @@ import {
   CheckCircle2,
   XCircle,
   Sparkles,
-  Wallet,
   Star,
   Phone,
   ShieldCheck,
@@ -31,7 +30,6 @@ import {
   toNumber,
   formatPrice,
   discountPercent,
-  bookingAmount,
   pluralize,
 } from "@/lib/packageUtils";
 
@@ -148,7 +146,6 @@ export default function PackageDetail() {
   if (images.length === 0 && hospital?.cover_image_url) images.push(hospital.cover_image_url);
 
   const discount = discountPercent(pkg);
-  const deposit = bookingAmount(pkg);
   const label = pkg.category || treatment?.name;
   const location = [pkg.city || hospital?.city, pkg.country || hospital?.country].filter(Boolean).join(", ");
   const highlights = parseList(pkg.highlights);
@@ -255,7 +252,7 @@ export default function PackageDetail() {
 
               {/* Mobile price card */}
               <div className="lg:hidden">
-                <PriceCard pkg={pkg} discount={discount} deposit={deposit} facts={facts} onBook={book} onQuote={quote} whatsappHref={whatsappHref} />
+                <PriceCard pkg={pkg} discount={discount} facts={facts} onBook={book} onQuote={quote} whatsappHref={whatsappHref} />
               </div>
 
               {highlights.length > 0 && (
@@ -340,7 +337,7 @@ export default function PackageDetail() {
             {/* Desktop price card: shown in place at the top; once scrolled,
                 the fixed copy below takes over. */}
             <aside className={`hidden lg:block transition-opacity ${showFloating ? "opacity-0 pointer-events-none" : "opacity-100"}`}>
-              <PriceCard pkg={pkg} discount={discount} deposit={deposit} facts={facts} onBook={book} onQuote={quote} whatsappHref={whatsappHref} />
+              <PriceCard pkg={pkg} discount={discount} facts={facts} onBook={book} onQuote={quote} whatsappHref={whatsappHref} />
             </aside>
           </div>
 
@@ -370,7 +367,7 @@ export default function PackageDetail() {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex justify-end">
           <div ref={cardRef} className={`w-[calc((100%-4rem)/3)] ${showFloating ? "pointer-events-auto" : ""}`}>
-            <PriceCard pkg={pkg} discount={discount} deposit={deposit} facts={facts} onBook={book} onQuote={quote} whatsappHref={whatsappHref} />
+            <PriceCard pkg={pkg} discount={discount} facts={facts} onBook={book} onQuote={quote} whatsappHref={whatsappHref} />
           </div>
         </div>
       </div>
@@ -396,7 +393,7 @@ export default function PackageDetail() {
   );
 }
 
-function PriceCard({ pkg, discount, deposit, facts, onBook, onQuote, whatsappHref }) {
+function PriceCard({ pkg, discount, facts, onBook, onQuote, whatsappHref }) {
   return (
     <div className="bg-white rounded-2xl border border-border shadow-lg shadow-secondary/5 p-5 sm:p-6">
       <div className="flex items-center justify-between gap-2">
@@ -411,13 +408,6 @@ function PriceCard({ pkg, discount, deposit, facts, onBook, onQuote, whatsappHre
           <span className="text-sm text-muted-foreground line-through">{formatPrice(pkg.original_price, pkg.currency)}</span>
         )}
       </div>
-
-      {deposit > 0 && (
-        <div className="flex items-center gap-2 mt-3 px-3 py-2 rounded-xl bg-accent-jade/10 text-accent-jade text-sm font-semibold">
-          <Wallet className="w-4 h-4 shrink-0" />
-          Pay just {pkg.booking_percent}% to book · {formatPrice(deposit, pkg.currency)}
-        </div>
-      )}
 
       {facts.length > 0 && (
         <dl className="mt-5 divide-y divide-border border-y border-border">

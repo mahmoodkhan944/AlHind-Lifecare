@@ -25,7 +25,7 @@ export default function FeaturedPackages() {
   const header = useSectionContent("home_packages_header", {
     badge: "Treatment Packages",
     heading: "Popular Treatment Packages",
-    subtitle: "All-inclusive packages with hospital, surgeon, stay and aftercare — book with just a small deposit.",
+    subtitle: "All-inclusive packages with hospital, surgeon, stay and aftercare.",
   });
 
   useEffect(() => {
@@ -137,7 +137,6 @@ function HomePackageCard({ pkg, hospital, treatment, index }) {
   const location = [city, country].filter(Boolean).join(" - ");
   const image = pkg.image_url || hospital?.cover_image_url;
   const to = packagePath(pkg);
-  const deposit = toNumber(pkg.booking_percent);
 
   const points = [
     label,
@@ -215,7 +214,7 @@ function HomePackageCard({ pkg, hospital, treatment, index }) {
             to={to}
             className="flex items-center justify-between gap-2 w-full h-11 pl-4 pr-1.5 rounded-xl bg-secondary hover:bg-secondary/90 text-white text-sm lg:text-[13px] xl:text-sm font-heading font-bold whitespace-nowrap transition-colors"
           >
-            {deposit > 0 ? `Book at ${deposit}% deposit` : "View Package"}
+            View Package
             <span className="w-8 h-8 rounded-lg bg-white/15 flex items-center justify-center shrink-0">
               <ArrowRight className="w-4 h-4" />
             </span>

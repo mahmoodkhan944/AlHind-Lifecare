@@ -7,7 +7,6 @@ import {
   Building2,
   BedDouble,
   Hotel,
-  Wallet,
   ArrowRight,
   Package as PackageIcon,
   SlidersHorizontal,
@@ -27,7 +26,6 @@ import {
   COUNTRY_CODES,
   formatPrice,
   discountPercent,
-  bookingAmount,
   packagePath,
   pluralize,
   toNumber,
@@ -345,7 +343,6 @@ export default function Packages() {
 
 export function PackageCard({ pkg, hospital, treatment, index = 0 }) {
   const discount = discountPercent(pkg);
-  const deposit = bookingAmount(pkg);
   const label = pkg.category || treatment?.name;
   const location = [pkg.city || hospital?.city, pkg.country || hospital?.country].filter(Boolean).join(", ");
   const to = packagePath(pkg);
@@ -411,12 +408,6 @@ export function PackageCard({ pkg, hospital, treatment, index = 0 }) {
           )}
         </div>
 
-        {deposit > 0 && (
-          <span className="self-start inline-flex items-center gap-1.5 mt-3 px-2.5 py-1 rounded-full bg-accent-jade/10 text-accent-jade text-xs font-semibold">
-            <Wallet className="w-3.5 h-3.5" />
-            Pay just {pkg.booking_percent}% to book · {formatPrice(deposit, pkg.currency)}
-          </span>
-        )}
 
         <div className="flex items-end justify-between gap-3 mt-4 sm:mt-auto pt-2">
           <div className="flex items-baseline gap-2">

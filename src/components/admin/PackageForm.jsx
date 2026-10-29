@@ -15,9 +15,7 @@ import {
   PACKAGE_COUNTRIES,
   parseList,
   toNumber,
-  formatPrice,
   discountPercent,
-  bookingAmount,
 } from "@/lib/packageUtils";
 
 const LIST_FIELDS = ["inclusions", "exclusions", "highlights", "itinerary", "gallery_images", "faqs"];
@@ -40,7 +38,6 @@ export default function PackageForm({ initialData, onCancel, onSaved }) {
       return {
         status: "active",
         currency: "USD",
-        booking_percent: 10,
         inclusions: DEFAULT_INCLUSIONS,
         exclusions: [],
         highlights: [],
@@ -220,7 +217,6 @@ export default function PackageForm({ initialData, onCancel, onSaved }) {
   };
 
   const discount = discountPercent(form);
-  const deposit = bookingAmount(form);
 
   return (
     <form onSubmit={handleSubmit} className="min-h-screen bg-muted -m-4 sm:-m-6 lg:-m-8">
@@ -329,18 +325,10 @@ export default function PackageForm({ initialData, onCancel, onSaved }) {
               <Input type="number" min="0" value={form.original_price ?? ""} onChange={(e) => set("original_price", e.target.value)} placeholder="5500" className="h-10 rounded-lg" />
             </Field>
           </div>
-          <Field label="Booking deposit (%)" hint="'Pay just X% to book'. Leave empty to hide.">
-            <Input type="number" min="0" max="100" value={form.booking_percent ?? ""} onChange={(e) => set("booking_percent", e.target.value)} placeholder="10" className="h-10 rounded-lg" />
-          </Field>
-          {toNumber(form.price) > 0 && (
+          {toNumber(form.price) > 0 && discount > 0 && (
             <div className="flex flex-wrap gap-2 text-xs">
               {discount > 0 && (
                 <span className="px-2.5 py-1 rounded-full bg-accent-jade text-white font-bold">SAVE {discount}%</span>
-              )}
-              {deposit > 0 && (
-                <span className="px-2.5 py-1 rounded-full bg-accent-jade/10 text-accent-jade font-semibold">
-                  Pay just {form.booking_percent}% to book · {formatPrice(deposit)}
-                </span>
               )}
             </div>
           )}
