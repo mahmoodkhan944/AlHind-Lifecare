@@ -107,6 +107,9 @@ const fallbackAdvantages = [
   },
 ];
 
+// Leadership section on the About page is switched off. Change to true to show it again.
+const SHOW_LEADERSHIP = false;
+
 const fallbackLeaders = [
   {
     photo: "https://scontent.fdel18-1.fna.fbcdn.net/v/t39.30808-1/400434253_3640507126180107_5636551770658110022_n.jpg?stp=dst-jpg_tt6&cstp=mx379x378&ctp=s200x200&_nc_cat=103&ccb=1-7&_nc_sid=e99d92&_nc_ohc=3oAbSgJ0c9oQ7kNvwFJ2hD0&_nc_oc=AdqOKsUoNTdF0uouCUghbGHhLPFvaQ8BczZhHT03my0HQJy5k80GlqBccdiebzadXAY&_nc_zt=24&_nc_ht=scontent.fdel18-1.fna&_nc_gid=0QWoaodqWeS9NpKMyvc9nQ&_nc_ss=7b2a8&oh=00_AQDpAu8C3bOBlsjXuyXiGJj0HfNBfiVIbt73iv8Uyruk-g&oe=6A6BC830",
@@ -525,7 +528,9 @@ export default function About() {
         </div>
       </section>
 
-      {/* Leadership */}
+      {/* Leadership — hidden for now. Set SHOW_LEADERSHIP to true (top of
+          this file) to bring it back; the content in Admin → About Page is kept. */}
+      {SHOW_LEADERSHIP && (
       <section className="py-10 sm:py-12 md:py-14">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <div className="text-center max-w-2xl mx-auto mb-7 sm:mb-8">
@@ -585,6 +590,7 @@ export default function About() {
           </div>
         </div>
       </section>
+      )}
 
       {/* Advantages of choosing us */}
       <section className="py-10 sm:py-12 md:py-14 bg-secondary/30">
