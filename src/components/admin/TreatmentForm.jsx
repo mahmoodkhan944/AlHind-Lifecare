@@ -7,7 +7,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/components/ui/use-toast";
-import DynamicListField from "@/components/admin/DynamicListField";
+import GroupedListField from "@/components/admin/GroupedListField";
+import { buildGroupsMap, applyGroupsToPayload } from "@/lib/sectionGroups";
+
+// Sections that support several sub-headings (Admin → drag to reorder).
+const TREATMENT_GROUP_KEYS = ["key_benefits", "overview", "signs_symptoms", "related_conditions", "diagnosis", "treatment_types", "surgery_types", "how_its_done", "purpose", "recovery_details", "risks", "summary", "why_choose_india", "why_choose_turkey", "treatment_procedures", "additional_information"];
 import SearchableCheckboxList from "@/components/admin/SearchableCheckboxList";
 import SectionOrderEditor from "@/components/admin/SectionOrderEditor";
 import { DEFAULT_TREATMENT_SECTIONS } from "@/pages/TreatmentDetail";
@@ -29,12 +33,13 @@ export default function TreatmentForm({ initialData, onCancel, onSaved }) {
   const isEdit = !!initialData;
 
   const [form, setForm] = useState(() => {
-    if (!initialData) return {};
+    if (!initialData) return { section_groups: buildGroupsMap(null, TREATMENT_GROUP_KEYS) };
     const f = { ...initialData };
     ["key_benefits","treatment_procedures","overview","additional_information","signs_symptoms","related_conditions","diagnosis","treatment_types","surgery_types","how_its_done","purpose","recovery_details","risks","summary","why_choose_india","why_choose_turkey","hospital_ids","doctor_ids","section_config"].forEach((k) => {
       f[k] = parseList(initialData[k]);
     });
     f.section_subheadings = parseObj(initialData.section_subheadings);
+    f.section_groups = buildGroupsMap(initialData, TREATMENT_GROUP_KEYS);
     return f;
   });
   const [saving, setSaving] = useState(false);
@@ -48,9 +53,9 @@ export default function TreatmentForm({ initialData, onCancel, onSaved }) {
   }, []);
 
   const set = (key, val) => setForm((p) => ({ ...p, [key]: val }));
+  const setGroups = (key, groups) =>
+    setForm((p) => ({ ...p, section_groups: { ...(p.section_groups || {}), [key]: groups } }));
   const setList = (key, val) => set(key, val);
-  const setSubheading = (key, val) =>
-    setForm((p) => ({ ...p, section_subheadings: { ...(p.section_subheadings || {}), [key]: val } }));
 
   const handleImage = async (e) => {
     const file = e.target.files[0];
@@ -108,6 +113,10 @@ export default function TreatmentForm({ initialData, onCancel, onSaved }) {
       section_config: JSON.stringify(form.section_config || []),
       section_subheadings: JSON.stringify(form.section_subheadings || {}),
     };
+
+    // Several sub-headings per section → section_groups, plus the old
+    // single-list columns (all points) so listings/search keep working.
+    applyGroupsToPayload(data, form.section_groups, TREATMENT_GROUP_KEYS);
 
     try {
       if (isEdit) {
@@ -257,33 +266,33 @@ export default function TreatmentForm({ initialData, onCancel, onSaved }) {
             4. KEY BENEFITS
             ================================================================== */}
         <SectionLabel step="Next" title="Key Benefits" desc="Checklist shown right after the description" />
-        <DynamicListField label="Key Benefits" placeholder="Benefit" optional values={form.key_benefits} onChange={(v) => setList("key_benefits", v)} subheading={form.section_subheadings?.key_benefits} onSubheadingChange={(v) => setSubheading("key_benefits", v)} />
+        <GroupedListField label="Key Benefits" placeholder="Benefit" optional groups={form.section_groups?.key_benefits} onChange={(g) => setGroups("key_benefits", g)} />
 
         {/* ==================================================================
             5. DETAILED SECTIONS — rendered on the page in exactly this
             order, each as its own numbered card.
             ================================================================== */}
         <SectionLabel step="Next" title="Detailed Sections" desc="Each of these becomes its own section, in this order" />
-        <DynamicListField label="Overview" placeholder="Overview point" number={1} required values={form.overview} onChange={(v) => setList("overview", v)} subheading={form.section_subheadings?.overview} onSubheadingChange={(v) => setSubheading("overview", v)} />
-        <DynamicListField label="Signs and Symptoms" placeholder="Sign / Symptom" number={2} optional values={form.signs_symptoms} onChange={(v) => setList("signs_symptoms", v)} subheading={form.section_subheadings?.signs_symptoms} onSubheadingChange={(v) => setSubheading("signs_symptoms", v)} />
-        <DynamicListField label="Condition" placeholder="Condition" number={3} optional values={form.related_conditions} onChange={(v) => setList("related_conditions", v)} subheading={form.section_subheadings?.related_conditions} onSubheadingChange={(v) => setSubheading("related_conditions", v)} />
-        <DynamicListField label="Diagnosis" placeholder="Diagnosis point" number={4} optional values={form.diagnosis} onChange={(v) => setList("diagnosis", v)} subheading={form.section_subheadings?.diagnosis} onSubheadingChange={(v) => setSubheading("diagnosis", v)} />
-        <DynamicListField label="Types of Treatments" placeholder="Treatment type" number={5} optional values={form.treatment_types} onChange={(v) => setList("treatment_types", v)} subheading={form.section_subheadings?.treatment_types} onSubheadingChange={(v) => setSubheading("treatment_types", v)} />
-        <DynamicListField label="Types of Surgery" placeholder="Surgery type" number={6} optional values={form.surgery_types} onChange={(v) => setList("surgery_types", v)} subheading={form.section_subheadings?.surgery_types} onSubheadingChange={(v) => setSubheading("surgery_types", v)} />
-        <DynamicListField label="How It's Done" placeholder="Step" number={7} optional values={form.how_its_done} onChange={(v) => setList("how_its_done", v)} subheading={form.section_subheadings?.how_its_done} onSubheadingChange={(v) => setSubheading("how_its_done", v)} />
-        <DynamicListField label="Purpose" placeholder="Purpose point" number={8} optional values={form.purpose} onChange={(v) => setList("purpose", v)} subheading={form.section_subheadings?.purpose} onSubheadingChange={(v) => setSubheading("purpose", v)} />
-        <DynamicListField label="Recovery" placeholder="Recovery detail" number={9} optional values={form.recovery_details} onChange={(v) => setList("recovery_details", v)} subheading={form.section_subheadings?.recovery_details} onSubheadingChange={(v) => setSubheading("recovery_details", v)} />
-        <DynamicListField label="Risk" placeholder="Risk / Complication" number={10} optional values={form.risks} onChange={(v) => setList("risks", v)} subheading={form.section_subheadings?.risks} onSubheadingChange={(v) => setSubheading("risks", v)} />
-        <DynamicListField label="Summary" placeholder="Summary point" number={11} optional values={form.summary} onChange={(v) => setList("summary", v)} subheading={form.section_subheadings?.summary} onSubheadingChange={(v) => setSubheading("summary", v)} />
-        <DynamicListField label="Why Choose India" placeholder="Reason" number={12} optional values={form.why_choose_india} onChange={(v) => setList("why_choose_india", v)} subheading={form.section_subheadings?.why_choose_india} onSubheadingChange={(v) => setSubheading("why_choose_india", v)} />
-        <DynamicListField label="Why Choose Turkey" placeholder="Reason" number={13} optional values={form.why_choose_turkey} onChange={(v) => setList("why_choose_turkey", v)} subheading={form.section_subheadings?.why_choose_turkey} onSubheadingChange={(v) => setSubheading("why_choose_turkey", v)} />
+        <GroupedListField label="Overview" placeholder="Overview point" number={1} required groups={form.section_groups?.overview} onChange={(g) => setGroups("overview", g)} />
+        <GroupedListField label="Signs and Symptoms" placeholder="Sign / Symptom" number={2} optional groups={form.section_groups?.signs_symptoms} onChange={(g) => setGroups("signs_symptoms", g)} />
+        <GroupedListField label="Condition" placeholder="Condition" number={3} optional groups={form.section_groups?.related_conditions} onChange={(g) => setGroups("related_conditions", g)} />
+        <GroupedListField label="Diagnosis" placeholder="Diagnosis point" number={4} optional groups={form.section_groups?.diagnosis} onChange={(g) => setGroups("diagnosis", g)} />
+        <GroupedListField label="Types of Treatments" placeholder="Treatment type" number={5} optional groups={form.section_groups?.treatment_types} onChange={(g) => setGroups("treatment_types", g)} />
+        <GroupedListField label="Types of Surgery" placeholder="Surgery type" number={6} optional groups={form.section_groups?.surgery_types} onChange={(g) => setGroups("surgery_types", g)} />
+        <GroupedListField label="How It's Done" placeholder="Step" number={7} optional groups={form.section_groups?.how_its_done} onChange={(g) => setGroups("how_its_done", g)} />
+        <GroupedListField label="Purpose" placeholder="Purpose point" number={8} optional groups={form.section_groups?.purpose} onChange={(g) => setGroups("purpose", g)} />
+        <GroupedListField label="Recovery" placeholder="Recovery detail" number={9} optional groups={form.section_groups?.recovery_details} onChange={(g) => setGroups("recovery_details", g)} />
+        <GroupedListField label="Risk" placeholder="Risk / Complication" number={10} optional groups={form.section_groups?.risks} onChange={(g) => setGroups("risks", g)} />
+        <GroupedListField label="Summary" placeholder="Summary point" number={11} optional groups={form.section_groups?.summary} onChange={(g) => setGroups("summary", g)} />
+        <GroupedListField label="Why Choose India" placeholder="Reason" number={12} optional groups={form.section_groups?.why_choose_india} onChange={(g) => setGroups("why_choose_india", g)} />
+        <GroupedListField label="Why Choose Turkey" placeholder="Reason" number={13} optional groups={form.section_groups?.why_choose_turkey} onChange={(g) => setGroups("why_choose_turkey", g)} />
 
         {/* ==================================================================
             6. MORE DETAILS — shown after the numbered sections.
             ================================================================== */}
         <SectionLabel step="Next" title="More Details" desc="Shown further down the page, after the sections above" />
-        <DynamicListField label="Treatment Procedures" placeholder="Procedure step" optional values={form.treatment_procedures} onChange={(v) => setList("treatment_procedures", v)} subheading={form.section_subheadings?.treatment_procedures} onSubheadingChange={(v) => setSubheading("treatment_procedures", v)} />
-        <DynamicListField label="Additional Information" placeholder="Additional info" optional values={form.additional_information} onChange={(v) => setList("additional_information", v)} subheading={form.section_subheadings?.additional_information} onSubheadingChange={(v) => setSubheading("additional_information", v)} />
+        <GroupedListField label="Treatment Procedures" placeholder="Procedure step" optional groups={form.section_groups?.treatment_procedures} onChange={(g) => setGroups("treatment_procedures", g)} />
+        <GroupedListField label="Additional Information" placeholder="Additional info" optional groups={form.section_groups?.additional_information} onChange={(g) => setGroups("additional_information", g)} />
 
         {/* ==================================================================
             HOSPITALS & DOCTORS — pick which ones offer/perform this

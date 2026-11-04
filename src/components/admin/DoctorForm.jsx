@@ -6,7 +6,11 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
-import DynamicListField from "@/components/admin/DynamicListField";
+import GroupedListField from "@/components/admin/GroupedListField";
+import { buildGroupsMap, applyGroupsToPayload } from "@/lib/sectionGroups";
+
+// Sections that support several sub-headings (Admin → drag to reorder).
+const DOCTOR_GROUP_KEYS = ["specializations", "treatments_list", "overview_points", "experience_details", "qualifications_list", "clinical_focus", "additional_info", "research_publications", "awards_achievements", "why_choose_doctor"];
 import AutocompleteInput from "@/components/admin/AutocompleteInput";
 import SectionOrderEditor from "@/components/admin/SectionOrderEditor";
 import { DEFAULT_DOCTOR_SECTIONS } from "@/pages/DoctorDetail";
@@ -38,10 +42,11 @@ export default function DoctorForm({ initialData, onCancel, onSaved }) {
   const isEdit = !!initialData;
 
   const [form, setForm] = useState(() => {
-    if (!initialData) return {};
+    if (!initialData) return { section_groups: buildGroupsMap(null, DOCTOR_GROUP_KEYS) };
     const f = { ...initialData };
     LIST_FIELDS.forEach((k) => { f[k] = parseList(initialData[k]); });
     f.section_subheadings = parseObj(initialData.section_subheadings);
+    f.section_groups = buildGroupsMap(initialData, DOCTOR_GROUP_KEYS);
     return f;
   });
   const [saving, setSaving] = useState(false);
@@ -56,9 +61,9 @@ export default function DoctorForm({ initialData, onCancel, onSaved }) {
   }, []);
 
   const set = (key, val) => setForm((p) => ({ ...p, [key]: val }));
+  const setGroups = (key, groups) =>
+    setForm((p) => ({ ...p, section_groups: { ...(p.section_groups || {}), [key]: groups } }));
   const setList = (key, val) => set(key, val);
-  const setSubheading = (key, val) =>
-    setForm((p) => ({ ...p, section_subheadings: { ...(p.section_subheadings || {}), [key]: val } }));
 
   const handlePhoto = async (e) => {
     const file = e.target.files[0];
@@ -129,6 +134,10 @@ export default function DoctorForm({ initialData, onCancel, onSaved }) {
       section_config: JSON.stringify(form.section_config || []),
       section_subheadings: JSON.stringify(form.section_subheadings || {}),
     };
+
+    // Several sub-headings per section → section_groups, plus the old
+    // single-list columns (all points) so listings/search keep working.
+    applyGroupsToPayload(data, form.section_groups, DOCTOR_GROUP_KEYS);
 
     try {
       if (isEdit) {
@@ -223,8 +232,8 @@ export default function DoctorForm({ initialData, onCancel, onSaved }) {
         </div>
 
         {/* Specializations & Treatments (unnumbered) */}
-        <DynamicListField label="Specializations" placeholder="e.g., Heart Surgery" optional values={form.specializations} onChange={(v) => setList("specializations", v)} buttonAtTop darkButton  subheading={form.section_subheadings?.specializations} onSubheadingChange={(v) => setSubheading("specializations", v)} />
-        <DynamicListField label="List of Treatments" placeholder="e.g., Knee Replacement Surgery" optional values={form.treatments_list} onChange={(v) => setList("treatments_list", v)} buttonAtTop darkButton  subheading={form.section_subheadings?.treatments_list} onSubheadingChange={(v) => setSubheading("treatments_list", v)} />
+        <GroupedListField label="Specializations" placeholder="e.g., Heart Surgery" optional groups={form.section_groups?.specializations} onChange={(g) => setGroups("specializations", g)} />
+        <GroupedListField label="List of Treatments" placeholder="e.g., Knee Replacement Surgery" optional groups={form.section_groups?.treatments_list} onChange={(g) => setGroups("treatments_list", g)} />
 
         {/* Section 1: Overview & Detailed Experience */}
         <div className="bg-white rounded-2xl border border-border p-4 sm:p-5 shadow-sm">
@@ -236,19 +245,19 @@ export default function DoctorForm({ initialData, onCancel, onSaved }) {
             <Field label="Overview" required>
               <Textarea value={form.overview || ""} onChange={(e) => set("overview", e.target.value)} placeholder="Brief overview about the doctor..." className="rounded-lg border-border min-h-[80px]" rows={3} />
             </Field>
-            <DynamicListField label="Overview Points" placeholder="Overview point" optional values={form.overview_points} onChange={(v) => setList("overview_points", v)} buttonAtTop darkButton addLabel="Add Point"  subheading={form.section_subheadings?.overview_points} onSubheadingChange={(v) => setSubheading("overview_points", v)} />
+            <GroupedListField label="Overview Points" placeholder="Overview point" optional groups={form.section_groups?.overview_points} onChange={(g) => setGroups("overview_points", g)} />
             <Field label="Detailed Experience" required>
               <Textarea value={form.detailed_experience || ""} onChange={(e) => set("detailed_experience", e.target.value)} placeholder="Detailed experience description..." className="rounded-lg border-border min-h-[80px]" rows={3} />
             </Field>
-            <DynamicListField label="Experience Details" placeholder="Experience detail" optional values={form.experience_details} onChange={(v) => setList("experience_details", v)} buttonAtTop darkButton addLabel="Add Detail"  subheading={form.section_subheadings?.experience_details} onSubheadingChange={(v) => setSubheading("experience_details", v)} />
+            <GroupedListField label="Experience Details" placeholder="Experience detail" optional groups={form.section_groups?.experience_details} onChange={(g) => setGroups("experience_details", g)} />
           </div>
         </div>
 
         {/* Sections 2-5 */}
-        <DynamicListField label="Qualification" placeholder="e.g., MBBS - AIIMS, New Delhi" number={2} optional values={form.qualifications_list} onChange={(v) => setList("qualifications_list", v)} buttonAtTop darkButton  subheading={form.section_subheadings?.qualifications_list} onSubheadingChange={(v) => setSubheading("qualifications_list", v)} />
-        <DynamicListField label="Clinical Focus" placeholder="e.g., Patient-centered care" number={3} optional values={form.clinical_focus} onChange={(v) => setList("clinical_focus", v)} buttonAtTop darkButton  subheading={form.section_subheadings?.clinical_focus} onSubheadingChange={(v) => setSubheading("clinical_focus", v)} />
-        <DynamicListField label="Additional Information" placeholder="e.g., Fluent in English, Hindi, and Arabic" number={4} optional values={form.additional_info} onChange={(v) => setList("additional_info", v)} buttonAtTop darkButton  subheading={form.section_subheadings?.additional_info} onSubheadingChange={(v) => setSubheading("additional_info", v)} />
-        <DynamicListField label="Research & Publication" placeholder="e.g., Published in Journal of Medicine" number={5} optional values={form.research_publications} onChange={(v) => setList("research_publications", v)} buttonAtTop darkButton  subheading={form.section_subheadings?.research_publications} onSubheadingChange={(v) => setSubheading("research_publications", v)} />
+        <GroupedListField label="Qualification" placeholder="e.g., MBBS - AIIMS, New Delhi" number={2} optional groups={form.section_groups?.qualifications_list} onChange={(g) => setGroups("qualifications_list", g)} />
+        <GroupedListField label="Clinical Focus" placeholder="e.g., Patient-centered care" number={3} optional groups={form.section_groups?.clinical_focus} onChange={(g) => setGroups("clinical_focus", g)} />
+        <GroupedListField label="Additional Information" placeholder="e.g., Fluent in English, Hindi, and Arabic" number={4} optional groups={form.section_groups?.additional_info} onChange={(g) => setGroups("additional_info", g)} />
+        <GroupedListField label="Research & Publication" placeholder="e.g., Published in Journal of Medicine" number={5} optional groups={form.section_groups?.research_publications} onChange={(g) => setGroups("research_publications", g)} />
 
         {/* Section 6: Awards (accent card) */}
         <div className="bg-[hsl(var(--accent-warm)/0.08)] rounded-2xl border border-amber-200 p-4 sm:p-5 shadow-sm">
@@ -257,7 +266,7 @@ export default function DoctorForm({ initialData, onCancel, onSaved }) {
             <Trophy className="w-4 h-4 text-[hsl(var(--accent-warm))]" />
             <h3 className="font-bold text-secondary text-sm">Award & Achievement</h3>
           </div>
-          <DynamicListField label="" placeholder="e.g., Best Doctor Award 2023" values={form.awards_achievements} onChange={(v) => setList("awards_achievements", v)} buttonAtTop darkButton accent addLabel="Add"  subheading={form.section_subheadings?.awards_achievements} onSubheadingChange={(v) => setSubheading("awards_achievements", v)} />
+          <GroupedListField label="" placeholder="e.g., Best Doctor Award 2023" accent groups={form.section_groups?.awards_achievements} onChange={(g) => setGroups("awards_achievements", g)} />
           <div className="mt-3">
             <label className="cursor-pointer block">
               <input type="file" onChange={handleDoc} className="hidden" />
@@ -272,7 +281,7 @@ export default function DoctorForm({ initialData, onCancel, onSaved }) {
         </div>
 
         {/* Section 7 */}
-        <DynamicListField label="Why Choose This Doctor" placeholder="e.g., Internationally trained in robotic surgery" number={7} optional values={form.why_choose_doctor} onChange={(v) => setList("why_choose_doctor", v)} buttonAtTop darkButton  subheading={form.section_subheadings?.why_choose_doctor} onSubheadingChange={(v) => setSubheading("why_choose_doctor", v)} />
+        <GroupedListField label="Why Choose This Doctor" placeholder="e.g., Internationally trained in robotic surgery" number={7} optional groups={form.section_groups?.why_choose_doctor} onChange={(g) => setGroups("why_choose_doctor", g)} />
 
         {/* Doctor Image */}
         <div className="bg-white rounded-2xl border border-border p-4 sm:p-5 shadow-sm">

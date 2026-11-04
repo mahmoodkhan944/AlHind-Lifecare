@@ -49,6 +49,7 @@ import { useSiteSettings, DEFAULT_SETTINGS, getWhatsAppLink } from "@/hooks/useS
 import { slugify } from "@/lib/slugify";
 import { useDocumentMeta } from "@/hooks/useDocumentMeta";
 import DetailPageSkeleton from "@/components/common/DetailPageSkeleton";
+import { visibleGroups } from "@/lib/sectionGroups";
 
 const parseList = (val) => {
   if (!val) return [];
@@ -1010,41 +1011,51 @@ function renderTreatmentSection(key, title, treatment) {
   if (key === "why_choose_turkey" && treatment.country === "India") return null;
 
   if (key === "key_benefits" || CHECKLIST_KEYS.includes(key) || key === "additional_information") {
-    const items = parseList(treatment[key]);
-    if (items.length === 0) return null;
+    const groups = visibleGroups(treatment, key);
+    if (groups.length === 0) return null;
     const theme = SECTION_ICON_THEME[key];
     const ItemIcon = theme?.icon || CheckCircle2;
     return (
-      <SectionCard key={key} title={title} subheading={parseObj(treatment.section_subheadings)[key]}>
-        <ul className="space-y-2">
-          {items.map((item, idx) => (
-            <li key={idx} className="flex items-start gap-2.5 text-sm text-muted-foreground">
-              <span className={`flex items-center justify-center w-6 h-6 rounded-full flex-shrink-0 ${theme ? `${theme.bg} ${theme.color}` : "bg-secondary/15 text-secondary"}`}>
-                <ItemIcon className="w-3.5 h-3.5" />
-              </span>
-              <span className="pt-0.5">{item}</span>
-            </li>
-          ))}
-        </ul>
+      <SectionCard key={key} title={title} subheading={groups[0].subheading}>
+        <GroupList
+          groups={groups}
+          render={(items) => (
+            <ul className="space-y-2">
+              {items.map((item, idx) => (
+                <li key={idx} className="flex items-start gap-2.5 text-sm text-muted-foreground">
+                  <span className={`flex items-center justify-center w-6 h-6 rounded-full flex-shrink-0 ${theme ? `${theme.bg} ${theme.color}` : "bg-secondary/15 text-secondary"}`}>
+                    <ItemIcon className="w-3.5 h-3.5" />
+                  </span>
+                  <span className="pt-0.5">{item}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        />
       </SectionCard>
     );
   }
 
   if (NUMBERED_KEYS.includes(key)) {
-    const items = parseList(treatment[key]);
-    if (items.length === 0) return null;
+    const groups = visibleGroups(treatment, key);
+    if (groups.length === 0) return null;
     return (
-      <SectionCard key={key} title={title} subheading={parseObj(treatment.section_subheadings)[key]}>
-        <ol className="space-y-3">
-          {items.map((item, idx) => (
-            <li key={idx} className="flex items-start gap-3">
-              <span className="flex items-center justify-center w-6 h-6 rounded-full bg-accent-jade text-white text-xs font-bold flex-shrink-0">
-                {idx + 1}
-              </span>
-              <p className="text-sm text-muted-foreground pt-0.5">{item}</p>
-            </li>
-          ))}
-        </ol>
+      <SectionCard key={key} title={title} subheading={groups[0].subheading}>
+        <GroupList
+          groups={groups}
+          render={(items) => (
+            <ol className="space-y-3">
+              {items.map((item, idx) => (
+                <li key={idx} className="flex items-start gap-3">
+                  <span className="flex items-center justify-center w-6 h-6 rounded-full bg-accent-jade text-white text-xs font-bold flex-shrink-0">
+                    {idx + 1}
+                  </span>
+                  <p className="text-sm text-muted-foreground pt-0.5">{item}</p>
+                </li>
+              ))}
+            </ol>
+          )}
+        />
       </SectionCard>
     );
   }
@@ -1060,6 +1071,18 @@ function renderTreatmentSection(key, title, treatment) {
   }
 
   return null;
+}
+
+// A section's sub-heading groups, in the admin's order. The first group's
+// sub-heading is shown in the SectionCard's sub-heading slot, so only the
+// later ones get a heading here.
+function GroupList({ groups, render }) {
+  return groups.map((g, i) => (
+    <div key={g.id} className={i > 0 ? "mt-5" : ""}>
+      {i > 0 && g.subheading && <h3 className="font-heading font-bold text-base text-foreground/80 mb-3">{g.subheading}</h3>}
+      {g.items.length > 0 && render(g.items)}
+    </div>
+  ));
 }
 
 function SectionCard({ title, subheading, children }) {

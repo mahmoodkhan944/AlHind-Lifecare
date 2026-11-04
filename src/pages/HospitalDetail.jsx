@@ -26,6 +26,7 @@ import { useLeadModal } from "@/lib/LeadModalContext";
 import { useDocumentMeta } from "@/hooks/useDocumentMeta";
 import { useSiteSettings, getWhatsAppLink } from "@/hooks/useSiteSettings";
 import DetailPageSkeleton from "@/components/common/DetailPageSkeleton";
+import { visibleGroups } from "@/lib/sectionGroups";
 
 const parseList = (val) => {
   if (!val) return [];
@@ -439,140 +440,123 @@ function renderHospitalSection(key, rawTitle, hospital) {
   const title = rawTitle.replace("{name}", hospital.name);
 
   if (key === "about") {
-    const fullDescription = parseList(hospital.full_description);
-    if (!hospital.description && fullDescription.length === 0) return null;
+    const groups = visibleGroups(hospital, "full_description");
+    if (!hospital.description && groups.length === 0) return null;
+    const subs = parseObj(hospital.section_subheadings);
     return (
-      <SectionCard
-        key={key}
-        title={title}
-        subheading={parseObj(hospital.section_subheadings)[key] || parseObj(hospital.section_subheadings).full_description}
-      >
+      <SectionCard key={key} title={title} subheading={groups[0]?.subheading || subs[key]}>
         {hospital.description && (
           <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-3">{hospital.description}</p>
         )}
-        {fullDescription.length > 0 && (
-          <div className="space-y-3">
-            {fullDescription.map((p, idx) => (
-              <p key={idx} className="text-sm text-muted-foreground leading-relaxed">{p}</p>
-            ))}
-          </div>
-        )}
+        <GroupList
+          groups={groups}
+          render={(items) => (
+            <div className="space-y-3">
+              {items.map((p, idx) => (
+                <p key={idx} className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">{p}</p>
+              ))}
+            </div>
+          )}
+        />
       </SectionCard>
     );
   }
 
-  if (key === "specialities" || key === "area_of_expertise" || key === "infrastructure_details") {
-    const items = parseList(hospital[key]);
-    if (items.length === 0) return null;
-    const subheading = parseObj(hospital.section_subheadings)[key];
+  if (key === "specialities" || key === "area_of_expertise" || key === "infrastructure_details" || key === "doctors_list") {
+    const groups = visibleGroups(hospital, key);
+    if (groups.length === 0) return null;
     const theme = SECTION_ICON_THEME[key];
+    const fallbackSub = key === "doctors_list" ? "Our team of expert medical professionals" : "";
+    const firstSub = groups[0].subheading;
     return (
       <div key={key}>
         <h2 className="font-heading font-bold text-lg sm:text-xl mb-1">{title}</h2>
-        {subheading && <p className="font-bold text-base text-foreground/70 mb-3">{subheading}</p>}
-        {!subheading && <div className="mb-2 sm:mb-3" />}
-        <div className={`grid sm:grid-cols-2 ${key === "infrastructure_details" ? "" : "md:grid-cols-3"} gap-3`}>
-          {items.map((item, idx) => (
-            <div key={idx} className="flex items-center gap-2.5 text-sm text-muted-foreground bg-secondary/5 border border-secondary/15 rounded-xl px-3.5 py-3">
-              <span className={`flex items-center justify-center w-6 h-6 rounded-full ${theme.bg} ${theme.color} flex-shrink-0`}>
-                <theme.icon className="w-3.5 h-3.5" />
-              </span>
-              {item}
+        {firstSub ? (
+          <p className="font-bold text-base text-foreground/70 mb-3">{firstSub}</p>
+        ) : fallbackSub ? (
+          <p className="text-sm text-muted-foreground mb-3">{fallbackSub}</p>
+        ) : (
+          <div className="mb-2 sm:mb-3" />
+        )}
+        <GroupList
+          groups={groups}
+          render={(items) => (
+            <div className={`grid sm:grid-cols-2 ${key === "infrastructure_details" ? "" : "md:grid-cols-3"} gap-3`}>
+              {items.map((item, idx) => (
+                <div key={idx} className="flex items-center gap-2.5 text-sm text-muted-foreground bg-secondary/5 border border-secondary/15 rounded-xl px-3.5 py-3">
+                  <span className={`flex items-center justify-center w-6 h-6 rounded-full ${theme.bg} ${theme.color} flex-shrink-0`}>
+                    <theme.icon className="w-3.5 h-3.5" />
+                  </span>
+                  {item}
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  if (key === "doctors_list") {
-    const items = parseList(hospital.doctors_list);
-    if (items.length === 0) return null;
-    const subheading = parseObj(hospital.section_subheadings)[key];
-    return (
-      <div key={key}>
-        <h2 className="font-heading font-bold text-lg sm:text-xl mb-0.5">{title}</h2>
-        <p className={subheading ? "font-bold text-base text-foreground/70 mb-3" : "text-sm text-muted-foreground mb-3"}>
-          {subheading || "Our team of expert medical professionals"}
-        </p>
-        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
-          {items.map((doc, idx) => (
-            <div key={idx} className="flex items-center gap-2.5 text-sm text-muted-foreground bg-secondary/5 border border-secondary/15 rounded-xl px-3.5 py-3">
-              <span className={`flex items-center justify-center w-6 h-6 rounded-full ${SECTION_ICON_THEME.doctors_list.bg} ${SECTION_ICON_THEME.doctors_list.color} flex-shrink-0`}>
-                <Users className="w-3.5 h-3.5" />
-              </span>
-              {doc}
-            </div>
-          ))}
-        </div>
+          )}
+        />
       </div>
     );
   }
 
   if (key === "facilities") {
-    const facilities = parseList(hospital.facilities);
-    const internationalServices = parseList(hospital.international_patient_services);
-    if (facilities.length === 0 && internationalServices.length === 0) return null;
-    const subheading = parseObj(hospital.section_subheadings)[key];
+    const facilityGroups = visibleGroups(hospital, "facilities");
+    const intlGroups = visibleGroups(hospital, "international_patient_services");
+    if (facilityGroups.length === 0 && intlGroups.length === 0) return null;
+    const chips = (Icon) => (items) => (
+      <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
+        {items.map((f, idx) => (
+          <div key={idx} className="flex items-center gap-2.5 text-sm text-muted-foreground bg-secondary/5 border border-secondary/15 rounded-xl px-3.5 py-3">
+            <span className={`flex items-center justify-center w-6 h-6 rounded-full ${SECTION_ICON_THEME.facilities.bg} ${SECTION_ICON_THEME.facilities.color} flex-shrink-0`}>
+              <Icon className="w-3.5 h-3.5" />
+            </span>
+            {f}
+          </div>
+        ))}
+      </div>
+    );
+    const firstSub = facilityGroups[0]?.subheading;
+    // International services: every group shows its own heading (the first
+    // one defaults to "International Patient Services").
+    const intl = intlGroups.map((g, i) => (i === 0 && !g.subheading ? { ...g, subheading: "International Patient Services" } : g));
     return (
       <div key={key}>
         <h2 className="font-heading font-bold text-lg sm:text-xl mb-1">{title}</h2>
-        {subheading && <p className="font-bold text-base text-foreground/70 mb-3">{subheading}</p>}
-        {!subheading && <div className="mb-2 sm:mb-3" />}
-        {facilities.length > 0 && (
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
-            {facilities.map((f, idx) => (
-              <div key={idx} className="flex items-center gap-2.5 text-sm text-muted-foreground bg-secondary/5 border border-secondary/15 rounded-xl px-3.5 py-3">
-                <span className={`flex items-center justify-center w-6 h-6 rounded-full ${SECTION_ICON_THEME.facilities.bg} ${SECTION_ICON_THEME.facilities.color} flex-shrink-0`}>
-                  <Building2 className="w-3.5 h-3.5" />
-                </span>
-                {f}
-              </div>
-            ))}
+        {firstSub ? <p className="font-bold text-base text-foreground/70 mb-3">{firstSub}</p> : <div className="mb-2 sm:mb-3" />}
+        <GroupList groups={facilityGroups} render={chips(Building2)} />
+        {intl.length > 0 && (
+          <div className={facilityGroups.length > 0 ? "mt-5" : ""}>
+            <GroupList groups={intl} render={chips(Globe)} showFirst />
           </div>
-        )}
-        {internationalServices.length > 0 && (
-          <>
-            <h3 className={`font-heading font-bold text-base text-foreground/80 mb-3 ${facilities.length > 0 ? "mt-5" : ""}`}>
-              {parseObj(hospital.section_subheadings).international_patient_services || "International Patient Services"}
-            </h3>
-            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
-              {internationalServices.map((f, idx) => (
-                <div key={idx} className="flex items-center gap-2.5 text-sm text-muted-foreground bg-secondary/5 border border-secondary/15 rounded-xl px-3.5 py-3">
-                  <span className={`flex items-center justify-center w-6 h-6 rounded-full ${SECTION_ICON_THEME.facilities.bg} ${SECTION_ICON_THEME.facilities.color} flex-shrink-0`}>
-                    <Globe className="w-3.5 h-3.5" />
-                  </span>
-                  {f}
-                </div>
-              ))}
-            </div>
-          </>
         )}
       </div>
     );
   }
 
   if (key === "accreditations") {
-    const items = parseList(hospital.accreditations);
-    if (items.length === 0) return null;
-    const subheading = parseObj(hospital.section_subheadings)[key];
+    const groups = visibleGroups(hospital, key);
+    if (groups.length === 0) return null;
+    const firstSub = groups[0].subheading;
     return (
       <div key={key}>
         <h2 className="font-heading font-bold text-lg sm:text-xl mb-0.5">{title}</h2>
-        <p className={subheading ? "font-bold text-base text-foreground/70 mb-3" : "text-sm text-muted-foreground mb-3"}>
-          {subheading || "Recognized for excellence in healthcare quality and safety"}
+        <p className={firstSub ? "font-bold text-base text-foreground/70 mb-3" : "text-sm text-muted-foreground mb-3"}>
+          {firstSub || "Recognized for excellence in healthcare quality and safety"}
         </p>
-        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3 mb-4">
-          {items.map((a, idx) => (
-            <div key={idx} className="relative bg-white border border-border rounded-xl border-t-4 border-t-secondary px-4 py-3.5">
-              <Star className="absolute top-3 right-3 w-4 h-4 text-secondary/20" />
-              <p className="font-heading font-bold text-sm text-foreground pr-5">{a}</p>
-              <p className="flex items-center gap-1 text-xs text-secondary font-medium mt-1">
-                <CheckCircle2 className="w-3.5 h-3.5" /> Certified Excellence
-              </p>
+        <GroupList
+          groups={groups}
+          render={(items) => (
+            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3 mb-4">
+              {items.map((a, idx) => (
+                <div key={idx} className="relative bg-white border border-border rounded-xl border-t-4 border-t-secondary px-4 py-3.5">
+                  <Star className="absolute top-3 right-3 w-4 h-4 text-secondary/20" />
+                  <p className="font-heading font-bold text-sm text-foreground pr-5">{a}</p>
+                  <p className="flex items-center gap-1 text-xs text-secondary font-medium mt-1">
+                    <CheckCircle2 className="w-3.5 h-3.5" /> Certified Excellence
+                  </p>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          )}
+        />
         <div className="flex items-start gap-2.5 bg-blue-50 border border-blue-100 rounded-xl px-4 py-3.5">
           <Info className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
           <div>
@@ -589,8 +573,8 @@ function renderHospitalSection(key, rawTitle, hospital) {
   }
 
   if (key === "awards") {
-    const awards = parseList(hospital.awards);
-    if (awards.length === 0) return null;
+    const groups = visibleGroups(hospital, key);
+    if (groups.length === 0) return null;
     return (
       <motion.div
         key={key}
@@ -605,21 +589,24 @@ function renderHospitalSection(key, rawTitle, hospital) {
           </span>
           <div>
             <h2 className="font-heading font-bold text-lg sm:text-xl">{title}</h2>
-            {parseObj(hospital.section_subheadings).awards && (
-              <p className="font-bold text-sm text-foreground/70">{parseObj(hospital.section_subheadings).awards}</p>
-            )}
+            {groups[0].subheading && <p className="font-bold text-sm text-foreground/70">{groups[0].subheading}</p>}
           </div>
         </div>
-        <ul className="space-y-2.5">
-          {awards.map((a, idx) => (
-            <li key={idx} className="flex items-start gap-2.5 text-sm text-muted-foreground bg-white/70 rounded-lg px-3.5 py-3">
-              <span className="flex items-center justify-center w-6 h-6 rounded-full bg-[hsl(var(--accent-warm)/0.15)] text-[hsl(var(--accent-warm))] shrink-0">
-                <Medal className="w-3.5 h-3.5" />
-              </span>
-              {a}
-            </li>
-          ))}
-        </ul>
+        <GroupList
+          groups={groups}
+          render={(items) => (
+            <ul className="space-y-2.5">
+              {items.map((a, idx) => (
+                <li key={idx} className="flex items-start gap-2.5 text-sm text-muted-foreground bg-white/70 rounded-lg px-3.5 py-3">
+                  <span className="flex items-center justify-center w-6 h-6 rounded-full bg-[hsl(var(--accent-warm)/0.15)] text-[hsl(var(--accent-warm))] shrink-0">
+                    <Medal className="w-3.5 h-3.5" />
+                  </span>
+                  {a}
+                </li>
+              ))}
+            </ul>
+          )}
+        />
       </motion.div>
     );
   }
@@ -645,6 +632,20 @@ function renderHospitalSection(key, rawTitle, hospital) {
   }
 
   return null;
+}
+
+// A section's sub-heading groups, in the admin's order. The first group's
+// sub-heading is shown by the caller in the section's sub-heading slot
+// (unless showFirst), so only the later ones get a heading here.
+function GroupList({ groups, render, showFirst = false }) {
+  return groups.map((g, i) => (
+    <div key={g.id} className={i > 0 ? "mt-5" : ""}>
+      {(i > 0 || showFirst) && g.subheading && (
+        <h3 className="font-heading font-bold text-base text-foreground/80 mb-3">{g.subheading}</h3>
+      )}
+      {g.items.length > 0 && render(g.items)}
+    </div>
+  ));
 }
 
 function SectionCard({ title, subheading, children }) {

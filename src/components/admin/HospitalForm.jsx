@@ -6,7 +6,11 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
-import DynamicListField from "@/components/admin/DynamicListField";
+import GroupedListField from "@/components/admin/GroupedListField";
+import { buildGroupsMap, applyGroupsToPayload } from "@/lib/sectionGroups";
+
+// Sections that support several sub-headings (Admin → drag to reorder).
+const HOSPITAL_GROUP_KEYS = ["full_description", "specialities", "doctors_list", "facilities", "international_patient_services", "accreditations", "area_of_expertise", "infrastructure_details", "awards"];
 import SectionOrderEditor from "@/components/admin/SectionOrderEditor";
 import { DEFAULT_HOSPITAL_SECTIONS } from "@/pages/HospitalDetail";
 
@@ -33,20 +37,21 @@ export default function HospitalForm({ initialData, onCancel, onSaved }) {
   const isEdit = !!initialData;
 
   const [form, setForm] = useState(() => {
-    if (!initialData) return {};
+    if (!initialData) return { section_groups: buildGroupsMap(null, HOSPITAL_GROUP_KEYS) };
     const f = { ...initialData };
     ["full_description","specialities","doctors_list","facilities","international_patient_services","accreditations","area_of_expertise","infrastructure_details","awards","section_config"].forEach((k) => {
       f[k] = parseList(initialData[k]);
     });
     f.section_subheadings = parseObj(initialData.section_subheadings);
+    f.section_groups = buildGroupsMap(initialData, HOSPITAL_GROUP_KEYS);
     return f;
   });
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
 
   const set = (key, val) => setForm((p) => ({ ...p, [key]: val }));
-  const setSubheading = (key, val) =>
-    setForm((p) => ({ ...p, section_subheadings: { ...(p.section_subheadings || {}), [key]: val } }));
+  const setGroups = (key, groups) =>
+    setForm((p) => ({ ...p, section_groups: { ...(p.section_groups || {}), [key]: groups } }));
   const setList = (key, val) => set(key, val);
 
   const handleImage = async (e) => {
@@ -100,6 +105,10 @@ export default function HospitalForm({ initialData, onCancel, onSaved }) {
       section_config: JSON.stringify(form.section_config || []),
       section_subheadings: JSON.stringify(form.section_subheadings || {}),
     };
+
+    // Several sub-headings per section → section_groups, plus the old
+    // single-list columns (all points) so listings/search keep working.
+    applyGroupsToPayload(data, form.section_groups, HOSPITAL_GROUP_KEYS);
 
     try {
       if (isEdit) {
@@ -250,15 +259,15 @@ export default function HospitalForm({ initialData, onCancel, onSaved }) {
         </div>
 
         {/* Dynamic List Sections */}
-        <DynamicListField label="Full Description" placeholder="Description paragraph" required values={form.full_description} onChange={(v) => setList("full_description", v)} buttonAtTop  subheading={form.section_subheadings?.full_description} onSubheadingChange={(v) => setSubheading("full_description", v)} />
-        <DynamicListField label="Specialities" placeholder="Specialty" required values={form.specialities} onChange={(v) => setList("specialities", v)} buttonAtTop  subheading={form.section_subheadings?.specialities} onSubheadingChange={(v) => setSubheading("specialities", v)} />
-        <DynamicListField label="Doctor's List" placeholder="Doctor name" optional values={form.doctors_list} onChange={(v) => setList("doctors_list", v)} buttonAtTop  subheading={form.section_subheadings?.doctors_list} onSubheadingChange={(v) => setSubheading("doctors_list", v)} />
-        <DynamicListField label="Facilities" placeholder="Facility" required values={form.facilities} onChange={(v) => setList("facilities", v)} buttonAtTop  subheading={form.section_subheadings?.facilities} onSubheadingChange={(v) => setSubheading("facilities", v)} />
-        <DynamicListField label="International Patient Services" placeholder="Service" optional values={form.international_patient_services} onChange={(v) => setList("international_patient_services", v)} buttonAtTop  subheading={form.section_subheadings?.international_patient_services} onSubheadingChange={(v) => setSubheading("international_patient_services", v)} />
-        <DynamicListField label="Accreditation" placeholder="Accreditation" required values={form.accreditations} onChange={(v) => setList("accreditations", v)} buttonAtTop  subheading={form.section_subheadings?.accreditations} onSubheadingChange={(v) => setSubheading("accreditations", v)} />
-        <DynamicListField label="Area of Expertise" placeholder="Expertise" optional values={form.area_of_expertise} onChange={(v) => setList("area_of_expertise", v)} buttonAtTop  subheading={form.section_subheadings?.area_of_expertise} onSubheadingChange={(v) => setSubheading("area_of_expertise", v)} />
-        <DynamicListField label="Infrastructure Details" placeholder="Infrastructure detail" optional values={form.infrastructure_details} onChange={(v) => setList("infrastructure_details", v)} buttonAtTop  subheading={form.section_subheadings?.infrastructure_details} onSubheadingChange={(v) => setSubheading("infrastructure_details", v)} />
-        <DynamicListField label="Awards" placeholder="Award" optional values={form.awards} onChange={(v) => setList("awards", v)} buttonAtTop  subheading={form.section_subheadings?.awards} onSubheadingChange={(v) => setSubheading("awards", v)} />
+        <GroupedListField label="Full Description" placeholder="Description paragraph" required groups={form.section_groups?.full_description} onChange={(g) => setGroups("full_description", g)} multiline />
+        <GroupedListField label="Specialities" placeholder="Specialty" required groups={form.section_groups?.specialities} onChange={(g) => setGroups("specialities", g)} />
+        <GroupedListField label="Doctor's List" placeholder="Doctor name" optional groups={form.section_groups?.doctors_list} onChange={(g) => setGroups("doctors_list", g)} />
+        <GroupedListField label="Facilities" placeholder="Facility" required groups={form.section_groups?.facilities} onChange={(g) => setGroups("facilities", g)} />
+        <GroupedListField label="International Patient Services" placeholder="Service" optional groups={form.section_groups?.international_patient_services} onChange={(g) => setGroups("international_patient_services", g)} />
+        <GroupedListField label="Accreditation" placeholder="Accreditation" required groups={form.section_groups?.accreditations} onChange={(g) => setGroups("accreditations", g)} />
+        <GroupedListField label="Area of Expertise" placeholder="Expertise" optional groups={form.section_groups?.area_of_expertise} onChange={(g) => setGroups("area_of_expertise", g)} />
+        <GroupedListField label="Infrastructure Details" placeholder="Infrastructure detail" optional groups={form.section_groups?.infrastructure_details} onChange={(g) => setGroups("infrastructure_details", g)} />
+        <GroupedListField label="Awards" placeholder="Award" optional groups={form.section_groups?.awards} onChange={(g) => setGroups("awards", g)} />
 
         {/* Contact Information */}
         <div className="bg-white rounded-2xl border border-border p-4 sm:p-5 shadow-sm">

@@ -30,6 +30,7 @@ import { useLeadModal } from "@/lib/LeadModalContext";
 import { useSiteSettings, DEFAULT_SETTINGS, getWhatsAppLink } from "@/hooks/useSiteSettings";
 import { useDocumentMeta } from "@/hooks/useDocumentMeta";
 import DetailPageSkeleton from "@/components/common/DetailPageSkeleton";
+import { visibleGroups } from "@/lib/sectionGroups";
 
 const parseList = (val) => {
   if (!val) return [];
@@ -493,143 +494,78 @@ function resolveDoctorSectionConfig(raw) {
 // Renders one section's content for the given key, or null if there's
 // nothing to show — the caller filters out the nulls.
 function renderDoctorSection(key, title, doctor) {
-  if (key === "overview") {
-    const points = parseList(doctor.overview_points);
-    if (!doctor.overview && points.length === 0) return null;
-    const theme = SECTION_ICON_THEME.overview;
+  // Icon checklist used by most doctor sections.
+  const checklist = (theme) => (items) => (
+    <ul className="space-y-2">
+      {items.map((item, idx) => (
+        <li key={idx} className="flex items-start gap-2.5 text-sm text-muted-foreground">
+          <span className={`flex items-center justify-center w-6 h-6 rounded-full ${theme.bg} ${theme.color} flex-shrink-0`}>
+            <theme.icon className="w-3.5 h-3.5" />
+          </span>
+          <span className="pt-0.5">{item}</span>
+        </li>
+      ))}
+    </ul>
+  );
+
+  // Paragraph + points sections: "Overview" (overview + overview_points) and
+  // "Detailed Experience" (detailed_experience + experience_details).
+  if (key === "overview" || key === "detailed_experience") {
+    const pointsKey = key === "overview" ? "overview_points" : "experience_details";
+    const groups = visibleGroups(doctor, pointsKey);
+    const text = doctor[key];
+    if (!text && groups.length === 0) return null;
     const subs = parseObj(doctor.section_subheadings);
     return (
-      <SectionCard key={key} title={title} subheading={subs[key] || subs.overview_points}>
-        {doctor.overview && <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-3">{doctor.overview}</p>}
-        {points.length > 0 && (
-          <ul className="space-y-2">
-            {points.map((p, idx) => (
-              <li key={idx} className="flex items-start gap-2.5 text-sm text-muted-foreground">
-                <span className={`flex items-center justify-center w-6 h-6 rounded-full ${theme.bg} ${theme.color} flex-shrink-0`}>
-                  <theme.icon className="w-3.5 h-3.5" />
-                </span>
-                <span className="pt-0.5">{p}</span>
-              </li>
-            ))}
-          </ul>
-        )}
+      <SectionCard key={key} title={title} subheading={groups[0]?.subheading || subs[key]}>
+        {text && <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-3">{text}</p>}
+        <GroupList groups={groups} render={checklist(SECTION_ICON_THEME[key])} />
       </SectionCard>
     );
   }
 
   if (key === "treatments_list" || key === "specializations") {
-    const items = parseList(doctor[key]);
-    if (items.length === 0) return null;
-    const subheading = parseObj(doctor.section_subheadings)[key];
+    const groups = visibleGroups(doctor, key);
+    if (groups.length === 0) return null;
     const theme = SECTION_ICON_THEME[key];
+    const firstSub = groups[0].subheading;
     return (
       <div key={key}>
         <h2 className="font-heading font-bold text-lg sm:text-xl mb-1">{title}</h2>
-        {subheading && <p className="font-bold text-base text-foreground/70 mb-3">{subheading}</p>}
-        {!subheading && <div className="mb-2 sm:mb-3" />}
-        <div className="grid sm:grid-cols-2 gap-3">
-          {items.map((t, idx) => (
-            <div key={idx} className="flex items-center gap-2.5 text-sm text-muted-foreground bg-secondary/5 border border-secondary/15 rounded-xl px-3.5 py-3">
-              <span className={`flex items-center justify-center w-6 h-6 rounded-full ${theme.bg} ${theme.color} flex-shrink-0`}>
-                <theme.icon className="w-3.5 h-3.5" />
-              </span>
-              {t}
+        {firstSub ? <p className="font-bold text-base text-foreground/70 mb-3">{firstSub}</p> : <div className="mb-2 sm:mb-3" />}
+        <GroupList
+          groups={groups}
+          render={(items) => (
+            <div className="grid sm:grid-cols-2 gap-3">
+              {items.map((t, idx) => (
+                <div key={idx} className="flex items-center gap-2.5 text-sm text-muted-foreground bg-secondary/5 border border-secondary/15 rounded-xl px-3.5 py-3">
+                  <span className={`flex items-center justify-center w-6 h-6 rounded-full ${theme.bg} ${theme.color} flex-shrink-0`}>
+                    <theme.icon className="w-3.5 h-3.5" />
+                  </span>
+                  {t}
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          )}
+        />
       </div>
     );
   }
 
-  if (key === "detailed_experience") {
-    const points = parseList(doctor.experience_details);
-    if (!doctor.detailed_experience && points.length === 0) return null;
-    const theme = SECTION_ICON_THEME.detailed_experience;
-    const subs = parseObj(doctor.section_subheadings);
+  if (key === "qualifications_list" || key === "clinical_focus" || key === "additional_info" || key === "research_publications") {
+    const groups = visibleGroups(doctor, key);
+    if (groups.length === 0) return null;
     return (
-      <SectionCard key={key} title={title} subheading={subs[key] || subs.experience_details}>
-        {doctor.detailed_experience && (
-          <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-3">{doctor.detailed_experience}</p>
-        )}
-        {points.length > 0 && (
-          <ul className="space-y-2">
-            {points.map((d, idx) => (
-              <li key={idx} className="flex items-start gap-2.5 text-sm text-muted-foreground">
-                <span className={`flex items-center justify-center w-6 h-6 rounded-full ${theme.bg} ${theme.color} flex-shrink-0`}>
-                  <theme.icon className="w-3.5 h-3.5" />
-                </span>
-                <span className="pt-0.5">{d}</span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </SectionCard>
-    );
-  }
-
-  if (key === "qualifications_list" || key === "clinical_focus") {
-    const items = parseList(doctor[key]);
-    if (items.length === 0) return null;
-    const theme = SECTION_ICON_THEME[key];
-    return (
-      <SectionCard key={key} title={title} subheading={parseObj(doctor.section_subheadings)[key]}>
-        <ul className="space-y-2">
-          {items.map((item, idx) => (
-            <li key={idx} className="flex items-start gap-2.5 text-sm text-muted-foreground">
-              <span className={`flex items-center justify-center w-6 h-6 rounded-full ${theme.bg} ${theme.color} flex-shrink-0`}>
-                <theme.icon className="w-3.5 h-3.5" />
-              </span>
-              <span className="pt-0.5">{item}</span>
-            </li>
-          ))}
-        </ul>
-      </SectionCard>
-    );
-  }
-
-  if (key === "additional_info") {
-    const items = parseList(doctor.additional_info);
-    if (items.length === 0) return null;
-    const theme = SECTION_ICON_THEME.additional_info;
-    return (
-      <SectionCard key={key} title={title} subheading={parseObj(doctor.section_subheadings)[key]}>
-        <ul className="space-y-2.5">
-          {items.map((item, idx) => (
-            <li key={idx} className="flex items-start gap-2.5 text-sm text-muted-foreground">
-              <span className={`flex items-center justify-center w-6 h-6 rounded-full ${theme.bg} ${theme.color} flex-shrink-0`}>
-                <theme.icon className="w-3.5 h-3.5" />
-              </span>
-              <span className="pt-0.5">{item}</span>
-            </li>
-          ))}
-        </ul>
-      </SectionCard>
-    );
-  }
-
-  if (key === "research_publications") {
-    const items = parseList(doctor.research_publications);
-    if (items.length === 0) return null;
-    const theme = SECTION_ICON_THEME.research_publications;
-    return (
-      <SectionCard key={key} title={title} subheading={parseObj(doctor.section_subheadings)[key]}>
-        <ul className="space-y-2">
-          {items.map((item, idx) => (
-            <li key={idx} className="flex items-start gap-2.5 text-sm text-muted-foreground">
-              <span className={`flex items-center justify-center w-6 h-6 rounded-full ${theme.bg} ${theme.color} flex-shrink-0`}>
-                <theme.icon className="w-3.5 h-3.5" />
-              </span>
-              <span className="pt-0.5">{item}</span>
-            </li>
-          ))}
-        </ul>
+      <SectionCard key={key} title={title} subheading={groups[0].subheading}>
+        <GroupList groups={groups} render={checklist(SECTION_ICON_THEME[key])} />
       </SectionCard>
     );
   }
 
   if (key === "awards_achievements") {
-    const awards = parseList(doctor.awards_achievements);
-    if (awards.length === 0 && !doctor.award_document_url) return null;
+    const groups = visibleGroups(doctor, key);
+    const total = groups.reduce((n, g) => n + g.items.length, 0);
+    if (groups.length === 0 && !doctor.award_document_url) return null;
     return (
       <motion.div
         key={key}
@@ -644,21 +580,24 @@ function renderDoctorSection(key, title, doctor) {
           </span>
           <div>
             <h2 className="font-heading font-bold text-lg sm:text-xl">{title}</h2>
-            {parseObj(doctor.section_subheadings).awards_achievements && (
-              <p className="font-bold text-sm text-foreground/70">{parseObj(doctor.section_subheadings).awards_achievements}</p>
-            )}
+            {groups[0]?.subheading && <p className="font-bold text-sm text-foreground/70">{groups[0].subheading}</p>}
           </div>
         </div>
-        <ul className="space-y-2.5">
-          {awards.map((a, idx) => (
-            <li key={idx} className="flex items-start gap-2.5 text-sm text-muted-foreground bg-white/70 rounded-lg px-3.5 py-3">
-              <span className="flex items-center justify-center w-6 h-6 rounded-full bg-[hsl(var(--accent-warm)/0.15)] text-[hsl(var(--accent-warm))] shrink-0">
-                <Medal className="w-3.5 h-3.5" />
-              </span>
-              {a}
-            </li>
-          ))}
-        </ul>
+        <GroupList
+          groups={groups}
+          render={(items) => (
+            <ul className="space-y-2.5">
+              {items.map((a, idx) => (
+                <li key={idx} className="flex items-start gap-2.5 text-sm text-muted-foreground bg-white/70 rounded-lg px-3.5 py-3">
+                  <span className="flex items-center justify-center w-6 h-6 rounded-full bg-[hsl(var(--accent-warm)/0.15)] text-[hsl(var(--accent-warm))] shrink-0">
+                    <Medal className="w-3.5 h-3.5" />
+                  </span>
+                  {a}
+                </li>
+              ))}
+            </ul>
+          )}
+        />
         {doctor.award_document_url && (
           <a
             href={doctor.award_document_url}
@@ -669,32 +608,38 @@ function renderDoctorSection(key, title, doctor) {
             <Award className="w-4 h-4" /> View Certificate/Document
           </a>
         )}
-        <p className="flex items-center gap-1.5 justify-center mt-4 pt-4 border-t border-amber-200/70 text-xs font-medium text-[hsl(var(--accent-warm))]">
-          <Trophy className="w-3.5 h-3.5" /> {awards.length} Professional Achievement{awards.length !== 1 ? "s" : ""}
-        </p>
+        {total > 0 && (
+          <p className="flex items-center gap-1.5 justify-center mt-4 pt-4 border-t border-amber-200/70 text-xs font-medium text-[hsl(var(--accent-warm))]">
+            <Trophy className="w-3.5 h-3.5" /> {total} Professional Achievement{total !== 1 ? "s" : ""}
+          </p>
+        )}
       </motion.div>
     );
   }
 
   if (key === "why_choose_doctor") {
-    const items = parseList(doctor.why_choose_doctor);
-    if (items.length === 0) return null;
-    const subheading = parseObj(doctor.section_subheadings)[key];
+    const groups = visibleGroups(doctor, key);
+    if (groups.length === 0) return null;
+    const firstSub = groups[0].subheading;
     return (
       <div key={key}>
         <h2 className="font-heading font-bold text-lg sm:text-xl mb-1">{title}</h2>
-        {subheading && <p className="font-bold text-base text-foreground/70 mb-3">{subheading}</p>}
-        {!subheading && <div className="mb-2 sm:mb-3" />}
-        <div className="space-y-2.5">
-          {items.map((item, idx) => (
-            <div key={idx} className="flex items-start gap-2.5 text-sm text-muted-foreground bg-white border border-border rounded-xl px-4 py-3.5">
-              <span className="flex items-center justify-center w-5 h-5 rounded-full bg-accent-jade/15 text-accent-jade shrink-0 mt-0.5">
-                <CheckCircle2 className="w-3.5 h-3.5" />
-              </span>
-              {item}
+        {firstSub ? <p className="font-bold text-base text-foreground/70 mb-3">{firstSub}</p> : <div className="mb-2 sm:mb-3" />}
+        <GroupList
+          groups={groups}
+          render={(items) => (
+            <div className="space-y-2.5">
+              {items.map((item, idx) => (
+                <div key={idx} className="flex items-start gap-2.5 text-sm text-muted-foreground bg-white border border-border rounded-xl px-4 py-3.5">
+                  <span className="flex items-center justify-center w-5 h-5 rounded-full bg-accent-jade/15 text-accent-jade shrink-0 mt-0.5">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                  </span>
+                  {item}
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          )}
+        />
       </div>
     );
   }
@@ -709,6 +654,18 @@ function renderDoctorSection(key, title, doctor) {
   }
 
   return null;
+}
+
+// A section's sub-heading groups, in the admin's order. The first group's
+// sub-heading is shown by the caller in the section's sub-heading slot,
+// so only the later ones get a heading here.
+function GroupList({ groups, render }) {
+  return groups.map((g, i) => (
+    <div key={g.id} className={i > 0 ? "mt-5" : ""}>
+      {i > 0 && g.subheading && <h3 className="font-heading font-bold text-base text-foreground/80 mb-3">{g.subheading}</h3>}
+      {g.items.length > 0 && render(g.items)}
+    </div>
+  ));
 }
 
 function SectionCard({ title, subheading, children }) {
