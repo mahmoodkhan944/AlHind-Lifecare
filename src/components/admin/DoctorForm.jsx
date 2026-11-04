@@ -13,7 +13,7 @@ import { buildGroupsMap, applyGroupsToPayload } from "@/lib/sectionGroups";
 const DOCTOR_GROUP_KEYS = ["specializations", "treatments_list", "overview_points", "experience_details", "qualifications_list", "clinical_focus", "additional_info", "research_publications", "awards_achievements", "why_choose_doctor"];
 import AutocompleteInput from "@/components/admin/AutocompleteInput";
 import SectionOrderEditor from "@/components/admin/SectionOrderEditor";
-import { DEFAULT_DOCTOR_SECTIONS } from "@/pages/DoctorDetail";
+import { DEFAULT_DOCTOR_SECTIONS, renameOldDoctorTitles } from "@/pages/DoctorDetail";
 
 const parseList = (val) => {
   if (!val) return [];
@@ -45,6 +45,7 @@ export default function DoctorForm({ initialData, onCancel, onSaved }) {
     if (!initialData) return { section_groups: buildGroupsMap(null, DOCTOR_GROUP_KEYS) };
     const f = { ...initialData };
     LIST_FIELDS.forEach((k) => { f[k] = parseList(initialData[k]); });
+    f.section_config = renameOldDoctorTitles(f.section_config);
     f.section_subheadings = parseObj(initialData.section_subheadings);
     f.section_groups = buildGroupsMap(initialData, DOCTOR_GROUP_KEYS);
     return f;
@@ -233,7 +234,7 @@ export default function DoctorForm({ initialData, onCancel, onSaved }) {
 
         {/* Specializations & Treatments (unnumbered) */}
         <GroupedListField label="Specializations" placeholder="e.g., Heart Surgery" optional groups={form.section_groups?.specializations} onChange={(g) => setGroups("specializations", g)} />
-        <GroupedListField label="List of Treatments" placeholder="e.g., Knee Replacement Surgery" optional groups={form.section_groups?.treatments_list} onChange={(g) => setGroups("treatments_list", g)} />
+        <GroupedListField label="Treatments Offered" placeholder="e.g., Knee Replacement Surgery" optional groups={form.section_groups?.treatments_list} onChange={(g) => setGroups("treatments_list", g)} />
 
         {/* Section 1: Overview & Detailed Experience */}
         <div className="bg-white rounded-2xl border border-border p-4 sm:p-5 shadow-sm">

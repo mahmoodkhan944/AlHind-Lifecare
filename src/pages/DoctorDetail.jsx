@@ -471,7 +471,7 @@ const SECTION_ICON_THEME = {
 
 export const DEFAULT_DOCTOR_SECTIONS = [
   { key: "overview", title: "Overview" },
-  { key: "treatments_list", title: "List of Treatments" },
+  { key: "treatments_list", title: "Treatments Offered" },
   { key: "specializations", title: "Specializations" },
   { key: "detailed_experience", title: "Detailed Experience" },
   { key: "qualifications_list", title: "Qualifications" },
@@ -483,8 +483,19 @@ export const DEFAULT_DOCTOR_SECTIONS = [
   { key: "bio", title: "About" },
 ];
 
+// Section titles that were renamed — doctors saved with the old default title
+// show the new one (a title the admin typed themselves is left alone).
+const RENAMED_DOCTOR_TITLES = { treatments_list: { "List of Treatments": "Treatments Offered" } };
+
+export function renameOldDoctorTitles(list) {
+  return list.map((s) => {
+    const renamed = RENAMED_DOCTOR_TITLES[s?.key]?.[s?.title];
+    return renamed ? { ...s, title: renamed } : s;
+  });
+}
+
 function resolveDoctorSectionConfig(raw) {
-  const saved = parseList(raw);
+  const saved = renameOldDoctorTitles(parseList(raw));
   if (saved.length === 0) return DEFAULT_DOCTOR_SECTIONS.map((s) => ({ ...s, visible: true }));
   const known = new Set(saved.map((s) => s.key));
   const missing = DEFAULT_DOCTOR_SECTIONS.filter((s) => !known.has(s.key)).map((s) => ({ ...s, visible: true }));
