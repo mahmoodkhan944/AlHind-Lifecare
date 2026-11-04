@@ -193,7 +193,7 @@ export default function Hospitals() {
                             {h.doctors_count} Doctors
                           </span>
                         )}
-                        {h.rating && (
+                        {Number(h.rating) > 0 && (
                           <span className="flex items-center gap-1 text-amber-500">
                             <Star className="w-3.5 h-3.5 fill-current shrink-0" />
                             {h.rating}

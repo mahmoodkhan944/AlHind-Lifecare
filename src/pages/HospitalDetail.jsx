@@ -24,6 +24,7 @@ import { db } from "@/api/dataClient";
 import { Button } from "@/components/ui/button";
 import { useLeadModal } from "@/lib/LeadModalContext";
 import { useDocumentMeta } from "@/hooks/useDocumentMeta";
+import { useSiteSettings, getWhatsAppLink } from "@/hooks/useSiteSettings";
 import DetailPageSkeleton from "@/components/common/DetailPageSkeleton";
 
 const parseList = (val) => {
@@ -52,6 +53,8 @@ export default function HospitalDetail() {
   const [loading, setLoading] = useState(true);
   const [doctors, setDoctors] = useState([]);
   const { openLeadModal } = useLeadModal();
+  const { data: settings } = useSiteSettings();
+  const whatsappNumber = settings?.whatsapp_number;
 
   // The fixed CTA panel should only appear once the two-column content
   // section (marked by this ref) has scrolled up to roughly navbar height —
@@ -81,10 +84,14 @@ export default function HospitalDetail() {
   // the hospital details as clickable cards linking to each doctor's profile.
   useEffect(() => {
     if (!hospital?.name) return;
-    db.entities.Doctor.filter({ status: "active", hospital_name: hospital.name }, "-rating", 100)
-      .then(setDoctors)
+    // Matched loosely (ignoring case, extra spaces and punctuation) so a doctor
+    // saved with "Apollo hospital, Delhi" still shows on "Apollo Hospital Delhi".
+    const norm = (s) => String(s || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+    const target = norm(hospital.name);
+    db.entities.Doctor.filter({ status: "active" }, "-rating", 2000)
+      .then((all) => setDoctors(all.filter((d) => d.hospital_id === hospital.id || (d.hospital_name && norm(d.hospital_name) === target))))
       .catch(() => {});
-  }, [hospital?.name]);
+  }, [hospital?.id, hospital?.name]);
 
   // Sets the browser tab title / SEO meta description only — nothing from
   // this renders anywhere on the visible page.
@@ -137,10 +144,13 @@ export default function HospitalDetail() {
                   {hospital.hospital_type}
                 </span>
               )}
-              {hospital.rating && (
+              {Number(hospital.rating) > 0 && (
                 <span className="absolute top-4 sm:top-5 right-4 sm:right-5 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/95 backdrop-blur-sm text-xs sm:text-sm font-bold text-foreground shadow-sm">
                   {hospital.rating}
                   <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                  {Number(hospital.reviews_count) > 0 && (
+                    <span className="font-medium text-muted-foreground">({hospital.reviews_count} reviews)</span>
+                  )}
                 </span>
               )}
 
@@ -151,9 +161,9 @@ export default function HospitalDetail() {
                 </h1>
                 <p className="flex items-center gap-1.5 text-white/85 mb-4 text-sm sm:text-base">
                   <MapPin className="w-4 h-4 shrink-0" />
-                  {hospital.address || `${hospital.city}, ${hospital.country}`}
+                  {hospital.address || [hospital.city, hospital.state, hospital.country].filter(Boolean).join(", ")}
                 </p>
-                <div className="grid grid-cols-3 gap-3 sm:gap-6 pt-4 border-t border-white/20">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-6 pt-4 border-t border-white/20">
                   {hospital.established_year && (
                     <div className="flex items-start gap-2">
                       <Building2 className="w-4 h-4 sm:w-5 sm:h-5 shrink-0 mt-0.5 text-accent-warm" />
@@ -173,6 +183,15 @@ export default function HospitalDetail() {
                             .filter(Boolean)
                             .join(" | ")}
                         </p>
+                      </div>
+                    </div>
+                  )}
+                  {hospital.hospital_owner && (
+                    <div className="flex items-start gap-2">
+                      <Users className="w-4 h-4 sm:w-5 sm:h-5 shrink-0 mt-0.5 text-accent-warm" />
+                      <div className="min-w-0">
+                        <p className="text-[11px] sm:text-xs text-white/70">Owner / Chairman</p>
+                        <p className="font-heading font-bold text-sm sm:text-base leading-tight">{hospital.hospital_owner}</p>
                       </div>
                     </div>
                   )}
@@ -207,7 +226,7 @@ export default function HospitalDetail() {
                 card is the fixed panel below. No lead-capture form here on
                 purpose — just the two action buttons. */}
             <div className="lg:hidden">
-              <HospitalSidebarCard hospital={hospital} openLeadModal={openLeadModal} />
+              <HospitalSidebarCard hospital={hospital} openLeadModal={openLeadModal} whatsappNumber={whatsappNumber} />
             </div>
             <div className="hidden lg:block" />
           </div>
@@ -295,7 +314,7 @@ export default function HospitalDetail() {
           <Calendar className="w-4 h-4" /> Request Appointment
         </Button>
         <a
-          href={`https://wa.me/919876543210?text=I'm interested in ${hospital.name}`}
+          href={`${getWhatsAppLink(whatsappNumber)}?text=${encodeURIComponent(`I'm interested in ${hospital.name}`)}`}
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -316,7 +335,7 @@ export default function HospitalDetail() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex justify-end">
             <div className={`w-full lg:w-[calc(33.333%-1rem)] ${showFloatingCta ? "pointer-events-auto" : "pointer-events-none"}`}>
-              <HospitalSidebarCard hospital={hospital} openLeadModal={openLeadModal} />
+              <HospitalSidebarCard hospital={hospital} openLeadModal={openLeadModal} whatsappNumber={whatsappNumber} />
             </div>
           </div>
         </div>
@@ -325,7 +344,7 @@ export default function HospitalDetail() {
   );
 }
 
-function HospitalSidebarCard({ hospital, openLeadModal }) {
+function HospitalSidebarCard({ hospital, openLeadModal, whatsappNumber }) {
   return (
     <div className="bg-white rounded-2xl p-5 sm:p-6 border shadow-lg space-y-3.5">
       <h3 className="font-heading font-bold text-base sm:text-lg">Get in Touch</h3>
@@ -342,7 +361,7 @@ function HospitalSidebarCard({ hospital, openLeadModal }) {
         <Calendar className="w-4 h-4" /> Request Appointment
       </Button>
       <a
-        href={`https://wa.me/919876543210?text=I'm interested in ${hospital.name}`}
+        href={`${getWhatsAppLink(whatsappNumber)}?text=${encodeURIComponent(`I'm interested in ${hospital.name}`)}`}
         target="_blank"
         rel="noopener noreferrer"
         className="block"
@@ -422,7 +441,11 @@ function renderHospitalSection(key, rawTitle, hospital) {
     const fullDescription = parseList(hospital.full_description);
     if (!hospital.description && fullDescription.length === 0) return null;
     return (
-      <SectionCard key={key} title={title} subheading={parseObj(hospital.section_subheadings)[key]}>
+      <SectionCard
+        key={key}
+        title={title}
+        subheading={parseObj(hospital.section_subheadings)[key] || parseObj(hospital.section_subheadings).full_description}
+      >
         {hospital.description && (
           <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-3">{hospital.description}</p>
         )}
@@ -495,16 +518,35 @@ function renderHospitalSection(key, rawTitle, hospital) {
         <h2 className="font-heading font-bold text-lg sm:text-xl mb-1">{title}</h2>
         {subheading && <p className="font-bold text-base text-foreground/70 mb-3">{subheading}</p>}
         {!subheading && <div className="mb-2 sm:mb-3" />}
-        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
-          {[...facilities, ...internationalServices].map((f, idx) => (
-            <div key={idx} className="flex items-center gap-2.5 text-sm text-muted-foreground bg-secondary/5 border border-secondary/15 rounded-xl px-3.5 py-3">
-              <span className={`flex items-center justify-center w-6 h-6 rounded-full ${SECTION_ICON_THEME.facilities.bg} ${SECTION_ICON_THEME.facilities.color} flex-shrink-0`}>
-                <Building2 className="w-3.5 h-3.5" />
-              </span>
-              {f}
+        {facilities.length > 0 && (
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
+            {facilities.map((f, idx) => (
+              <div key={idx} className="flex items-center gap-2.5 text-sm text-muted-foreground bg-secondary/5 border border-secondary/15 rounded-xl px-3.5 py-3">
+                <span className={`flex items-center justify-center w-6 h-6 rounded-full ${SECTION_ICON_THEME.facilities.bg} ${SECTION_ICON_THEME.facilities.color} flex-shrink-0`}>
+                  <Building2 className="w-3.5 h-3.5" />
+                </span>
+                {f}
+              </div>
+            ))}
+          </div>
+        )}
+        {internationalServices.length > 0 && (
+          <>
+            <h3 className={`font-heading font-bold text-base text-foreground/80 mb-3 ${facilities.length > 0 ? "mt-5" : ""}`}>
+              {parseObj(hospital.section_subheadings).international_patient_services || "International Patient Services"}
+            </h3>
+            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
+              {internationalServices.map((f, idx) => (
+                <div key={idx} className="flex items-center gap-2.5 text-sm text-muted-foreground bg-secondary/5 border border-secondary/15 rounded-xl px-3.5 py-3">
+                  <span className={`flex items-center justify-center w-6 h-6 rounded-full ${SECTION_ICON_THEME.facilities.bg} ${SECTION_ICON_THEME.facilities.color} flex-shrink-0`}>
+                    <Globe className="w-3.5 h-3.5" />
+                  </span>
+                  {f}
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          </>
+        )}
       </div>
     );
   }
