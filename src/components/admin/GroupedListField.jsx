@@ -30,6 +30,7 @@ export default function GroupedListField({
   onChange,
   multiline = false,
   accent = false,
+  hint,
 }) {
   // An empty section still shows one blank group to type into.
   const list = groups && groups.length > 0 ? groups : [newGroup()];
@@ -85,6 +86,7 @@ export default function GroupedListField({
       <p className="text-[11px] text-muted-foreground/80 mb-3">
         Add as many sub-headings as you need. Drag <GripVertical className="inline w-3 h-3 -mt-0.5" /> to move sub-headings or points up/down.
       </p>
+      {hint && <p className="text-xs text-accent-jade bg-accent-jade/5 border border-accent-jade/15 rounded-lg px-3 py-2 mb-3">{hint}</p>}
 
       <DragDropContext onDragEnd={onDragEnd}>
         <Droppable droppableId="groups" type="GROUP">

@@ -266,7 +266,7 @@ export default function HospitalForm({ initialData, onCancel, onSaved }) {
         <GroupedListField label="International Patient Services" placeholder="Service" optional groups={form.section_groups?.international_patient_services} onChange={(g) => setGroups("international_patient_services", g)} />
         <GroupedListField label="Accreditation" placeholder="Accreditation" required groups={form.section_groups?.accreditations} onChange={(g) => setGroups("accreditations", g)} />
         <GroupedListField label="Area of Expertise" placeholder="Expertise" optional groups={form.section_groups?.area_of_expertise} onChange={(g) => setGroups("area_of_expertise", g)} />
-        <GroupedListField label="Infrastructure Details" placeholder="Infrastructure detail" optional groups={form.section_groups?.infrastructure_details} onChange={(g) => setGroups("infrastructure_details", g)} />
+        <GroupedListField label="Infrastructure Details" placeholder="e.g. Total Beds | 230" hint={<>Write <b>Name | Detail</b> (e.g. <b>Total Beds | 230</b>) to show it as a table row. A point without "|" (e.g. <b>Advanced modular operation theatres</b>) is shown as a bullet highlight below the table.</>} optional groups={form.section_groups?.infrastructure_details} onChange={(g) => setGroups("infrastructure_details", g)} />
         <GroupedListField label="Awards" placeholder="Award" optional groups={form.section_groups?.awards} onChange={(g) => setGroups("awards", g)} />
 
         {/* Contact Information */}

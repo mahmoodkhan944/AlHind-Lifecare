@@ -1016,7 +1016,7 @@ function renderTreatmentSection(key, title, treatment) {
     const theme = SECTION_ICON_THEME[key];
     const ItemIcon = theme?.icon || CheckCircle2;
     return (
-      <SectionCard key={key} title={title} subheading={groups[0].subheading}>
+      <SectionCard key={key} title={title} subheading={slotSub(groups)}>
         <GroupList
           groups={groups}
           render={(items) => (
@@ -1040,7 +1040,7 @@ function renderTreatmentSection(key, title, treatment) {
     const groups = visibleGroups(treatment, key);
     if (groups.length === 0) return null;
     return (
-      <SectionCard key={key} title={title} subheading={groups[0].subheading}>
+      <SectionCard key={key} title={title} subheading={slotSub(groups)}>
         <GroupList
           groups={groups}
           render={(items) => (
@@ -1073,16 +1073,37 @@ function renderTreatmentSection(key, title, treatment) {
   return null;
 }
 
-// A section's sub-heading groups, in the admin's order. The first group's
-// sub-heading is shown in the SectionCard's sub-heading slot, so only the
-// later ones get a heading here.
+// A sub-heading inside a section: small accent bar + bold text, so it reads
+// as part of the heading above it rather than a new section.
+function SubHeading({ children, hidden = false }) {
+  return (
+    <h3
+      className={`flex items-center gap-2 font-heading font-bold text-[15px] text-secondary mb-3 ${hidden ? "invisible" : ""}`}
+      aria-hidden={hidden || undefined}
+    >
+      <span className="w-1 h-4 rounded-full bg-accent-jade shrink-0" />
+      {children}
+    </h3>
+  );
+}
+
+// With one group its sub-heading goes under the section title (as before);
+// with several, every group shows its own sub-heading inside the section.
+const slotSub = (groups) => (groups.length === 1 ? groups[0].subheading : "");
+
+// A section's sub-heading groups, in the admin's order.
 function GroupList({ groups, render }) {
-  return groups.map((g, i) => (
-    <div key={g.id} className={i > 0 ? "mt-5" : ""}>
-      {i > 0 && g.subheading && <h3 className="font-heading font-bold text-base text-foreground/80 mb-3">{g.subheading}</h3>}
+  const multi = groups.length > 1;
+  const blocks = groups.map((g, i) => (
+    <div key={g.id} className={i > 0 ? "mt-5 pt-5 border-t border-border/70" : ""}>
+      {multi && g.subheading && <SubHeading>{g.subheading}</SubHeading>}
       {g.items.length > 0 && render(g.items)}
     </div>
   ));
+  // Several sub-headings: one white card under the section heading holds them
+  // all (same look as the Hospital page), so they read as part of it.
+  if (!multi) return blocks;
+  return <div className="rounded-2xl border border-border bg-white/80 p-4 sm:p-5">{blocks}</div>;
 }
 
 function SectionCard({ title, subheading, children }) {

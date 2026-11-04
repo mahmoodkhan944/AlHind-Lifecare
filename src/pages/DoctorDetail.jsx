@@ -533,7 +533,7 @@ function renderDoctorSection(key, title, doctor) {
     if (!text && groups.length === 0) return null;
     const subs = parseObj(doctor.section_subheadings);
     return (
-      <SectionCard key={key} title={title} subheading={groups[0]?.subheading || subs[key]}>
+      <SectionCard key={key} title={title} subheading={groups.length > 1 ? "" : groups[0]?.subheading || subs[key]}>
         {text && <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-3">{text}</p>}
         <GroupList groups={groups} render={checklist(SECTION_ICON_THEME[key])} />
       </SectionCard>
@@ -569,7 +569,7 @@ function renderDoctorSection(key, title, doctor) {
     const groups = visibleGroups(doctor, key);
     if (groups.length === 0) return null;
     return (
-      <SectionCard key={key} title={title} subheading={groups[0].subheading}>
+      <SectionCard key={key} title={title} subheading={slotSub(groups)}>
         <GroupList groups={groups} render={checklist(SECTION_ICON_THEME[key])} />
       </SectionCard>
     );
@@ -593,7 +593,7 @@ function renderDoctorSection(key, title, doctor) {
           </span>
           <div>
             <h2 className="font-heading font-bold text-lg sm:text-xl">{title}</h2>
-            {groups[0]?.subheading && <p className="font-bold text-sm text-foreground/70">{groups[0].subheading}</p>}
+            {slotSub(groups) && <p className="font-bold text-sm text-foreground/70">{slotSub(groups)}</p>}
           </div>
         </div>
         <GroupList
@@ -633,7 +633,7 @@ function renderDoctorSection(key, title, doctor) {
   if (key === "why_choose_doctor") {
     const groups = visibleGroups(doctor, key);
     if (groups.length === 0) return null;
-    const firstSub = groups[0].subheading;
+    const firstSub = slotSub(groups);
     return (
       <div key={key}>
         <h2 className="font-heading font-bold text-lg sm:text-xl mb-1">{title}</h2>
@@ -686,35 +686,58 @@ function ChipGroups({ groups, renderItem, maxCols = 3, className = "" }) {
   const multi = groups.length > 1;
   // Keeps boxes aligned when one group has no sub-heading but its neighbours do.
   const anySub = multi && groups.some((g) => g.subheading);
-  return (
-    <div className={`grid ${outer} grid-flow-row-dense gap-x-3 ${multi ? "gap-y-5" : "gap-y-3"} ${className}`}>
+  const grid = (
+    <div className={`grid ${outer} grid-flow-row-dense gap-x-3 ${multi ? "gap-y-6" : "gap-y-3"}`}>
       {groups.map((g) => {
         const n = Math.min(Math.max(g.items.length, 1), 3);
         return (
           <div key={g.id} className={`flex flex-col ${SPAN[n]}`}>
-            {anySub && (
-              <h3 className={`font-heading font-bold text-base text-foreground/80 mb-2.5 ${g.subheading ? "" : "invisible"}`} aria-hidden={!g.subheading}>
-                {g.subheading || "\u00a0"}
-              </h3>
+            {anySub && <SubHeading hidden={!g.subheading}>{g.subheading || "\u00a0"}</SubHeading>}
+            {g.items.length > 0 && (
+              <div className={`grid ${INNER[n]} auto-rows-fr gap-3 flex-1`}>{g.items.map((item, idx) => renderItem(item, idx, g))}</div>
             )}
-            {g.items.length > 0 && <div className={`grid ${INNER[n]} auto-rows-fr gap-3 flex-1`}>{g.items.map(renderItem)}</div>}
           </div>
         );
       })}
     </div>
   );
+  // Several sub-headings: keep them all inside one card so they clearly
+  // belong to the section heading above instead of looking like new sections.
+  if (!multi) return className ? <div className={className}>{grid}</div> : grid;
+  return <div className={`rounded-2xl border border-border bg-white/70 p-4 sm:p-5 ${className}`}>{grid}</div>;
 }
 
-// A section's sub-heading groups, in the admin's order. The first group's
-// sub-heading is shown by the caller in the section's sub-heading slot,
-// so only the later ones get a heading here.
+// A sub-heading inside a section: small accent bar + bold text, so it reads
+// as part of the heading above it rather than a new section.
+function SubHeading({ children, hidden = false }) {
+  return (
+    <h3
+      className={`flex items-center gap-2 font-heading font-bold text-[15px] text-secondary mb-3 ${hidden ? "invisible" : ""}`}
+      aria-hidden={hidden || undefined}
+    >
+      <span className="w-1 h-4 rounded-full bg-accent-jade shrink-0" />
+      {children}
+    </h3>
+  );
+}
+
+// With one group its sub-heading goes under the section title (as before);
+// with several, every group shows its own sub-heading inside the section.
+const slotSub = (groups) => (groups.length === 1 ? groups[0].subheading : "");
+
+// A section's sub-heading groups, in the admin's order.
 function GroupList({ groups, render }) {
-  return groups.map((g, i) => (
-    <div key={g.id} className={i > 0 ? "mt-5" : ""}>
-      {i > 0 && g.subheading && <h3 className="font-heading font-bold text-base text-foreground/80 mb-3">{g.subheading}</h3>}
+  const multi = groups.length > 1;
+  const blocks = groups.map((g, i) => (
+    <div key={g.id} className={i > 0 ? "mt-5 pt-5 border-t border-border/70" : ""}>
+      {multi && g.subheading && <SubHeading>{g.subheading}</SubHeading>}
       {g.items.length > 0 && render(g.items)}
     </div>
   ));
+  // Several sub-headings: one white card under the section heading holds them
+  // all (same look as the Hospital page), so they read as part of it.
+  if (!multi) return blocks;
+  return <div className="rounded-2xl border border-border bg-white/80 p-4 sm:p-5">{blocks}</div>;
 }
 
 function SectionCard({ title, subheading, children }) {
