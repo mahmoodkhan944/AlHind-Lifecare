@@ -1,105 +1,207 @@
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Star, ChevronLeft, ChevronRight, Quote } from "lucide-react";
+import { motion } from "framer-motion";
+import { Star, Quote, MessageSquareText, ChevronLeft, ChevronRight, PlayCircle } from "lucide-react";
 import { db } from "@/api/dataClient";
 
-const fallback = [
-  {
-    id: "1",
-    patient_name: "Lison Tafadzwa Shumba",
-    country: "Zimbabwe",
-    photo_url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop&crop=face",
-    treatment: "Aortic Valve Replacement Surgery",
-    hospital: "Metro Heart Institute",
-    rating: 5,
-    review_text: "I was advised to undergo Aortic Valve Replacement surgery and contacted Alhind Medical Care for help. From online consultations and visa assistance to hospital arrangements and support in India, their team helped me at every step. Through Alhind Medical Care, I met Dr. Vishal Dhir at Metro Heart Institute, where my surgery was successfully completed. I am especially thankful to Mr. Mohd Ashraf for his support, guidance, and personal care throughout the journey. I truly appreciate the honest support and services provided by Alhind Medical Care.",
-  },
-];
+const HERO_IMAGE =
+  "https://plus.unsplash.com/premium_photo-1738663458251-ab83dc049ff3?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mzd8fHRlc3RpbW9uaWFsc3xlbnwwfHwwfHx8MA%3D%3D";
+
+const PAGE_SIZE = 12;
 
 export default function Testimonials() {
-  const [items, setItems] = useState(fallback);
-  const [idx, setIdx] = useState(0);
+  const [testimonials, setTestimonials] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
-    db.entities.Testimonial.filter({ status: "approved", featured: true }, "-created_date", 10)
-      .then((data) => { if (data.length > 0) setItems(data); })
-      .catch(() => {});
+    // "-created_date" sorts newest first, so the latest approved testimonials
+    // are already at the front of the array — page 1 shows them first.
+    db.entities.Testimonial.filter({ status: "approved" }, "-created_date", 500)
+      .then(setTestimonials)
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, []);
 
-  const t = items[idx] || fallback[0];
-  const prev = () => setIdx((p) => (p - 1 + items.length) % items.length);
-  const next = () => setIdx((p) => (p + 1) % items.length);
+  const totalPages = Math.max(1, Math.ceil(testimonials.length / PAGE_SIZE));
+  const paginated = testimonials.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+  const goToPage = (p) => {
+    const next = Math.min(Math.max(1, p), totalPages);
+    setPage(next);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   return (
-    <section className="py-10 sm:py-12 md:py-16">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6">
-        <div className="text-center mb-10">
-          <span className="text-xs font-bold tracking-wider uppercase text-primary mb-1 block">Testimonials</span>
-          <h2 className="font-heading font-extrabold text-2xl md:text-3xl text-foreground">What Our Patients Say</h2>
-          <p className="text-sm md:text-base text-muted-foreground mt-1">Stories of Healing and Trust From Our Valued Patients</p>
+    <div>
+      {/* Hero */}
+      <section className="relative pt-20 sm:pt-24 md:pt-28 pb-8 sm:pb-10 md:pb-12 overflow-hidden">
+        <div className="absolute inset-0">
+          <img src={HERO_IMAGE} alt="" className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-br from-secondary/90 via-secondary/90 to-[#0E8C7A]/85" />
         </div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 text-center">
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="font-heading font-bold text-[clamp(1.75rem,6vw,3rem)] text-white mb-3 text-balance"
+          >
+            Patient Testimonials
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="text-white/70 text-base sm:text-lg text-balance"
+          >
+            Real stories from real patients around the world
+          </motion.p>
+        </div>
+      </section>
 
-        <div className="bg-white rounded-3xl border border-border/40 p-6 sm:p-10 shadow-lg shadow-primary/5">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={idx}
-              initial={{ opacity: 0, x: 30 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -30 }}
-              transition={{ duration: 0.3 }}
-              className="grid md:grid-cols-[1fr_auto] gap-6 md:gap-8 items-center"
-            >
-              <div>
-                <div className="flex gap-1 mb-4">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className={`w-5 h-5 ${i < (t.rating || 5) ? "text-accent fill-accent" : "text-muted"}`} />
-                  ))}
-                </div>
-                <Quote className="w-8 h-8 text-secondary mb-3" />
-                <p className="text-sm md:text-base text-muted-foreground leading-relaxed mb-5">{t.review_text}</p>
-                <h4 className="font-heading font-bold text-base text-foreground">{t.patient_name}</h4>
-                <p className="text-xs text-muted-foreground">
-                  {t.treatment || "AVR Surgery"} • {t.hospital || "Metro Heart Institute"}
-                </p>
-              </div>
-              <div className="flex flex-col items-center text-center">
-                <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden bg-muted border-2 border-secondary flex-shrink-0">
-                  {t.photo_url ? (
-                    <img src={t.photo_url} alt={t.patient_name} className="w-full h-full object-cover" loading="lazy" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-3xl font-bold text-muted-foreground">
-                      {t.patient_name?.[0]}
+      <section className="py-8 sm:py-10 md:py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          {loading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="p-6 sm:p-8 rounded-2xl bg-white border border-border/50 animate-pulse space-y-4">
+                  <div className="flex gap-1">
+                    {[...Array(5)].map((_, j) => (
+                      <div key={j} className="w-4 h-4 rounded-full bg-muted" />
+                    ))}
+                  </div>
+                  <div className="space-y-2">
+                    <div className="h-3 w-full bg-muted rounded" />
+                    <div className="h-3 w-5/6 bg-muted rounded" />
+                    <div className="h-3 w-2/3 bg-muted rounded" />
+                  </div>
+                  <div className="flex items-center gap-3 pt-4 border-t">
+                    <div className="w-10 h-10 rounded-full bg-muted shrink-0" />
+                    <div className="space-y-1.5 flex-1">
+                      <div className="h-3 w-1/2 bg-muted rounded" />
+                      <div className="h-2.5 w-1/3 bg-muted rounded" />
                     </div>
-                  )}
+                  </div>
                 </div>
-                <p className="font-heading font-semibold text-sm text-foreground mt-3">{t.patient_name}</p>
-                <p className="text-xs text-muted-foreground">{t.country}</p>
-              </div>
-            </motion.div>
-          </AnimatePresence>
-
-          {/* Controls */}
-          <div className="flex items-center justify-between mt-8">
-            <div className="flex gap-2">
-              <button onClick={prev} className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 transition-colors">
-                <ChevronLeft className="w-5 h-5" />
-              </button>
-              <button onClick={next} className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 transition-colors">
-                <ChevronRight className="w-5 h-5" />
-              </button>
-            </div>
-            <div className="flex gap-2">
-              {items.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => setIdx(i)}
-                  className={`h-2 rounded-full transition-all ${i === idx ? "w-6 bg-primary" : "w-2 bg-muted"}`}
-                />
               ))}
             </div>
-          </div>
+          ) : testimonials.length === 0 ? (
+            <div className="text-center py-10 sm:py-12 text-muted-foreground">
+              <MessageSquareText className="w-10 h-10 mx-auto mb-3 text-primary/40" />
+              <p className="font-medium">No testimonials yet</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              {paginated.map((t, i) => (
+                <motion.div
+                  key={t.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: Math.min(i * 0.05, 0.4) }}
+                  className="flex flex-col h-full p-6 sm:p-8 rounded-2xl bg-white border border-border/50 hover:shadow-lg transition-all relative"
+                >
+                  <Quote className="absolute top-5 right-5 sm:top-6 sm:right-6 w-7 h-7 sm:w-8 sm:h-8 text-primary/10" />
+                  <div className="flex items-center gap-1 mb-3 sm:mb-4">
+                    {Array.from({ length: 5 }).map((_, j) => (
+                      <Star
+                        key={j}
+                        className={`w-4 h-4 shrink-0 ${j < (t.rating || 5) ? "text-[hsl(var(--accent-warm))] fill-[hsl(var(--accent-warm))]" : "text-muted-foreground/30"}`}
+                      />
+                    ))}
+                  </div>
+                  <p className="text-foreground/80 text-sm leading-relaxed mb-5 sm:mb-6 flex-1">"{t.review_text}"</p>
+                  {t.video_url && (
+                    <a
+                      href={t.video_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline mb-4 -mt-2 self-start"
+                    >
+                      <PlayCircle className="w-4 h-4" /> Watch video
+                    </a>
+                  )}
+                  <div className="flex items-center gap-3 pt-4 border-t mt-auto">
+                    <div className="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-bold text-sm shrink-0">
+                      {t.photo_url ? (
+                        <img
+                          src={t.photo_url}
+                          alt={t.patient_name}
+                          loading="lazy"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        t.patient_name?.[0]
+                      )}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="font-heading font-semibold text-sm truncate">{t.patient_name}</p>
+                      <p className="text-xs text-muted-foreground truncate">
+                        {t.country}
+                        {t.treatment ? ` · ${t.treatment}` : ""}
+                      </p>
+                      {(t.hospital || t.doctor) && (
+                        <p className="text-xs text-muted-foreground/80 truncate">
+                          {[t.doctor, t.hospital].filter(Boolean).join(" · ")}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
+
+          {/* Pagination — 12 testimonials per page, latest first */}
+          {!loading && testimonials.length > PAGE_SIZE && (
+            <div className="flex items-center justify-center gap-1.5 sm:gap-2 mt-8 sm:mt-10 flex-wrap">
+              <button
+                onClick={() => goToPage(page - 1)}
+                disabled={page === 1}
+                aria-label="Previous page"
+                className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-lg border border-border bg-white text-muted-foreground hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+
+              {Array.from({ length: totalPages }, (_, i) => i + 1)
+                .filter((p) => p === 1 || p === totalPages || Math.abs(p - page) <= 1)
+                .reduce((acc, p, idx, arr) => {
+                  if (idx > 0 && p - arr[idx - 1] > 1) acc.push("ellipsis-" + p);
+                  acc.push(p);
+                  return acc;
+                }, [])
+                .map((p) =>
+                  typeof p === "string" ? (
+                    <span key={p} className="px-1 text-muted-foreground text-sm select-none">
+                      …
+                    </span>
+                  ) : (
+                    <button
+                      key={p}
+                      onClick={() => goToPage(p)}
+                      aria-current={p === page ? "page" : undefined}
+                      className={`w-9 h-9 sm:w-10 sm:h-10 rounded-lg text-sm font-semibold transition-colors ${
+                        p === page
+                          ? "bg-primary text-primary-foreground shadow-md shadow-primary/25"
+                          : "border border-border bg-white text-foreground hover:bg-muted"
+                      }`}
+                    >
+                      {p}
+                    </button>
+                  )
+                )}
+
+              <button
+                onClick={() => goToPage(page + 1)}
+                disabled={page === totalPages}
+                aria-label="Next page"
+                className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-lg border border-border bg-white text-muted-foreground hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          )}
         </div>
-      </div>
-    </section>
+      </section>
+    </div>
   );
 }

@@ -6,6 +6,7 @@ import { db } from "@/api/dataClient";
 import { Button } from "@/components/ui/button";
 import moment from "moment";
 import { toBlogHtml } from "@/lib/blogContent";
+import { useDocumentMeta } from "@/hooks/useDocumentMeta";
 
 const parseList = (val) => {
   if (!val) return [];
@@ -28,10 +29,18 @@ export default function BlogDetail() {
 
   useEffect(() => {
     db.entities.BlogPost.get(id)
-      .then(setPost)
+      // Drafts are not public — only published posts open on the website.
+      .then((p) => setPost(p && p.status === "published" ? p : null))
       .catch(() => {})
       .finally(() => setLoading(false));
   }, [id]);
+
+  // The SEO Title / SEO Description from Admin → Blog were saved but never
+  // used. They now set the browser tab title and search-engine description.
+  useDocumentMeta({
+    title: post ? post.seo_title || `${post.title} | AlHind Lifecare` : undefined,
+    description: post ? post.seo_description || post.excerpt || undefined : undefined,
+  });
 
   if (loading) {
     return (

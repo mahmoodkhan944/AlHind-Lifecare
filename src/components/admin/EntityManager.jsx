@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
-import { Plus, Pencil, Trash2, Search } from "lucide-react";
+import { Plus, Pencil, Trash2, Search, Upload, Loader2 } from "lucide-react";
 import AdminPagination from "@/components/admin/AdminPagination";
 import AdminPageHeader from "@/components/admin/AdminPageHeader";
 import StatCard from "@/components/admin/StatCard";
@@ -40,6 +40,8 @@ export default function EntityManager({
   const [editItem, setEditItem] = useState(null);
   const [form, setForm] = useState({});
   const [page, setPage] = useState(1);
+  const [saving, setSaving] = useState(false);
+  const [uploadingKey, setUploadingKey] = useState(null);
   const { toast } = useToast();
 
   const entity = db.entities[entityName];
@@ -58,27 +60,62 @@ export default function EntityManager({
     setPage(1);
   }, [search, filterValue]);
 
-  const openNew = () => { setEditItem(null); setForm({}); setDialogOpen(true); };
+  // New records start with each field's `default` (e.g. a testimonial added by
+  // the admin starts as "approved" so it shows on the website straight away).
+  const openNew = () => {
+    setEditItem(null);
+    setForm(Object.fromEntries(fields.filter((f) => f.default !== undefined).map((f) => [f.key, f.default])));
+    setDialogOpen(true);
+  };
   const openEdit = (item) => { setEditItem(item); setForm({ ...item }); setDialogOpen(true); };
 
   const handleSave = async () => {
+    const missing = fields.filter((f) => f.required && (form[f.key] === undefined || String(form[f.key]).trim() === ""));
+    if (missing.length > 0) {
+      toast({ title: `Please fill in: ${missing.map((f) => f.label).join(", ")}`, variant: "destructive" });
+      return;
+    }
     const data = {};
     fields.forEach((f) => {
-      if (form[f.key] !== undefined && form[f.key] !== "") {
+      const v = form[f.key];
+      if (v !== undefined && v !== "") {
         // FIX: number fields now hold the raw string while typing (see renderField),
         // so convert to an actual number here at save time instead of on every keystroke.
-        data[f.key] = f.type === "number" ? Number(form[f.key]) : form[f.key];
+        data[f.key] = f.type === "number" ? Number(v) : v;
+      } else if (editItem && editItem[f.key] != null && editItem[f.key] !== "") {
+        // A field the admin cleared while editing — actually clear it, instead
+        // of silently keeping the old value.
+        data[f.key] = null;
       }
     });
-    if (editItem) {
-      await entity.update(editItem.id, data);
-      toast({ title: "Updated successfully" });
-    } else {
-      await entity.create(data);
-      toast({ title: "Created successfully" });
+    setSaving(true);
+    try {
+      if (editItem) {
+        await entity.update(editItem.id, data);
+        toast({ title: "Updated successfully" });
+      } else {
+        await entity.create(data);
+        toast({ title: "Created successfully" });
+      }
+      setDialogOpen(false);
+      loadItems();
+    } catch (err) {
+      // Previously a failed save threw silently and the dialog just stayed open.
+      toast({ title: "Couldn't save", description: err?.message, variant: "destructive" });
     }
-    setDialogOpen(false);
-    loadItems();
+    setSaving(false);
+  };
+
+  const handleUpload = async (field, file) => {
+    if (!file) return;
+    setUploadingKey(field.key);
+    try {
+      const { file_url } = await db.integrations.Core.UploadFile({ file });
+      setForm((f) => ({ ...f, [field.key]: file_url }));
+    } catch (err) {
+      toast({ title: "Upload failed", description: err?.message, variant: "destructive" });
+    }
+    setUploadingKey(null);
   };
 
   const handleDelete = async (id) => {
@@ -109,6 +146,20 @@ export default function EntityManager({
     if (field.type === "textarea") return <Textarea value={val} onChange={(e) => setForm({ ...form, [field.key]: e.target.value })} placeholder={field.label} rows={4} />;
     if (field.type === "boolean") return <Switch checked={!!val} onCheckedChange={(v) => setForm({ ...form, [field.key]: v })} />;
     if (field.type === "number") return <Input type="number" value={val} onChange={(e) => setForm({ ...form, [field.key]: e.target.value })} placeholder={field.label} />;
+    if (field.type === "image") {
+      return (
+        <div className="flex items-center gap-2">
+          {val ? <img src={val} alt="" className="w-10 h-10 rounded-full object-cover border shrink-0" /> : null}
+          <Input value={val} onChange={(e) => setForm({ ...form, [field.key]: e.target.value })} placeholder="Paste a URL or upload" className="min-w-0" />
+          <label className="shrink-0 cursor-pointer">
+            <input type="file" accept="image/*" className="hidden" onChange={(e) => { handleUpload(field, e.target.files?.[0]); e.target.value = ""; }} />
+            <span className="flex items-center gap-1 h-10 px-3 rounded-md border text-sm hover:bg-muted">
+              {uploadingKey === field.key ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />} Upload
+            </span>
+          </label>
+        </div>
+      );
+    }
     return <Input value={val} onChange={(e) => setForm({ ...form, [field.key]: e.target.value })} placeholder={field.label} />;
   };
 
@@ -233,14 +284,18 @@ export default function EntityManager({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
             {fields.map((field) => (
               <div key={field.key} className={field.type === "textarea" ? "md:col-span-2" : ""}>
-                <label className="text-sm font-medium mb-1.5 block">{field.label}</label>
+                <label className="text-sm font-medium mb-1.5 block">
+                  {field.label}
+                  {field.required && <span className="text-destructive"> *</span>}
+                </label>
                 {renderField(field)}
               </div>
             ))}
           </div>
           <div className="flex justify-end gap-3 pt-4">
             <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
-            <Button onClick={handleSave} className="bg-gradient-to-r from-primary to-secondary text-white">
+            <Button onClick={handleSave} disabled={saving} className="bg-gradient-to-r from-primary to-secondary text-white">
+              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
               {editItem ? "Update" : "Create"}
             </Button>
           </div>

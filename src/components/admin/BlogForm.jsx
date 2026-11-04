@@ -481,9 +481,16 @@ export default function BlogForm({ initialData, onCancel, onSaved }) {
                   <SelectItem value="published">Published</SelectItem>
                 </SelectContent>
               </Select>
+              <p className={`text-xs mt-1.5 ${(form.status || "draft") === "draft" ? "text-amber-600 font-medium" : "text-muted-foreground/70"}`}>
+                {(form.status || "draft") === "draft"
+                  ? "Draft posts are NOT shown on the website. Choose Published to make it live."
+                  : "Live on the website."}
+              </p>
             </Field>
             <div className="flex items-center justify-between">
-              <label className="text-sm font-medium text-foreground/80">Featured Blog</label>
+              <label className="text-sm font-medium text-foreground/80">
+                Featured Blog <span className="font-normal text-muted-foreground/70 text-xs">(shown first on the blog)</span>
+              </label>
               <Switch checked={!!form.featured} onCheckedChange={(v) => set("featured", v)} />
             </div>
           </div>

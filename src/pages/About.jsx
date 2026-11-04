@@ -203,6 +203,8 @@ export default function About() {
   const [helpHeader, setHelpHeader] = useState(fallbackHelpHeader);
   const [leadershipHeader, setLeadershipHeader] = useState(fallbackLeadershipHeader);
   const [advantagesHeader, setAdvantagesHeader] = useState(fallbackAdvantagesHeader);
+  // Admin → About Page → Stats (Value e.g. "50,000+", Label e.g. "Happy Patients").
+  const [stats, setStats] = useState([]);
 
   useEffect(() => {
     // Singleton sections (one row each, picked via sort_order): hero,
@@ -299,6 +301,10 @@ export default function About() {
       })
       .catch(() => {});
 
+    db.entities.SiteContent.filter({ section: "about_stats", status: "active" }, "sort_order", 8)
+      .then((data) => setStats(data.map((d) => ({ value: d.title, label: d.description || "" }))))
+      .catch(() => {});
+
     db.entities.SiteContent.filter({ section: "about_team", status: "active" }, "sort_order", 20)
       .then((data) => {
         if (data.length > 0) {
@@ -392,6 +398,28 @@ export default function About() {
           </div>
         </div>
       </section>
+
+      {/* Stats — only shown once the admin adds some (previously saved but never displayed) */}
+      {stats.length > 0 && (
+        <section className="py-8 sm:py-10 bg-secondary">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6">
+            <div className={`grid grid-cols-2 ${stats.length >= 4 ? "md:grid-cols-4" : stats.length === 3 ? "md:grid-cols-3" : ""} gap-6 text-center`}>
+              {stats.map((st, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.05 }}
+                >
+                  <p className="font-heading font-extrabold text-3xl sm:text-4xl text-white">{st.value}</p>
+                  {st.label && <p className="text-sm text-white/75 mt-1">{st.label}</p>}
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Our Services */}
       <section className="py-10 sm:py-12 md:py-14 bg-secondary/30">

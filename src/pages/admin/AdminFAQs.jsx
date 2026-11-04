@@ -4,11 +4,11 @@ import { Pencil, Trash2, FileText } from "lucide-react";
 import EntityManager from "@/components/admin/EntityManager";
 
 const fields = [
-  { key: "question", label: "Question", type: "text", showInList: true },
-  { key: "answer", label: "Answer", type: "textarea", showInList: false },
+  { key: "question", label: "Question", type: "text", showInList: true, required: true },
+  { key: "answer", label: "Answer", type: "textarea", showInList: false, required: true },
   { key: "category", label: "Category", type: "text", showInList: true },
   { key: "order", label: "Order", type: "number", showInList: true },
-  { key: "status", label: "Status", type: "select", options: ["active", "inactive"], showInList: true },
+  { key: "status", label: "Status", type: "select", options: ["active", "inactive"], showInList: true, default: "active" },
 ];
 
 function FAQCard(item, { openEdit, handleDelete }) {

@@ -4,17 +4,18 @@ import { Pencil, Trash2, Star, MessageSquare } from "lucide-react";
 import EntityManager from "@/components/admin/EntityManager";
 
 const fields = [
-  { key: "patient_name", label: "Patient Name", type: "text", showInList: true },
+  { key: "patient_name", label: "Patient Name", type: "text", showInList: true, required: true },
   { key: "country", label: "Country", type: "text", showInList: true },
   { key: "treatment", label: "Treatment", type: "text", showInList: true },
   { key: "hospital", label: "Hospital", type: "text", showInList: false },
   { key: "doctor", label: "Doctor", type: "text", showInList: false },
-  { key: "rating", label: "Rating (1-5)", type: "number", showInList: true },
-  { key: "review_text", label: "Review", type: "textarea", showInList: false },
-  { key: "photo_url", label: "Photo URL", type: "text", showInList: false },
+  { key: "rating", label: "Rating (1-5)", type: "number", showInList: true, default: 5 },
+  { key: "review_text", label: "Review", type: "textarea", showInList: false, required: true },
+  { key: "photo_url", label: "Photo", type: "image", showInList: false },
   { key: "video_url", label: "Video URL", type: "text", showInList: false },
   { key: "featured", label: "Featured", type: "boolean", showInList: true },
-  { key: "status", label: "Status", type: "select", options: ["pending", "approved", "rejected"], showInList: true },
+  // Only "approved" testimonials appear on the website.
+  { key: "status", label: "Status (only approved show on website)", type: "select", options: ["pending", "approved", "rejected"], showInList: true, default: "approved" },
 ];
 
 const statusColors = {

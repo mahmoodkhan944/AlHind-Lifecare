@@ -75,7 +75,8 @@ export default function HospitalDetail() {
 
   useEffect(() => {
     db.entities.Hospital.get(id)
-      .then(setHospital)
+      // Inactive hospitals are hidden from the site, including direct links.
+      .then((h) => setHospital(h && h.status !== "inactive" ? h : null))
       .catch(() => {})
       .finally(() => setLoading(false));
   }, [id]);

@@ -4,6 +4,9 @@ import { motion } from "framer-motion";
 import { Calendar, User, ArrowUpRight, ArrowRight, Newspaper } from "lucide-react";
 import { db } from "@/api/dataClient";
 import moment from "moment";
+import { sortBlogPosts } from "@/lib/blogContent";
+
+const PAGE_SIZE = 12;
 
 const HERO_IMAGE =
   "https://plus.unsplash.com/premium_photo-1672759455907-bdaef741cd88?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTI5fHxtZWRpY2FsJTIwYmxvZ3N8ZW58MHx8MHx8fDA%3D";
@@ -11,10 +14,12 @@ const HERO_IMAGE =
 export default function Blog() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [visible, setVisible] = useState(PAGE_SIZE);
 
   useEffect(() => {
-    db.entities.BlogPost.filter({ status: "published" }, "-created_date", 50)
-      .then(setPosts)
+    // Was capped at 50, so the 51st published post never appeared anywhere.
+    db.entities.BlogPost.filter({ status: "published" }, "-created_date", 2000)
+      .then((rows) => setPosts(sortBlogPosts(rows)))
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
@@ -75,7 +80,7 @@ export default function Blog() {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-              {posts.map((post, i) => (
+              {posts.slice(0, visible).map((post, i) => (
                 <motion.div
                   key={post.id}
                   initial={{ opacity: 0, y: 20 }}
@@ -139,6 +144,16 @@ export default function Blog() {
                   </Link>
                 </motion.div>
               ))}
+            </div>
+          )}
+          {!loading && posts.length > visible && (
+            <div className="flex justify-center mt-8">
+              <button
+                onClick={() => setVisible((v) => v + PAGE_SIZE)}
+                className="px-6 h-11 rounded-full border border-border bg-white text-sm font-semibold hover:bg-muted transition-colors"
+              >
+                Load more articles
+              </button>
             </div>
           )}
         </div>

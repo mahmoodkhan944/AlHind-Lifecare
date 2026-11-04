@@ -138,7 +138,8 @@ export default function TreatmentDetail({ forceLanding = false }) {
           (all) => all.find((t) => slugify(t.slug || t.name) === slugify(slug)) || null
         );
       })
-      .then(setTreatment)
+      // Inactive treatments are hidden from the site, including direct links.
+      .then((t) => setTreatment(t && t.status !== "inactive" ? t : null))
       .catch(() => setTreatment(null))
       .finally(() => setLoading(false));
   }, [slug]);
@@ -764,8 +765,8 @@ function ClassicPage({ treatment, relatedDoctors, relatedHospitals, openLeadModa
                   </p>
                 )}
                 {infoCards.length > 0 && (
-                  <div className="grid grid-cols-3 gap-3 sm:gap-6 pt-4 border-t border-white/20">
-                    {infoCards.slice(0, 3).map(({ icon: Icon, label, value }) => (
+                  <div className={`grid grid-cols-2 ${infoCards.length >= 4 ? "sm:grid-cols-4" : "sm:grid-cols-3"} gap-3 sm:gap-6 pt-4 border-t border-white/20`}>
+                    {infoCards.map(({ icon: Icon, label, value }) => (
                       <div key={label} className="flex items-start gap-2">
                         <Icon className="w-4 h-4 sm:w-5 sm:h-5 shrink-0 mt-0.5 text-accent-warm" />
                         <div>

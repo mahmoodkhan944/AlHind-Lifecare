@@ -16,3 +16,13 @@ export function toBlogHtml(content) {
   if (HTML_TAG.test(text)) return text;
   return renderToStaticMarkup(React.createElement(Markdown, null, text));
 }
+
+/**
+ * Order blog posts the way the admin expects: Featured posts first, then by
+ * the Publication Date set in the admin panel (falling back to when the post
+ * was created), newest first.
+ */
+export function sortBlogPosts(posts) {
+  const time = (p) => new Date(p.publication_date || p.created_date || 0).getTime() || 0;
+  return [...posts].sort((a, b) => Number(!!b.featured) - Number(!!a.featured) || time(b) - time(a));
+}

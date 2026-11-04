@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Calendar, User, ArrowRight, ArrowUpRight } from "lucide-react";
 import { db } from "@/api/dataClient";
 import moment from "moment";
+import { sortBlogPosts } from "@/lib/blogContent";
 import { useSectionContent } from "@/hooks/useSectionContent";
 
 const LIMIT = 4;
@@ -18,9 +19,9 @@ export default function LatestBlog() {
   });
 
   useEffect(() => {
-    // "-created_date" = newest first, so the latest posts lead the section.
-    db.entities.BlogPost.filter({ status: "published" }, "-created_date", LIMIT)
-      .then(setPosts)
+    // Featured first, then newest by the admin's Publication Date.
+    db.entities.BlogPost.filter({ status: "published" }, "-created_date", 200)
+      .then((rows) => setPosts(sortBlogPosts(rows).slice(0, LIMIT)))
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);

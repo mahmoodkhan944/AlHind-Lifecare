@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Star, Quote, ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
+import { Star, Quote, ChevronLeft, ChevronRight, ArrowRight, PlayCircle } from "lucide-react";
 import { db } from "@/api/dataClient";
 import { useSectionContent } from "@/hooks/useSectionContent";
 
@@ -150,6 +150,16 @@ export default function LatestTestimonials() {
                 <p className="text-foreground/80 text-sm leading-relaxed mb-5 flex-1 line-clamp-4">
                   "{t.review_text}"
                 </p>
+                {t.video_url && (
+                  <a
+                    href={t.video_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline mb-4 -mt-2 self-start"
+                  >
+                    <PlayCircle className="w-4 h-4" /> Watch video
+                  </a>
+                )}
                 <div className="flex items-center gap-3 pt-4 border-t mt-auto">
                   <div className="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-bold text-sm shrink-0">
                     {t.photo_url ? (
@@ -164,6 +174,11 @@ export default function LatestTestimonials() {
                       {t.country}
                       {t.treatment ? ` · ${t.treatment}` : ""}
                     </p>
+                    {(t.hospital || t.doctor) && (
+                      <p className="text-xs text-muted-foreground/80 truncate">
+                        {[t.doctor, t.hospital].filter(Boolean).join(" · ")}
+                      </p>
+                    )}
                   </div>
                 </div>
               </motion.div>

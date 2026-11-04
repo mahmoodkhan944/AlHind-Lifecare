@@ -4,7 +4,8 @@ import { motion } from "framer-motion";
 import {
   MapPin,
   Star,
-  Clock,
+  Languages,
+  Wallet,
   Award,
   Phone,
   ArrowLeft,
@@ -56,6 +57,7 @@ export default function DoctorDetail() {
   const [loading, setLoading] = useState(true);
   const [relatedDoctors, setRelatedDoctors] = useState([]);
   const { openLeadModal } = useLeadModal();
+  const { data: siteSettings } = useSiteSettings();
 
   // The fixed CTA panel should only appear once the two-column content
   // section (marked by this ref) has scrolled up to roughly navbar height —
@@ -76,7 +78,8 @@ export default function DoctorDetail() {
 
   useEffect(() => {
     db.entities.Doctor.get(id)
-      .then(setDoctor)
+      // Inactive doctors are hidden from the site, including direct links.
+      .then((d) => setDoctor(d && d.status !== "inactive" ? d : null))
       .catch(() => {})
       .finally(() => setLoading(false));
   }, [id]);
@@ -203,7 +206,7 @@ export default function DoctorDetail() {
               </div>
 
               {/* Stat row — compact, icon + text side by side */}
-              {(doctor.experience_years > 0 || parseList(doctor.specializations).length > 0 || doctor.city) && (
+              {(doctor.experience_years > 0 || parseList(doctor.specializations).length > 0 || doctor.city || doctor.country || doctor.languages || doctor.consultation_fee_usd != null) && (
                                 <div className="flex flex-wrap gap-x-10 sm:gap-x-16 gap-y-3 mt-3 pt-3 border-t border-border">
                   {doctor.experience_years > 0 && (
                     <div className="flex items-center gap-2">
@@ -229,14 +232,40 @@ export default function DoctorDetail() {
                       </div>
                     </div>
                   )}
-                  {doctor.city && (
+                  {(doctor.city || doctor.country) && (
                     <div className="flex items-center gap-2">
                       <span className="flex items-center justify-center w-7 h-7 rounded-md bg-accent-jade/10 text-accent-jade shrink-0">
                         <MapPin className="w-3.5 h-3.5" />
                       </span>
                       <div className="leading-tight">
                         <p className="text-[10px] text-muted-foreground">Location</p>
-                        <p className="font-heading font-bold text-xs sm:text-sm text-foreground">{doctor.city}</p>
+                        <p className="font-heading font-bold text-xs sm:text-sm text-foreground">
+                          {[doctor.city, doctor.country].filter(Boolean).join(", ")}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                  {doctor.languages && (
+                    <div className="flex items-center gap-2">
+                      <span className="flex items-center justify-center w-7 h-7 rounded-md bg-accent-jade/10 text-accent-jade shrink-0">
+                        <Languages className="w-3.5 h-3.5" />
+                      </span>
+                      <div className="leading-tight">
+                        <p className="text-[10px] text-muted-foreground">Languages</p>
+                        <p className="font-heading font-bold text-xs sm:text-sm text-foreground">{doctor.languages}</p>
+                      </div>
+                    </div>
+                  )}
+                  {doctor.consultation_fee_usd != null && doctor.consultation_fee_usd !== "" && (
+                    <div className="flex items-center gap-2">
+                      <span className="flex items-center justify-center w-7 h-7 rounded-md bg-accent-jade/10 text-accent-jade shrink-0">
+                        <Wallet className="w-3.5 h-3.5" />
+                      </span>
+                      <div className="leading-tight">
+                        <p className="text-[10px] text-muted-foreground">Consultation Fee</p>
+                        <p className="font-heading font-bold text-xs sm:text-sm text-foreground">
+                          {Number(doctor.consultation_fee_usd) === 0 ? "Free" : `$${Number(doctor.consultation_fee_usd).toLocaleString("en-US")}`}
+                        </p>
                       </div>
                     </div>
                   )}
@@ -364,7 +393,7 @@ export default function DoctorDetail() {
           <Calendar className="w-4 h-4" /> Book Appointment
         </Button>
         <a
-          href={`https://wa.me/919876543210?text=I'd like to consult with ${doctor.name}`}
+          href={`${getWhatsAppLink(siteSettings?.whatsapp_number)}?text=${encodeURIComponent(`I'd like to consult with ${doctor.name}`)}`}
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -465,12 +494,13 @@ function resolveDoctorSectionConfig(raw) {
 // nothing to show — the caller filters out the nulls.
 function renderDoctorSection(key, title, doctor) {
   if (key === "overview") {
-    if (!doctor.overview) return null;
     const points = parseList(doctor.overview_points);
+    if (!doctor.overview && points.length === 0) return null;
     const theme = SECTION_ICON_THEME.overview;
+    const subs = parseObj(doctor.section_subheadings);
     return (
-      <SectionCard key={key} title={title} subheading={parseObj(doctor.section_subheadings)[key]}>
-        <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-3">{doctor.overview}</p>
+      <SectionCard key={key} title={title} subheading={subs[key] || subs.overview_points}>
+        {doctor.overview && <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-3">{doctor.overview}</p>}
         {points.length > 0 && (
           <ul className="space-y-2">
             {points.map((p, idx) => (
@@ -512,12 +542,15 @@ function renderDoctorSection(key, title, doctor) {
   }
 
   if (key === "detailed_experience") {
-    if (!doctor.detailed_experience) return null;
     const points = parseList(doctor.experience_details);
+    if (!doctor.detailed_experience && points.length === 0) return null;
     const theme = SECTION_ICON_THEME.detailed_experience;
+    const subs = parseObj(doctor.section_subheadings);
     return (
-      <SectionCard key={key} title={title} subheading={parseObj(doctor.section_subheadings)[key]}>
-        <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-3">{doctor.detailed_experience}</p>
+      <SectionCard key={key} title={title} subheading={subs[key] || subs.experience_details}>
+        {doctor.detailed_experience && (
+          <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-3">{doctor.detailed_experience}</p>
+        )}
         {points.length > 0 && (
           <ul className="space-y-2">
             {points.map((d, idx) => (
@@ -596,7 +629,7 @@ function renderDoctorSection(key, title, doctor) {
 
   if (key === "awards_achievements") {
     const awards = parseList(doctor.awards_achievements);
-    if (awards.length === 0) return null;
+    if (awards.length === 0 && !doctor.award_document_url) return null;
     return (
       <motion.div
         key={key}
