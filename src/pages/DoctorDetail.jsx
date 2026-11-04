@@ -528,23 +528,20 @@ function renderDoctorSection(key, title, doctor) {
     const groups = visibleGroups(doctor, key);
     if (groups.length === 0) return null;
     const theme = SECTION_ICON_THEME[key];
-    const firstSub = groups[0].subheading;
+    const firstSub = groups.length === 1 ? groups[0].subheading : "";
     return (
       <div key={key}>
         <h2 className="font-heading font-bold text-lg sm:text-xl mb-1">{title}</h2>
         {firstSub ? <p className="font-bold text-base text-foreground/70 mb-3">{firstSub}</p> : <div className="mb-2 sm:mb-3" />}
-        <GroupList
+        <ChipGroups
           groups={groups}
-          render={(items) => (
-            <div className="grid sm:grid-cols-2 gap-3">
-              {items.map((t, idx) => (
-                <div key={idx} className="flex items-center gap-2.5 text-sm text-muted-foreground bg-secondary/5 border border-secondary/15 rounded-xl px-3.5 py-3">
-                  <span className={`flex items-center justify-center w-6 h-6 rounded-full ${theme.bg} ${theme.color} flex-shrink-0`}>
-                    <theme.icon className="w-3.5 h-3.5" />
-                  </span>
-                  {t}
-                </div>
-              ))}
+          maxCols={2}
+          renderItem={(t, idx) => (
+            <div key={idx} className="flex items-center gap-2.5 text-sm text-muted-foreground bg-secondary/5 border border-secondary/15 rounded-xl px-3.5 py-3 h-full">
+              <span className={`flex items-center justify-center w-6 h-6 rounded-full ${theme.bg} ${theme.color} flex-shrink-0`}>
+                <theme.icon className="w-3.5 h-3.5" />
+              </span>
+              {t}
             </div>
           )}
         />
@@ -654,6 +651,42 @@ function renderDoctorSection(key, title, doctor) {
   }
 
   return null;
+}
+
+// Box-style sections with several sub-headings: each sub-heading sits in the
+// same grid as its neighbours, taking only as many columns as it has boxes
+// (1 box = 1 column, 2 = 2, 3+ = full row), so small sub-headings sit side by
+// side instead of leaving the rest of the row empty. With a single group the
+// sub-heading is shown by the caller (under the section title) as before.
+const SPAN3 = { 1: "", 2: "sm:col-span-2", 3: "sm:col-span-2 md:col-span-3" };
+const INNER3 = { 1: "grid-cols-1", 2: "sm:grid-cols-2", 3: "sm:grid-cols-2 md:grid-cols-3" };
+const SPAN2 = { 1: "", 2: "sm:col-span-2", 3: "sm:col-span-2" };
+const INNER2 = { 1: "grid-cols-1", 2: "sm:grid-cols-2", 3: "sm:grid-cols-2" };
+
+function ChipGroups({ groups, renderItem, maxCols = 3, className = "" }) {
+  const SPAN = maxCols === 2 ? SPAN2 : SPAN3;
+  const INNER = maxCols === 2 ? INNER2 : INNER3;
+  const outer = maxCols === 2 ? "sm:grid-cols-2" : "sm:grid-cols-2 md:grid-cols-3";
+  const multi = groups.length > 1;
+  // Keeps boxes aligned when one group has no sub-heading but its neighbours do.
+  const anySub = multi && groups.some((g) => g.subheading);
+  return (
+    <div className={`grid ${outer} grid-flow-row-dense gap-x-3 ${multi ? "gap-y-5" : "gap-y-3"} ${className}`}>
+      {groups.map((g) => {
+        const n = Math.min(Math.max(g.items.length, 1), 3);
+        return (
+          <div key={g.id} className={`flex flex-col ${SPAN[n]}`}>
+            {anySub && (
+              <h3 className={`font-heading font-bold text-base text-foreground/80 mb-2.5 ${g.subheading ? "" : "invisible"}`} aria-hidden={!g.subheading}>
+                {g.subheading || "\u00a0"}
+              </h3>
+            )}
+            {g.items.length > 0 && <div className={`grid ${INNER[n]} auto-rows-fr gap-3 flex-1`}>{g.items.map(renderItem)}</div>}
+          </div>
+        );
+      })}
+    </div>
+  );
 }
 
 // A section's sub-heading groups, in the admin's order. The first group's

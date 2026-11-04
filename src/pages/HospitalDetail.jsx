@@ -467,7 +467,7 @@ function renderHospitalSection(key, rawTitle, hospital) {
     if (groups.length === 0) return null;
     const theme = SECTION_ICON_THEME[key];
     const fallbackSub = key === "doctors_list" ? "Our team of expert medical professionals" : "";
-    const firstSub = groups[0].subheading;
+    const firstSub = groups.length === 1 ? groups[0].subheading : "";
     return (
       <div key={key}>
         <h2 className="font-heading font-bold text-lg sm:text-xl mb-1">{title}</h2>
@@ -478,20 +478,29 @@ function renderHospitalSection(key, rawTitle, hospital) {
         ) : (
           <div className="mb-2 sm:mb-3" />
         )}
-        <GroupList
+        <ChipGroups
           groups={groups}
-          render={(items) => (
-            <div className={`grid sm:grid-cols-2 ${key === "infrastructure_details" ? "" : "md:grid-cols-3"} gap-3`}>
-              {items.map((item, idx) => (
-                <div key={idx} className="flex items-center gap-2.5 text-sm text-muted-foreground bg-secondary/5 border border-secondary/15 rounded-xl px-3.5 py-3">
-                  <span className={`flex items-center justify-center w-6 h-6 rounded-full ${theme.bg} ${theme.color} flex-shrink-0`}>
-                    <theme.icon className="w-3.5 h-3.5" />
-                  </span>
-                  {item}
-                </div>
-              ))}
-            </div>
-          )}
+          maxCols={key === "infrastructure_details" ? 2 : 3}
+          renderItem={(item, idx) =>
+            key === "area_of_expertise" ? (
+              // Area of Expertise: icon on the left as before; text lines start
+              // in a straight line, and the content sits in the vertical middle
+              // of the (equal-height) card.
+              <div key={idx} className="flex items-center gap-2.5 text-sm text-muted-foreground bg-secondary/5 border border-secondary/15 rounded-xl px-3.5 py-3 h-full">
+                <span className={`flex items-center justify-center w-6 h-6 rounded-full ${theme.bg} ${theme.color} flex-shrink-0`}>
+                  <theme.icon className="w-3.5 h-3.5" />
+                </span>
+                <span className="flex-1 text-left leading-relaxed">{item}</span>
+              </div>
+            ) : (
+              <div key={idx} className="flex items-center gap-2.5 text-sm text-muted-foreground bg-secondary/5 border border-secondary/15 rounded-xl px-3.5 py-3 h-full">
+                <span className={`flex items-center justify-center w-6 h-6 rounded-full ${theme.bg} ${theme.color} flex-shrink-0`}>
+                  <theme.icon className="w-3.5 h-3.5" />
+                </span>
+                {item}
+              </div>
+            )
+          }
         />
       </div>
     );
@@ -501,19 +510,15 @@ function renderHospitalSection(key, rawTitle, hospital) {
     const facilityGroups = visibleGroups(hospital, "facilities");
     const intlGroups = visibleGroups(hospital, "international_patient_services");
     if (facilityGroups.length === 0 && intlGroups.length === 0) return null;
-    const chips = (Icon) => (items) => (
-      <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
-        {items.map((f, idx) => (
-          <div key={idx} className="flex items-center gap-2.5 text-sm text-muted-foreground bg-secondary/5 border border-secondary/15 rounded-xl px-3.5 py-3">
-            <span className={`flex items-center justify-center w-6 h-6 rounded-full ${SECTION_ICON_THEME.facilities.bg} ${SECTION_ICON_THEME.facilities.color} flex-shrink-0`}>
-              <Icon className="w-3.5 h-3.5" />
-            </span>
-            {f}
-          </div>
-        ))}
+    const chip = (Icon) => (f, idx) => (
+      <div key={idx} className="flex items-center gap-2.5 text-sm text-muted-foreground bg-secondary/5 border border-secondary/15 rounded-xl px-3.5 py-3 h-full">
+        <span className={`flex items-center justify-center w-6 h-6 rounded-full ${SECTION_ICON_THEME.facilities.bg} ${SECTION_ICON_THEME.facilities.color} flex-shrink-0`}>
+          <Icon className="w-3.5 h-3.5" />
+        </span>
+        {f}
       </div>
     );
-    const firstSub = facilityGroups[0]?.subheading;
+    const firstSub = facilityGroups.length === 1 ? facilityGroups[0].subheading : "";
     // International services: every group shows its own heading (the first
     // one defaults to "International Patient Services").
     const intl = intlGroups.map((g, i) => (i === 0 && !g.subheading ? { ...g, subheading: "International Patient Services" } : g));
@@ -521,10 +526,13 @@ function renderHospitalSection(key, rawTitle, hospital) {
       <div key={key}>
         <h2 className="font-heading font-bold text-lg sm:text-xl mb-1">{title}</h2>
         {firstSub ? <p className="font-bold text-base text-foreground/70 mb-3">{firstSub}</p> : <div className="mb-2 sm:mb-3" />}
-        <GroupList groups={facilityGroups} render={chips(Building2)} />
+        {facilityGroups.length > 0 && <ChipGroups groups={facilityGroups} renderItem={chip(Building2)} />}
         {intl.length > 0 && (
           <div className={facilityGroups.length > 0 ? "mt-5" : ""}>
-            <GroupList groups={intl} render={chips(Globe)} showFirst />
+            {intl.length === 1 && (
+              <h3 className="font-heading font-bold text-base text-foreground/80 mb-3">{intl[0].subheading}</h3>
+            )}
+            <ChipGroups groups={intl} renderItem={chip(Globe)} />
           </div>
         )}
       </div>
@@ -534,26 +542,23 @@ function renderHospitalSection(key, rawTitle, hospital) {
   if (key === "accreditations") {
     const groups = visibleGroups(hospital, key);
     if (groups.length === 0) return null;
-    const firstSub = groups[0].subheading;
+    const firstSub = groups.length === 1 ? groups[0].subheading : "";
     return (
       <div key={key}>
         <h2 className="font-heading font-bold text-lg sm:text-xl mb-0.5">{title}</h2>
         <p className={firstSub ? "font-bold text-base text-foreground/70 mb-3" : "text-sm text-muted-foreground mb-3"}>
           {firstSub || "Recognized for excellence in healthcare quality and safety"}
         </p>
-        <GroupList
+        <ChipGroups
           groups={groups}
-          render={(items) => (
-            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3 mb-4">
-              {items.map((a, idx) => (
-                <div key={idx} className="relative bg-white border border-border rounded-xl border-t-4 border-t-secondary px-4 py-3.5">
-                  <Star className="absolute top-3 right-3 w-4 h-4 text-secondary/20" />
-                  <p className="font-heading font-bold text-sm text-foreground pr-5">{a}</p>
-                  <p className="flex items-center gap-1 text-xs text-secondary font-medium mt-1">
-                    <CheckCircle2 className="w-3.5 h-3.5" /> Certified Excellence
-                  </p>
-                </div>
-              ))}
+          className="mb-4"
+          renderItem={(a, idx) => (
+            <div key={idx} className="relative bg-white border border-border rounded-xl border-t-4 border-t-secondary px-4 py-3.5 h-full">
+              <Star className="absolute top-3 right-3 w-4 h-4 text-secondary/20" />
+              <p className="font-heading font-bold text-sm text-foreground pr-5">{a}</p>
+              <p className="flex items-center gap-1 text-xs text-secondary font-medium mt-1">
+                <CheckCircle2 className="w-3.5 h-3.5" /> Certified Excellence
+              </p>
             </div>
           )}
         />
@@ -632,6 +637,42 @@ function renderHospitalSection(key, rawTitle, hospital) {
   }
 
   return null;
+}
+
+// Box-style sections with several sub-headings: each sub-heading sits in the
+// same grid as its neighbours, taking only as many columns as it has boxes
+// (1 box = 1 column, 2 = 2, 3+ = full row), so small sub-headings sit side by
+// side instead of leaving the rest of the row empty. With a single group the
+// sub-heading is shown by the caller (under the section title) as before.
+const SPAN3 = { 1: "", 2: "sm:col-span-2", 3: "sm:col-span-2 md:col-span-3" };
+const INNER3 = { 1: "grid-cols-1", 2: "sm:grid-cols-2", 3: "sm:grid-cols-2 md:grid-cols-3" };
+const SPAN2 = { 1: "", 2: "sm:col-span-2", 3: "sm:col-span-2" };
+const INNER2 = { 1: "grid-cols-1", 2: "sm:grid-cols-2", 3: "sm:grid-cols-2" };
+
+function ChipGroups({ groups, renderItem, maxCols = 3, className = "" }) {
+  const SPAN = maxCols === 2 ? SPAN2 : SPAN3;
+  const INNER = maxCols === 2 ? INNER2 : INNER3;
+  const outer = maxCols === 2 ? "sm:grid-cols-2" : "sm:grid-cols-2 md:grid-cols-3";
+  const multi = groups.length > 1;
+  // Keeps boxes aligned when one group has no sub-heading but its neighbours do.
+  const anySub = multi && groups.some((g) => g.subheading);
+  return (
+    <div className={`grid ${outer} grid-flow-row-dense gap-x-3 ${multi ? "gap-y-5" : "gap-y-3"} ${className}`}>
+      {groups.map((g) => {
+        const n = Math.min(Math.max(g.items.length, 1), 3);
+        return (
+          <div key={g.id} className={`flex flex-col ${SPAN[n]}`}>
+            {anySub && (
+              <h3 className={`font-heading font-bold text-base text-foreground/80 mb-2.5 ${g.subheading ? "" : "invisible"}`} aria-hidden={!g.subheading}>
+                {g.subheading || "\u00a0"}
+              </h3>
+            )}
+            {g.items.length > 0 && <div className={`grid ${INNER[n]} auto-rows-fr gap-3 flex-1`}>{g.items.map(renderItem)}</div>}
+          </div>
+        );
+      })}
+    </div>
+  );
 }
 
 // A section's sub-heading groups, in the admin's order. The first group's
