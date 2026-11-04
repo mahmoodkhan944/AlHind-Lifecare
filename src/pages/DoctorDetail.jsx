@@ -179,6 +179,11 @@ export default function DoctorDetail() {
                         {doctor.name}
                         <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-accent-jade fill-accent-jade/15 shrink-0" />
                       </h1>
+                      {doctor.badge_title && (
+                        <span className="inline-block mt-1.5 mb-0.5 px-2.5 py-0.5 rounded-md bg-accent-jade/10 border border-accent-jade/20 text-accent-jade text-xs font-semibold">
+                          {doctor.badge_title}
+                        </span>
+                      )}
                       {(doctor.designation || doctor.speciality) && (
                         <p className="text-accent-jade font-semibold text-sm mt-0.5">
                           {doctor.designation || doctor.speciality}

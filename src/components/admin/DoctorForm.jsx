@@ -175,6 +175,10 @@ export default function DoctorForm({ initialData, onCancel, onSaved }) {
             <Field label="Doctor Name" required>
               <Input value={form.name || ""} onChange={(e) => set("name", e.target.value)} placeholder="e.g., Dr John Smith" className="h-10 rounded-lg border-border" />
             </Field>
+            <Field label="Badge (shown under the name)">
+              <Input value={form.badge_title || ""} onChange={(e) => set("badge_title", e.target.value)} placeholder="e.g., Senior Cardiac Surgeon" className="h-10 rounded-lg border-border" />
+              <p className="text-xs text-muted-foreground/70 mt-1">Optional. Appears as a green tag between the doctor's name and designation.</p>
+            </Field>
             <Field label="Designation" required>
               <Input value={form.designation || ""} onChange={(e) => set("designation", e.target.value)} placeholder="e.g., Senior Consultant Cardiologist" className="h-10 rounded-lg border-border" />
             </Field>
