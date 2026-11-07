@@ -45,6 +45,21 @@ const fallbackDoctors = [
   },
 ];
 
+// Only real doctors (from the database, with a UUID) have a profile page —
+// the sample doctors shown before data loads are not linked.
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const profilePath = (doc) => (UUID_RE.test(String(doc.id)) ? `/doctors/${doc.id}` : null);
+
+// Wraps content in a link to the doctor's profile when there is one.
+function ProfileLink({ to, className, children, label }) {
+  if (!to) return <div className={className}>{children}</div>;
+  return (
+    <Link to={to} className={className} aria-label={label}>
+      {children}
+    </Link>
+  );
+}
+
 export default function TopDoctors() {
   const [doctors, setDoctors] = useState(fallbackDoctors);
   const header = useSectionContent("home_doctors_header", {
@@ -84,15 +99,15 @@ export default function TopDoctors() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.08 }}
-              className="card-premium overflow-hidden"
+              className="card-premium overflow-hidden group"
             >
-              {/* Image with badges */}
-              <div className="relative aspect-[4/4] overflow-hidden bg-gray-100">
+              {/* Image with badges — opens the doctor's profile */}
+              <ProfileLink to={profilePath(doc)} label={`View profile of ${doc.name}`} className="relative block aspect-[4/4] overflow-hidden bg-gray-100">
                 {doc.photo_url ? (
                   <img
                     src={doc.photo_url}
                     alt={doc.name}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     loading="lazy"
                   />
                 ) : (
@@ -110,14 +125,16 @@ export default function TopDoctors() {
                   <Briefcase className="w-3 h-3" />
                   {doc.experience_years || 15}+
                 </div>
-              </div>
+              </ProfileLink>
 
               {/* Info */}
               <div className="p-3 sm:p-4">
   {/* Doctor Name */}
-  <h3 className="font-heading font-bold text-sm sm:text-base text-black text-center mb-1 line-clamp-1">
-    {doc.name}
-  </h3>
+  <ProfileLink to={profilePath(doc)} className="block">
+    <h3 className="font-heading font-bold text-sm sm:text-base text-black text-center mb-1 line-clamp-1 group-hover:text-primary transition-colors">
+      {doc.name}
+    </h3>
+  </ProfileLink>
 
   {/* Speciality */}
   <p className="text-xs font-medium text-accent-jade text-center mb-2 line-clamp-1 whitespace-nowrap overflow-hidden text-ellipsis">
