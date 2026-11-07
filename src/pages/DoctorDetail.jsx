@@ -118,7 +118,7 @@ export default function DoctorDetail() {
     title: doctor
       ? doctor.meta_title || `${doctor.name}${doctor.designation ? ` — ${doctor.designation}` : ""} | AlHind Lifecare`
       : undefined,
-    description: doctor ? doctor.meta_description || doctor.overview || undefined : undefined,
+    description: doctor ? doctor.meta_description || String(doctor.overview || "").split(/\n\s*\n/)[0].trim() || undefined : undefined,
   });
 
   if (loading) {
@@ -534,7 +534,18 @@ function renderDoctorSection(key, title, doctor) {
     const subs = parseObj(doctor.section_subheadings);
     return (
       <SectionCard key={key} title={title} subheading={groups.length > 1 ? "" : groups[0]?.subheading || subs[key]}>
-        {text && <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-3">{text}</p>}
+        {/* Paragraphs from the admin's paragraph boxes (separated by a blank line). */}
+        {text && (
+          <div className="space-y-3 mb-3">
+            {String(text)
+              .split(/\n\s*\n/)
+              .map((para) => para.trim())
+              .filter(Boolean)
+              .map((para, i) => (
+                <p key={i} className="text-sm sm:text-base text-muted-foreground leading-relaxed whitespace-pre-line">{para}</p>
+              ))}
+          </div>
+        )}
         <GroupList groups={groups} render={checklist(SECTION_ICON_THEME[key])} />
       </SectionCard>
     );

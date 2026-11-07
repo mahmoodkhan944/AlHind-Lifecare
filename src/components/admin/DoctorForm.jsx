@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
 import GroupedListField from "@/components/admin/GroupedListField";
+import ParagraphListField from "@/components/admin/ParagraphListField";
 import { buildGroupsMap, applyGroupsToPayload } from "@/lib/sectionGroups";
 
 // Sections that support several sub-headings (Admin → drag to reorder).
@@ -248,11 +249,11 @@ export default function DoctorForm({ initialData, onCancel, onSaved }) {
           </div>
           <div className="space-y-4">
             <Field label="Overview" required>
-              <Textarea value={form.overview || ""} onChange={(e) => set("overview", e.target.value)} placeholder="Brief overview about the doctor..." className="rounded-lg border-border min-h-[80px]" rows={3} />
+              <ParagraphListField value={form.overview} onChange={(v) => set("overview", v)} placeholder="Brief overview about the doctor..." />
             </Field>
             <GroupedListField label="Overview Points" placeholder="Overview point" optional groups={form.section_groups?.overview_points} onChange={(g) => setGroups("overview_points", g)} />
             <Field label="Detailed Experience" required>
-              <Textarea value={form.detailed_experience || ""} onChange={(e) => set("detailed_experience", e.target.value)} placeholder="Detailed experience description..." className="rounded-lg border-border min-h-[80px]" rows={3} />
+              <ParagraphListField value={form.detailed_experience} onChange={(v) => set("detailed_experience", v)} placeholder="Detailed experience description..." />
             </Field>
             <GroupedListField label="Experience Details" placeholder="Experience detail" optional groups={form.section_groups?.experience_details} onChange={(g) => setGroups("experience_details", g)} />
           </div>
