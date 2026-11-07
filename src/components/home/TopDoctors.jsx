@@ -5,6 +5,7 @@ import { MapPin, Star, Briefcase, ArrowRight } from "lucide-react";
 import { db } from "@/api/dataClient";
 import { useLeadModal } from "@/lib/LeadModalContext";
 import { useSectionContent } from "@/hooks/useSectionContent";
+import { homePicks } from "@/lib/homePicks";
 
 const fallbackDoctors = [
   {
@@ -72,7 +73,10 @@ export default function TopDoctors() {
   useEffect(() => {
     // Changed from "-rating" to "-created_date" so this section shows the newest
     // doctors added to the platform, not the highest-rated ones.
-    db.entities.Doctor.filter({ status: "active" }, "-created_date", 4)
+    // Doctors with "Show on Homepage" on; if none, the 4 newest.
+    homePicks(db.entities.Doctor, { status: "active" }, "-created_date", 4, () =>
+      db.entities.Doctor.filter({ status: "active" }, "-created_date", 4)
+    )
       .then((data) => { if (data.length > 0) setDoctors(data.slice(0, 4)); })
       .catch(() => {});
   }, []);

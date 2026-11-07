@@ -13,6 +13,7 @@ import { buildGroupsMap, applyGroupsToPayload } from "@/lib/sectionGroups";
 const HOSPITAL_GROUP_KEYS = ["full_description", "specialities", "doctors_list", "facilities", "international_patient_services", "accreditations", "area_of_expertise", "infrastructure_details", "awards"];
 import SectionOrderEditor from "@/components/admin/SectionOrderEditor";
 import { DEFAULT_HOSPITAL_SECTIONS } from "@/pages/HospitalDetail";
+import ShowOnHomeToggle from "@/components/admin/ShowOnHomeToggle";
 
 const parseList = (val) => {
   if (!val) return [];
@@ -255,6 +256,7 @@ export default function HospitalForm({ initialData, onCancel, onSaved }) {
                 Featured Hospital
               </label>
             </div>
+            <ShowOnHomeToggle checked={form.show_on_home} onChange={(v) => set("show_on_home", v)} section="Hospitals by Country" />
           </div>
         </div>
 

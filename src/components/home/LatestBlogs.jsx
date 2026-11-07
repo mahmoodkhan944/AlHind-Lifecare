@@ -6,6 +6,7 @@ import { db } from "@/api/dataClient";
 import moment from "moment";
 import { sortBlogPosts } from "@/lib/blogContent";
 import { useSectionContent } from "@/hooks/useSectionContent";
+import { homePicks } from "@/lib/homePicks";
 
 const LIMIT = 4;
 
@@ -19,8 +20,10 @@ export default function LatestBlog() {
   });
 
   useEffect(() => {
-    // Featured first, then newest by the admin's Publication Date.
-    db.entities.BlogPost.filter({ status: "published" }, "-created_date", 200)
+    // Posts with "Show on Homepage" on; if none, the newest (Featured first).
+    homePicks(db.entities.BlogPost, { status: "published" }, "-created_date", 200, () =>
+      db.entities.BlogPost.filter({ status: "published" }, "-created_date", 200)
+    )
       .then((rows) => setPosts(sortBlogPosts(rows).slice(0, LIMIT)))
       .catch(() => {})
       .finally(() => setLoading(false));

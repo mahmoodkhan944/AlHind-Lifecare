@@ -5,6 +5,7 @@ import SectionHeader from "@/components/common/SectionHeader";
 import { db } from "@/api/dataClient";
 import { useLeadModal } from "@/lib/LeadModalContext";
 import { useSectionContent } from "@/hooks/useSectionContent";
+import { homePicks } from "@/lib/homePicks";
 
 const iconMap = {
   "knee": Bone,
@@ -53,7 +54,10 @@ export default function LowestQuotes() {
   });
 
   useEffect(() => {
-    db.entities.Treatment.filter({ status: "active", featured: true }, "-created_date", 12)
+    // Treatments with "Show on Homepage" on; if none, the Featured ones (as before).
+    homePicks(db.entities.Treatment, { status: "active" }, "-created_date", 12, () =>
+      db.entities.Treatment.filter({ status: "active", featured: true }, "-created_date", 12)
+    )
       .then((data) => { if (data.length > 0) setTreatments(data); })
       .catch(() => {});
   }, []);

@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Star, Quote, ChevronLeft, ChevronRight, ArrowRight, PlayCircle } from "lucide-react";
 import { db } from "@/api/dataClient";
 import { useSectionContent } from "@/hooks/useSectionContent";
+import { homePicks } from "@/lib/homePicks";
 
 const LIMIT = 10;
 const AUTO_ADVANCE_MS = 5000;
@@ -20,8 +21,10 @@ export default function LatestTestimonials() {
   const autoplayRef = useRef(null);
 
   useEffect(() => {
-    // "-created_date" = newest first, so the latest approved testimonials lead the slider.
-    db.entities.Testimonial.filter({ status: "approved" }, "-created_date", LIMIT)
+    // Testimonials with "Show on Homepage" on; if none, the newest approved ones.
+    homePicks(db.entities.Testimonial, { status: "approved" }, "-created_date", LIMIT, () =>
+      db.entities.Testimonial.filter({ status: "approved" }, "-created_date", LIMIT)
+    )
       .then(setTestimonials)
       .catch(() => {})
       .finally(() => setLoading(false));

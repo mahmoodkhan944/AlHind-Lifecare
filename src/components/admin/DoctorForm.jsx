@@ -15,6 +15,7 @@ const DOCTOR_GROUP_KEYS = ["specializations", "treatments_list", "overview_point
 import AutocompleteInput from "@/components/admin/AutocompleteInput";
 import SectionOrderEditor from "@/components/admin/SectionOrderEditor";
 import { DEFAULT_DOCTOR_SECTIONS, renameOldDoctorTitles } from "@/pages/DoctorDetail";
+import ShowOnHomeToggle from "@/components/admin/ShowOnHomeToggle";
 
 const parseList = (val) => {
   if (!val) return [];
@@ -234,6 +235,7 @@ export default function DoctorForm({ initialData, onCancel, onSaved }) {
               <input type="checkbox" checked={!!form.featured} onChange={(e) => set("featured", e.target.checked)} className="w-4 h-4 rounded border-border" />
               Featured Doctor
             </label>
+            <ShowOnHomeToggle checked={form.show_on_home} onChange={(v) => set("show_on_home", v)} section="Top Doctors" />
           </div>
         </div>
 

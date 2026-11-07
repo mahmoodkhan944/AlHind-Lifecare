@@ -15,6 +15,7 @@ const TREATMENT_GROUP_KEYS = ["key_benefits", "overview", "signs_symptoms", "rel
 import SearchableCheckboxList from "@/components/admin/SearchableCheckboxList";
 import SectionOrderEditor from "@/components/admin/SectionOrderEditor";
 import { DEFAULT_TREATMENT_SECTIONS } from "@/pages/TreatmentDetail";
+import ShowOnHomeToggle from "@/components/admin/ShowOnHomeToggle";
 
 const parseList = (val) => {
   if (!val) return [];
@@ -193,6 +194,7 @@ export default function TreatmentForm({ initialData, onCancel, onSaved }) {
                 </Select>
               </Field>
             </div>
+            <ShowOnHomeToggle checked={form.show_on_home} onChange={(v) => set("show_on_home", v)} section="Lowest Quotes / Treatments" />
             <div className="flex items-center gap-6 pt-1 flex-wrap">
               <label className="flex items-center gap-2 text-sm font-medium text-foreground/80">
                 <Switch checked={!!form.featured} onCheckedChange={(v) => set("featured", v)} /> Featured

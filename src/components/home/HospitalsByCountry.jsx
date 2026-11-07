@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { MapPin, ArrowRight, Building2 } from "lucide-react";
 import { db } from "@/api/dataClient";
 import { useSectionContent } from "@/hooks/useSectionContent";
+import { homePicks } from "@/lib/homePicks";
 
 const fallback = {
   India: [
@@ -48,10 +49,15 @@ export default function HospitalsByCountry() {
   });
 
   useEffect(() => {
-    db.entities.Hospital.filter({ status: "active", country: "India" }, "-created_date", 4)
+    // Per country: hospitals with "Show on Homepage" on; if none, the 4 newest.
+    homePicks(db.entities.Hospital, { status: "active", country: "India" }, "-created_date", 4, () =>
+      db.entities.Hospital.filter({ status: "active", country: "India" }, "-created_date", 4)
+    )
       .then((data) => { if (data.length > 0) setHospitals((prev) => ({ ...prev, India: data.slice(0, 4) })); })
       .catch(() => {});
-    db.entities.Hospital.filter({ status: "active", country: "Turkey" }, "-created_date", 4)
+    homePicks(db.entities.Hospital, { status: "active", country: "Turkey" }, "-created_date", 4, () =>
+      db.entities.Hospital.filter({ status: "active", country: "Turkey" }, "-created_date", 4)
+    )
       .then((data) => { if (data.length > 0) setHospitals((prev) => ({ ...prev, Turkey: data.slice(0, 4) })); })
       .catch(() => {});
   }, []);

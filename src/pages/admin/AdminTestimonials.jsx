@@ -14,6 +14,8 @@ const fields = [
   { key: "photo_url", label: "Photo", type: "image", showInList: false },
   { key: "video_url", label: "Video URL", type: "text", showInList: false },
   { key: "featured", label: "Featured", type: "boolean", showInList: true },
+  // Picks which testimonials appear on the homepage (if none are picked, the newest approved ones show).
+  { key: "show_on_home", label: "Show on Homepage", type: "boolean", showInList: true },
   // Only "approved" testimonials appear on the website.
   { key: "status", label: "Status (only approved show on website)", type: "select", options: ["pending", "approved", "rejected"], showInList: true, default: "approved" },
 ];

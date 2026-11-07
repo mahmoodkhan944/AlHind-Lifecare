@@ -24,6 +24,7 @@ import {
   resolvePackageDetails,
   cleanDetails,
 } from "@/lib/packageUtils";
+import ShowOnHomeToggle from "@/components/admin/ShowOnHomeToggle";
 
 const LIST_FIELDS = ["highlights", "itinerary", "gallery_images", "faqs", "section_config"];
 
@@ -286,6 +287,7 @@ export default function PackageForm({ initialData, onCancel, onSaved }) {
           <label className="flex items-center gap-2 text-sm font-medium text-foreground/80 pt-1">
             <Switch checked={!!form.featured} onCheckedChange={(v) => set("featured", v)} /> Featured (pinned at the top; otherwise newest packages show first)
           </label>
+          <ShowOnHomeToggle checked={form.show_on_home} onChange={(v) => set("show_on_home", v)} section="Popular Treatment Packages" />
         </Card>
 
         {/* Links */}

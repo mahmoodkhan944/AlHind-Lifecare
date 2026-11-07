@@ -12,6 +12,7 @@ import { useToast } from "@/components/ui/use-toast";
 import DynamicListField from "@/components/admin/DynamicListField";
 import AutocompleteInput from "@/components/admin/AutocompleteInput";
 import { toBlogHtml } from "@/lib/blogContent";
+import ShowOnHomeToggle from "@/components/admin/ShowOnHomeToggle";
 
 const parseList = (val) => {
   if (!val) return [];
@@ -493,6 +494,7 @@ export default function BlogForm({ initialData, onCancel, onSaved }) {
               </label>
               <Switch checked={!!form.featured} onCheckedChange={(v) => set("featured", v)} />
             </div>
+            <ShowOnHomeToggle checked={form.show_on_home} onChange={(v) => set("show_on_home", v)} section="Latest Blogs" />
           </div>
         </div>
       </div>

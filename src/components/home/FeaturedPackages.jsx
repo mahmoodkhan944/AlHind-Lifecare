@@ -5,6 +5,7 @@ import { ArrowLeft, ArrowRight, Check, Package as PackageIcon } from "lucide-rea
 import { db } from "@/api/dataClient";
 import { useSectionContent } from "@/hooks/useSectionContent";
 import { formatPrice, discountPercent, packagePath, pluralize, toNumber } from "@/lib/packageUtils";
+import { homePicks } from "@/lib/homePicks";
 
 const MAX_CARDS = 12;
 
@@ -30,7 +31,10 @@ export default function FeaturedPackages() {
 
   useEffect(() => {
     Promise.all([
-      db.entities.Package.filter({ status: "active" }, "-created_date", 200),
+      // Packages with "Show on Homepage" on; if none, all active ones (newest first).
+      homePicks(db.entities.Package, { status: "active" }, "-created_date", 200, () =>
+        db.entities.Package.filter({ status: "active" }, "-created_date", 200)
+      ),
       db.entities.Hospital.list("name", 2000).catch(() => []),
       db.entities.Treatment.list("name", 2000).catch(() => []),
     ])
