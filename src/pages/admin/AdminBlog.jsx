@@ -7,6 +7,7 @@ import { Plus, Pencil, Trash2, Search, Loader2, FileText, Calendar } from "lucid
 import BlogForm from "@/components/admin/BlogForm";
 import AdminPagination from "@/components/admin/AdminPagination";
 import AdminPageHeader from "@/components/admin/AdminPageHeader";
+import { sortBlogPosts } from "@/lib/blogContent";
 
 const PAGE_SIZE = 15;
 
@@ -21,8 +22,9 @@ export default function AdminBlog() {
 
   const loadItems = () => {
     setLoading(true);
+    // Same order as the website: newest Publication Date first.
     db.entities.BlogPost.list("-created_date", 2000)
-      .then(setItems)
+      .then((rows) => setItems(sortBlogPosts(rows)))
       .catch(() => {})
       .finally(() => setLoading(false));
   };
@@ -128,7 +130,7 @@ export default function AdminBlog() {
                   </span>
                   {item.created_date && (
                     <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
-                      <Calendar className="w-3.5 h-3.5" /> {new Date(item.created_date).toLocaleDateString()}
+                      <Calendar className="w-3.5 h-3.5" /> {new Date(item.publication_date || item.created_date).toLocaleDateString()}
                     </span>
                   )}
                 </div>

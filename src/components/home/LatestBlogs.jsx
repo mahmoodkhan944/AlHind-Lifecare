@@ -20,7 +20,8 @@ export default function LatestBlog() {
   });
 
   useEffect(() => {
-    // Posts with "Show on Homepage" on; if none, the newest (Featured first).
+    // Posts with "Show on Homepage" on; if none, the newest. Ordered by the
+    // date shown on the post, newest date first.
     homePicks(db.entities.BlogPost, { status: "published" }, "-created_date", 200, () =>
       db.entities.BlogPost.filter({ status: "published" }, "-created_date", 200)
     )

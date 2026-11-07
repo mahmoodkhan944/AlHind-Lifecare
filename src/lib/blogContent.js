@@ -18,10 +18,12 @@ export function toBlogHtml(content) {
 }
 
 /**
- * Order blog posts: Featured posts first, then the newest-created post first
- * (so a post just added in the admin panel appears at the top).
+ * Order blog posts by the date shown on the post (Publication Date, or the
+ * created date when none is set): newest date first. If two posts have the
+ * same date, the one created later comes first.
  */
 export function sortBlogPosts(posts) {
-  const time = (p) => new Date(p.created_date || p.publication_date || 0).getTime() || 0;
-  return [...posts].sort((a, b) => Number(!!b.featured) - Number(!!a.featured) || time(b) - time(a));
+  const shown = (p) => new Date(p.publication_date || p.created_date || 0).getTime() || 0;
+  const created = (p) => new Date(p.created_date || 0).getTime() || 0;
+  return [...posts].sort((a, b) => shown(b) - shown(a) || created(b) - created(a));
 }

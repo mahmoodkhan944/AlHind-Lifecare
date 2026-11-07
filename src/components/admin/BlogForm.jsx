@@ -490,7 +490,7 @@ export default function BlogForm({ initialData, onCancel, onSaved }) {
             </Field>
             <div className="flex items-center justify-between">
               <label className="text-sm font-medium text-foreground/80">
-                Featured Blog <span className="font-normal text-muted-foreground/70 text-xs">(shown first on the blog)</span>
+                Featured Blog
               </label>
               <Switch checked={!!form.featured} onCheckedChange={(v) => set("featured", v)} />
             </div>
