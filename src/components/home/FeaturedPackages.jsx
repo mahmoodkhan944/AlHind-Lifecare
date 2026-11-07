@@ -135,7 +135,9 @@ function Arrow({ dir, onClick }) {
 
 function HomePackageCard({ pkg, hospital, treatment, index }) {
   const discount = discountPercent(pkg);
-  const label = pkg.category || treatment?.name || pkg.title;
+  // Category / treatment (e.g. "Neurology") — shown in the checklist; the
+  // card heading is the package's own name (e.g. "Endoscopic Brain Surgery").
+  const label = pkg.category || treatment?.name || "";
   const city = pkg.city || hospital?.city;
   const country = pkg.country || hospital?.country;
   const location = [city, country].filter(Boolean).join(" - ");
@@ -176,12 +178,12 @@ function HomePackageCard({ pkg, hospital, treatment, index }) {
       </Link>
 
       <div className="p-4 sm:p-5 flex flex-col flex-1">
-        <Link to={to} className="flex items-center gap-2.5 group" title={pkg.title}>
+        <Link to={to} className="flex items-start gap-2.5 group" title={pkg.title}>
           <span className="w-8 h-8 rounded-lg bg-secondary/5 text-secondary font-heading font-bold text-sm flex items-center justify-center shrink-0">
-            {String(label).trim().charAt(0).toUpperCase()}
+            {String(pkg.title || label).trim().charAt(0).toUpperCase()}
           </span>
-          <h3 className="font-heading font-bold text-[15px] leading-snug text-secondary group-hover:text-primary transition-colors line-clamp-1">
-            {label}
+          <h3 className="font-heading font-bold text-[15px] leading-snug text-secondary group-hover:text-primary transition-colors line-clamp-2 pt-1">
+            {pkg.title}
           </h3>
         </Link>
         {hospital?.name && <p className="text-xs text-muted-foreground mt-1.5 line-clamp-1">{hospital.name}</p>}
