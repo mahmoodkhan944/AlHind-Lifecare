@@ -35,6 +35,7 @@ import {
   resolvePackageSections,
   detailHasContent,
 } from "@/lib/packageUtils";
+import { doctorPath } from "@/lib/paths";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -329,7 +330,7 @@ export default function PackageDetail() {
                       <span className="flex items-center gap-1.5"><MapPin className="w-4 h-4 shrink-0" /> {location}</span>
                     )}
                     {doctor?.name && (
-                      <Link to={`/doctors/${doctor.id}`} className="flex items-center gap-1.5 hover:text-primary">
+                      <Link to={doctorPath(doctor)} className="flex items-center gap-1.5 hover:text-primary">
                         <Stethoscope className="w-4 h-4 shrink-0" /> {doctor.name}
                       </Link>
                     )}
@@ -517,7 +518,7 @@ function HospitalCard({ hospital, title = "Your Hospital" }) {
 function DoctorCard({ doctor, title = "Your Doctor" }) {
   return (
     <Section title={title}>
-      <Link to={`/doctors/${doctor.id}`} className="group flex items-center gap-4">
+      <Link to={doctorPath(doctor)} className="group flex items-center gap-4">
         <div className="w-20 h-20 rounded-full overflow-hidden bg-muted shrink-0">
           {doctor.photo_url ? (
             <img src={doctor.photo_url} alt={doctor.name} loading="lazy" className="w-full h-full object-cover" />

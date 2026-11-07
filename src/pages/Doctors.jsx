@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { useLeadModal } from "@/lib/LeadModalContext";
 import { formatCountApprox } from "@/lib/utils";
+import { doctorPath } from "@/lib/paths";
 
 const PAGE_SIZE = 12;
 
@@ -213,7 +214,7 @@ export default function Doctors() {
                     </div>
 
                     {/* Name & speciality */}
-                    <Link to={`/doctors/${doc.id}`} className="group">
+                    <Link to={doctorPath(doc)} className="group">
                       <h3 className="font-heading font-bold text-base sm:text-lg text-foreground group-hover:text-primary transition-colors line-clamp-1">
                         {doc.name}
                       </h3>
@@ -247,7 +248,7 @@ export default function Doctors() {
 
                     {/* Actions */}
                     <div className="flex gap-2 mt-auto pt-2">
-                      <Link to={`/doctors/${doc.id}`} className="flex-1">
+                      <Link to={doctorPath(doc)} className="flex-1">
                         <Button variant="outline" className="w-full h-9 rounded-full text-xs sm:text-sm">
                           View Profile
                         </Button>

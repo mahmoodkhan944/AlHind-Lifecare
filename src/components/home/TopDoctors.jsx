@@ -6,6 +6,7 @@ import { db } from "@/api/dataClient";
 import { useLeadModal } from "@/lib/LeadModalContext";
 import { useSectionContent } from "@/hooks/useSectionContent";
 import { homePicks } from "@/lib/homePicks";
+import { doctorPath } from "@/lib/paths";
 
 const fallbackDoctors = [
   {
@@ -49,7 +50,7 @@ const fallbackDoctors = [
 // Only real doctors (from the database, with a UUID) have a profile page —
 // the sample doctors shown before data loads are not linked.
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const profilePath = (doc) => (UUID_RE.test(String(doc.id)) ? `/doctors/${doc.id}` : null);
+const profilePath = (doc) => (UUID_RE.test(String(doc.id)) ? doctorPath(doc) : null);
 
 // Wraps content in a link to the doctor's profile when there is one.
 function ProfileLink({ to, className, children, label }) {

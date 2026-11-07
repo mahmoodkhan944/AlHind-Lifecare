@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { db } from "@/api/dataClient";
 import { treatmentUrl } from "@/lib/slugify";
 import { useQuery } from "@tanstack/react-query";
+import { doctorPath } from "@/lib/paths";
 
 export default function SmartSearch({ scrolled }) {
   const [open, setOpen] = useState(false);
@@ -125,7 +126,7 @@ export default function SmartSearch({ scrolled }) {
                   {!loading && hasResults && (
                     <div className="py-2">
                       {matchedDoctors.length > 0 && (
-                        <ResultGroup icon={Stethoscope} title="Doctors" items={matchedDoctors.map((d) => ({ label: d.name, sub: d.speciality, path: `/doctors/${d.id}` }))} onItemClick={go} />
+                        <ResultGroup icon={Stethoscope} title="Doctors" items={matchedDoctors.map((d) => ({ label: d.name, sub: d.speciality, path: doctorPath(d) }))} onItemClick={go} />
                       )}
                       {matchedHospitals.length > 0 && (
                         <ResultGroup icon={Building2} title="Hospitals" items={matchedHospitals.map((h) => ({ label: h.name, sub: h.city, path: `/hospitals/${h.id}` }))} onItemClick={go} />

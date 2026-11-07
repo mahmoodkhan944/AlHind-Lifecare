@@ -50,6 +50,7 @@ import { slugify } from "@/lib/slugify";
 import { useDocumentMeta } from "@/hooks/useDocumentMeta";
 import DetailPageSkeleton from "@/components/common/DetailPageSkeleton";
 import { visibleGroups } from "@/lib/sectionGroups";
+import { doctorPath } from "@/lib/paths";
 
 const parseList = (val) => {
   if (!val) return [];
@@ -1135,7 +1136,7 @@ function RelatedSections({ relatedDoctors, relatedHospitals, shaded = false }) {
               {relatedDoctors.map((doc) => (
                 <Link
                   key={doc.id}
-                  to={`/doctors/${doc.id}`}
+                  to={doctorPath(doc)}
                   className="group flex flex-col items-center text-center bg-white rounded-2xl border border-border/50 shadow-sm hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 transition-all duration-300 p-5 sm:p-6"
                 >
                   <div className="relative w-20 h-20 sm:w-24 sm:h-24 mb-3">

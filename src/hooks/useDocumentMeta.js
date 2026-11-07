@@ -1,39 +1,75 @@
 import { useEffect } from "react";
 
 /**
- * Sets the browser tab title and the page's <meta name="description"> tag.
- * Nothing from this ever renders in the visible page — it only touches
- * document.head, which is what search engines and link-preview cards read.
+ * Sets SEO tags in document.head only — nothing here ever renders in the
+ * visible page. Search engines and AI search tools read these tags.
  *
- * Restores the previous title/description on unmount, so navigating to
- * another page doesn't leave stale SEO tags behind.
+ *  title       → <title>
+ *  description → <meta name="description">
+ *  keywords    → <meta name="keywords">
+ *  canonical   → <link rel="canonical"> (the preferred URL of the page)
+ *  jsonLd      → <script type="application/ld+json"> structured data
+ *               (schema.org), e.g. a Physician with location & speciality
+ *
+ * Everything is restored/removed on unmount, so navigating to another page
+ * doesn't leave stale SEO tags behind.
  */
-export function useDocumentMeta({ title, description }) {
+function setHeadTag(selector, create, attr, value) {
+  let el = document.head.querySelector(selector);
+  const created = !el;
+  const previous = el ? el.getAttribute(attr) : null;
+  if (!value) return () => {};
+  if (!el) {
+    el = create();
+    document.head.appendChild(el);
+  }
+  el.setAttribute(attr, value);
+  return () => {
+    if (created) el.remove();
+    else if (previous !== null) el.setAttribute(attr, previous);
+  };
+}
+
+export function useDocumentMeta({ title, description, keywords, canonical, jsonLd }) {
+  const jsonLdText = jsonLd ? JSON.stringify(jsonLd) : "";
+
   useEffect(() => {
     const previousTitle = document.title;
     if (title) document.title = title;
 
-    let metaTag = document.querySelector('meta[name="description"]');
-    const previousDescription = metaTag?.getAttribute("content") ?? null;
-    const createdTag = !metaTag;
-    if (description) {
-      if (!metaTag) {
-        metaTag = document.createElement("meta");
-        metaTag.setAttribute("name", "description");
-        document.head.appendChild(metaTag);
-      }
-      metaTag.setAttribute("content", description);
+    const meta = (name) => () => {
+      const m = document.createElement("meta");
+      m.setAttribute("name", name);
+      return m;
+    };
+    const undo = [
+      setHeadTag('meta[name="description"]', meta("description"), "content", description),
+      setHeadTag('meta[name="keywords"]', meta("keywords"), "content", keywords),
+      setHeadTag(
+        'link[rel="canonical"]',
+        () => {
+          const l = document.createElement("link");
+          l.setAttribute("rel", "canonical");
+          return l;
+        },
+        "href",
+        canonical
+      ),
+    ];
+
+    let script = null;
+    if (jsonLdText) {
+      script = document.createElement("script");
+      script.type = "application/ld+json";
+      script.setAttribute("data-page-jsonld", "true");
+      script.textContent = jsonLdText;
+      document.head.appendChild(script);
     }
 
     return () => {
       document.title = previousTitle;
-      if (metaTag) {
-        if (createdTag) {
-          metaTag.remove();
-        } else if (previousDescription !== null) {
-          metaTag.setAttribute("content", previousDescription);
-        }
-      }
+      undo.forEach((fn) => fn());
+      if (script) script.remove();
     };
-  }, [title, description]);
+  }, [title, description, keywords, canonical, jsonLdText]);
 }

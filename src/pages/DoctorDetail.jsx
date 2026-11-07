@@ -31,6 +31,7 @@ import { useSiteSettings, DEFAULT_SETTINGS, getWhatsAppLink } from "@/hooks/useS
 import { useDocumentMeta } from "@/hooks/useDocumentMeta";
 import DetailPageSkeleton from "@/components/common/DetailPageSkeleton";
 import { visibleGroups } from "@/lib/sectionGroups";
+import { doctorPath } from "@/lib/paths";
 
 const parseList = (val) => {
   if (!val) return [];
@@ -78,10 +79,19 @@ export default function DoctorDetail() {
   }, []);
 
   useEffect(() => {
-    db.entities.Doctor.get(id)
+    // The URL can hold the SEO slug (/doctors/dr-vikram-dua-...) or, for old
+    // links, the doctor's id — both open the same profile.
+    const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    const load = async () => {
+      if (UUID_RE.test(id)) return db.entities.Doctor.get(id);
+      const bySlug = await db.entities.Doctor.filter({ slug: id }, "-created_date", 1);
+      return bySlug[0] || null;
+    };
+    setLoading(true);
+    load()
       // Inactive doctors are hidden from the site, including direct links.
       .then((d) => setDoctor(d && d.status !== "inactive" ? d : null))
-      .catch(() => {})
+      .catch(() => setDoctor(null))
       .finally(() => setLoading(false));
   }, [id]);
 
@@ -111,15 +121,11 @@ export default function DoctorDetail() {
       .catch(() => {});
   }, [doctor]);
 
-  // Sets the browser tab title / SEO meta description only — nothing from
-  // this renders anywhere on the visible page. Falls back to sensible
-  // auto-generated values when the admin hasn't filled in custom SEO text.
-  useDocumentMeta({
-    title: doctor
-      ? doctor.meta_title || `${doctor.name}${doctor.designation ? ` — ${doctor.designation}` : ""} | AlHind Lifecare`
-      : undefined,
-    description: doctor ? doctor.meta_description || String(doctor.overview || "").split(/\n\s*\n/)[0].trim() || undefined : undefined,
-  });
+  // SEO / GEO — everything here goes into <head> only (title, meta tags,
+  // canonical URL and schema.org structured data). Nothing renders on the
+  // visible page; search engines and AI search read it.
+  const seo = doctor ? buildDoctorSeo(doctor) : {};
+  useDocumentMeta(seo);
 
   if (loading) {
     return <DetailPageSkeleton />;
@@ -318,7 +324,7 @@ export default function DoctorDetail() {
                     key={doc.id}
                     className="group bg-white rounded-2xl border border-border/50 shadow-sm hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 transition-all duration-300 overflow-hidden"
                   >
-                    <Link to={`/doctors/${doc.id}`} className="block">
+                    <Link to={doctorPath(doc)} className="block">
                       <div className="relative aspect-[4/3] bg-gradient-to-br from-primary/5 to-secondary/5">
                         {doc.photo_url ? (
                           <img src={doc.photo_url} alt={doc.name} loading="lazy" className="w-full h-full object-cover" />
@@ -765,4 +771,60 @@ function SectionCard({ title, subheading, children }) {
       {children}
     </motion.div>
   );
+}
+
+// ---------------------------------------------------------------------------
+// SEO / GEO for a doctor page (admin-only fields → <head> only)
+// ---------------------------------------------------------------------------
+const firstParagraph = (text) => String(text || "").split(/\n\s*\n/)[0].trim();
+const clip = (text, n) => (text.length > n ? `${text.slice(0, n - 1).trimEnd()}…` : text);
+
+function buildDoctorSeo(doctor) {
+  const origin = typeof window !== "undefined" ? window.location.origin : "";
+  const base = (import.meta.env.BASE_URL || "/").replace(/\/$/, "");
+  const url = `${origin}${base}${doctorPath(doctor)}`;
+  const localText = String(doctor.local_seo_text || "").trim();
+  const description =
+    doctor.meta_description ||
+    clip(firstParagraph(localText) || firstParagraph(doctor.overview), 160) ||
+    undefined;
+  const keywords = String(doctor.seo_keywords || "")
+    .split(",")
+    .map((k) => k.trim())
+    .filter(Boolean);
+  const specialities = parseList(doctor.specializations).map(String).filter(Boolean);
+
+  // schema.org Physician — tells Google / AI search who the doctor is, where
+  // they practise and what they treat (the "GEO" part).
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Physician",
+    name: doctor.name,
+    url,
+    ...(doctor.photo_url ? { image: doctor.photo_url } : {}),
+    ...(doctor.designation ? { jobTitle: doctor.designation } : {}),
+    ...(localText || doctor.overview ? { description: localText || String(doctor.overview) } : {}),
+    ...(doctor.speciality || specialities.length ? { medicalSpecialty: doctor.speciality || specialities[0] } : {}),
+    ...(specialities.length ? { knowsAbout: specialities } : {}),
+    ...(keywords.length ? { keywords: keywords.join(", ") } : {}),
+    ...(doctor.languages ? { knowsLanguage: String(doctor.languages).split(",").map((l) => l.trim()).filter(Boolean) } : {}),
+    ...(doctor.city || doctor.country
+      ? { address: { "@type": "PostalAddress", ...(doctor.city ? { addressLocality: doctor.city } : {}), ...(doctor.country ? { addressCountry: doctor.country } : {}) } }
+      : {}),
+    ...(doctor.city ? { areaServed: doctor.city } : {}),
+    ...(doctor.hospital_name
+      ? { hospitalAffiliation: { "@type": "Hospital", name: doctor.hospital_name, ...(doctor.city ? { address: { "@type": "PostalAddress", addressLocality: doctor.city, ...(doctor.country ? { addressCountry: doctor.country } : {}) } } : {}) } }
+      : {}),
+    ...(Number(doctor.rating) > 0 && Number(doctor.reviews_count) > 0
+      ? { aggregateRating: { "@type": "AggregateRating", ratingValue: Number(doctor.rating), reviewCount: Number(doctor.reviews_count) } }
+      : {}),
+  };
+
+  return {
+    title: doctor.meta_title || `${doctor.name}${doctor.designation ? ` — ${doctor.designation}` : ""} | AlHind Lifecare`,
+    description,
+    keywords: keywords.length ? keywords.join(", ") : undefined,
+    canonical: url,
+    jsonLd,
+  };
 }

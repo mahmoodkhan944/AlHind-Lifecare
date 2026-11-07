@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { ArrowLeft, Loader2, Upload, ImageIcon, Trophy, Save } from "lucide-react";
+import { ArrowLeft, Loader2, Upload, ImageIcon, Trophy, Save, EyeOff } from "lucide-react";
+import { slugify } from "@/lib/paths";
 import { db } from "@/api/dataClient";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -108,7 +109,24 @@ export default function DoctorForm({ initialData, onCancel, onSaved }) {
     }
     setSaving(true);
 
-    const slug = form.slug || String(form.name).toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    // SEO URL slug (e.g. dr-vikram-dua-neurosurgeon-faridabad); from the name if empty.
+    const slug = slugify(form.slug) || slugify(form.name);
+
+    // Two doctors can't share a URL.
+    try {
+      const sameSlug = await db.entities.Doctor.filter({ slug }, "-created_date", 5);
+      if (sameSlug.some((d) => d.id !== initialData?.id)) {
+        toast({
+          title: "This URL slug is already used by another doctor",
+          description: "Change the URL Slug in SEO Settings and save again.",
+          variant: "destructive",
+        });
+        setSaving(false);
+        return;
+      }
+    } catch {
+      // if the check can't run, the save itself will still report problems
+    }
     const speciality = form.speciality || (form.specializations && form.specializations[0]) || "";
     const treatments_offered = (form.treatments_list || []).join(", ");
 
@@ -136,6 +154,8 @@ export default function DoctorForm({ initialData, onCancel, onSaved }) {
       why_choose_doctor: JSON.stringify(form.why_choose_doctor || []),
       section_config: JSON.stringify(form.section_config || []),
       section_subheadings: JSON.stringify(form.section_subheadings || {}),
+      seo_keywords: (form.seo_keywords || "").trim() || null,
+      local_seo_text: (form.local_seo_text || "").trim() || null,
     };
 
     // Several sub-headings per section → section_groups, plus the old
@@ -335,8 +355,48 @@ export default function DoctorForm({ initialData, onCancel, onSaved }) {
         />
 
         <div className="bg-white rounded-2xl border border-border p-4 sm:p-5 shadow-sm">
-          <h3 className="font-bold text-foreground text-sm mb-4">SEO Settings</h3>
+          <h3 className="font-bold text-foreground text-sm">SEO & Local Search (GEO)</h3>
+          <p className="flex items-start gap-1.5 text-xs text-muted-foreground mt-1 mb-4">
+            <EyeOff className="w-3.5 h-3.5 shrink-0 mt-px" />
+            Admin only — not shown on the website. Used in the page's search-engine tags and structured data, which Google and AI search read.
+          </p>
           <div className="space-y-4">
+            <Field label="URL Slug">
+              <Input
+                value={form.slug || ""}
+                onChange={(e) => set("slug", e.target.value)}
+                onBlur={(e) => set("slug", slugify(e.target.value))}
+                placeholder={slugify(form.name) || "dr-name-speciality-city"}
+                className="h-10 rounded-lg border-border font-mono text-sm"
+              />
+              <p className="text-xs text-muted-foreground/70 mt-1 break-all">
+                Page address: <span className="font-mono">/doctors/{slugify(form.slug) || slugify(form.name) || "…"}</span>
+                {" "}— e.g. dr-vikram-dua-neurosurgeon-faridabad. Leave empty to use the doctor's name.
+              </p>
+            </Field>
+            <Field label="SEO Keywords">
+              <Textarea
+                value={form.seo_keywords || ""}
+                onChange={(e) => set("seo_keywords", e.target.value)}
+                placeholder="Dr Vikram Dua, best neurosurgeon in Faridabad, spine surgeon Faridabad, ..."
+                className="rounded-lg border-border min-h-[70px]"
+                rows={2}
+              />
+              <p className="text-xs text-muted-foreground/70 mt-1">Separate keywords with commas.</p>
+            </Field>
+            <Field label="Local SEO / GEO Paragraph">
+              <Textarea
+                value={form.local_seo_text || ""}
+                onChange={(e) => set("local_seo_text", e.target.value)}
+                placeholder="Looking for an experienced neurosurgeon in Faridabad? Dr. ... at ... Hospital, Sector 86, Faridabad. Patients from Faridabad, Delhi, Noida, Gurugram ..."
+                className="rounded-lg border-border min-h-[120px]"
+                rows={5}
+              />
+              <p className="text-xs text-muted-foreground/70 mt-1">
+                Location, hospital, speciality and areas served. Used as the doctor's description for search engines and AI search
+                (and as the meta description when that is empty).
+              </p>
+            </Field>
             <Field label="Meta Title (optional)">
               <Input
                 value={form.meta_title || ""}

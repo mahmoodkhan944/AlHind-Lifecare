@@ -27,6 +27,7 @@ import { useDocumentMeta } from "@/hooks/useDocumentMeta";
 import { useSiteSettings, getWhatsAppLink } from "@/hooks/useSiteSettings";
 import DetailPageSkeleton from "@/components/common/DetailPageSkeleton";
 import { visibleGroups } from "@/lib/sectionGroups";
+import { doctorPath } from "@/lib/paths";
 
 const parseList = (val) => {
   if (!val) return [];
@@ -247,7 +248,7 @@ export default function HospitalDetail() {
                     key={doc.id}
                     className="group bg-white rounded-2xl border border-border/50 shadow-sm hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 transition-all duration-300 overflow-hidden"
                   >
-                    <Link to={`/doctors/${doc.id}`} className="block">
+                    <Link to={doctorPath(doc)} className="block">
                       <div className="relative aspect-[4/3] bg-gradient-to-br from-primary/5 to-secondary/5">
                         {doc.photo_url ? (
                           <img src={doc.photo_url} alt={doc.name} loading="lazy" className="w-full h-full object-cover" />
