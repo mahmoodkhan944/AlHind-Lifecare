@@ -38,8 +38,8 @@ const PRICE_STEP = 500;
 const HERO_IMAGE = "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=1600&q=80";
 
 const sortPackages = (a, b) =>
+  // Featured first, then the newest package.
   Number(!!b.featured) - Number(!!a.featured) ||
-  (toNumber(a.sort_order) || 0) - (toNumber(b.sort_order) || 0) ||
   String(b.created_date || "").localeCompare(String(a.created_date || ""));
 
 export default function Packages() {

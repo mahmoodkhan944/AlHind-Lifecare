@@ -8,6 +8,7 @@ import TreatmentForm from "@/components/admin/TreatmentForm";
 import BulkUploadDialog from "@/components/admin/BulkUploadDialog";
 import AdminPagination from "@/components/admin/AdminPagination";
 import { slugify } from "@/lib/slugify";
+import { activeFirst } from "@/lib/listOrder";
 
 const PAGE_SIZE = 15;
 
@@ -68,8 +69,9 @@ export default function AdminTreatments() {
     setLoading(true);
     // FIX: limit was 100, which would silently cap the list once the catalogue
     // grows past that. Raised, and now paginated client-side instead.
+    // Newest first; inactive ones at the bottom.
     db.entities.Treatment.list("-created_date", 2000)
-      .then(setItems)
+      .then((rows) => setItems(activeFirst(rows)))
       .catch(() => {})
       .finally(() => setLoading(false));
   };

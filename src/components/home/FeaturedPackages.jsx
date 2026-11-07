@@ -9,8 +9,8 @@ import { formatPrice, discountPercent, packagePath, pluralize, toNumber } from "
 const MAX_CARDS = 12;
 
 const sortPackages = (a, b) =>
+  // Featured first, then the newest package.
   Number(!!b.featured) - Number(!!a.featured) ||
-  (toNumber(a.sort_order) || 0) - (toNumber(b.sort_order) || 0) ||
   String(b.created_date || "").localeCompare(String(a.created_date || ""));
 
 // Homepage carousel of treatment packages (from Admin → Packages).

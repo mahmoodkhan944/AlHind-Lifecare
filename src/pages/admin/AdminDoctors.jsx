@@ -9,6 +9,7 @@ import BulkUploadDialog from "@/components/admin/BulkUploadDialog";
 import AdminPagination from "@/components/admin/AdminPagination";
 import AdminPageHeader from "@/components/admin/AdminPageHeader";
 import StatCard from "@/components/admin/StatCard";
+import { activeFirst } from "@/lib/listOrder";
 
 const PAGE_SIZE = 15;
 
@@ -53,8 +54,9 @@ export default function AdminDoctors() {
 
   const loadItems = () => {
     setLoading(true);
+    // Newest first; inactive ones at the bottom.
     db.entities.Doctor.list("-created_date", 2000)
-      .then(setItems)
+      .then((rows) => setItems(activeFirst(rows)))
       .catch(() => {})
       .finally(() => setLoading(false));
   };

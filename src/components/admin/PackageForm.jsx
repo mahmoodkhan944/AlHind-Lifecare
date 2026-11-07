@@ -181,7 +181,8 @@ export default function PackageForm({ initialData, onCancel, onSaved }) {
     }
 
     setSaving(true);
-    const { id, created_date, updated_date, ...rest } = form; // eslint-disable-line no-unused-vars
+    // Drop read-only columns before saving.
+    const { id: _id, created_date: _created, updated_date: _updated, ...rest } = form;
     const data = {
       ...rest,
       title: form.title.trim(),
@@ -281,12 +282,9 @@ export default function PackageForm({ initialData, onCancel, onSaved }) {
                 </SelectContent>
               </Select>
             </Field>
-            <Field label="Sort Order" hint="Lower shows first">
-              <Input type="number" value={form.sort_order ?? ""} onChange={(e) => set("sort_order", e.target.value)} placeholder="0" className="h-10 rounded-lg" />
-            </Field>
           </div>
           <label className="flex items-center gap-2 text-sm font-medium text-foreground/80 pt-1">
-            <Switch checked={!!form.featured} onCheckedChange={(v) => set("featured", v)} /> Featured (shown at the top)
+            <Switch checked={!!form.featured} onCheckedChange={(v) => set("featured", v)} /> Featured (pinned at the top; otherwise newest packages show first)
           </label>
         </Card>
 

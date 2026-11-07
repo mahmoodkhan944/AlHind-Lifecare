@@ -7,6 +7,7 @@ import { Plus, Pencil, Trash2, Search, Loader2, Eye, Copy, Star, Package, MapPin
 import PackageForm from "@/components/admin/PackageForm";
 import AdminPagination from "@/components/admin/AdminPagination";
 import { formatPrice, discountPercent, packagePath, parseList } from "@/lib/packageUtils";
+import { activeFirst } from "@/lib/listOrder";
 
 const PAGE_SIZE = 15;
 
@@ -22,8 +23,9 @@ export default function AdminPackages() {
 
   const loadItems = () => {
     setLoading(true);
+    // Newest first; inactive ones at the bottom.
     db.entities.Package.list("-created_date", 2000)
-      .then(setItems)
+      .then((rows) => setItems(activeFirst(rows)))
       .catch((err) =>
         toast({
           title: "Couldn't load packages",

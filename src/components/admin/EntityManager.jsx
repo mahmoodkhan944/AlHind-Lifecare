@@ -11,6 +11,7 @@ import { Plus, Pencil, Trash2, Search, Upload, Loader2 } from "lucide-react";
 import AdminPagination from "@/components/admin/AdminPagination";
 import AdminPageHeader from "@/components/admin/AdminPageHeader";
 import StatCard from "@/components/admin/StatCard";
+import { activeFirst } from "@/lib/listOrder";
 
 const PAGE_SIZE = 15;
 
@@ -50,7 +51,8 @@ export default function EntityManager({
     setLoading(true);
     // FIX: limit was 100, which would silently cap the list once an entity's
     // records grow past that. Raised, and now paginated client-side instead.
-    entity.list("-created_date", 2000).then(setItems).catch(() => {}).finally(() => setLoading(false));
+    // Newest first; inactive / rejected / cancelled at the bottom.
+    entity.list("-created_date", 2000).then((rows) => setItems(activeFirst(rows))).catch(() => {}).finally(() => setLoading(false));
   };
 
   useEffect(loadItems, [entityName]);

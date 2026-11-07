@@ -7,6 +7,7 @@ import { Plus, Pencil, Trash2, Search, Loader2, Eye, Copy, Star } from "lucide-r
 import HospitalForm from "@/components/admin/HospitalForm";
 import BulkUploadDialog from "@/components/admin/BulkUploadDialog";
 import AdminPagination from "@/components/admin/AdminPagination";
+import { activeFirst } from "@/lib/listOrder";
 
 const PAGE_SIZE = 15;
 
@@ -57,8 +58,9 @@ export default function AdminHospitals() {
     setLoading(true);
     // FIX: limit was 100, which would silently cap the list once the roster grows
     // past that. Raised, and now paginated client-side instead.
+    // Newest first; inactive ones at the bottom.
     db.entities.Hospital.list("-created_date", 2000)
-      .then(setItems)
+      .then((rows) => setItems(activeFirst(rows)))
       .catch(() => {})
       .finally(() => setLoading(false));
   };
