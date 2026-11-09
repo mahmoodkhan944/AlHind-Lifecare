@@ -1,4 +1,18 @@
 import { supabase } from '@/lib/supabaseClient';
+import { HIDDEN_COUNTRIES, hideCountriesNow, isHiddenCountry } from '@/lib/siteConfig';
+
+// Hospital ids in hidden countries (e.g. Turkey) — cached for the page visit.
+let hiddenHospitalIds = null;
+async function getHiddenHospitalIds() {
+  if (!hiddenHospitalIds) {
+    hiddenHospitalIds = supabase
+      .from('hospitals')
+      .select('id, country')
+      .then(({ data }) => new Set((data || []).filter((h) => isHiddenCountry(h.country)).map((h) => String(h.id))))
+      .catch(() => new Set());
+  }
+  return hiddenHospitalIds;
+}
 
 /**
  * Parses a sort string like "-created_date" or "order" into
@@ -30,21 +44,37 @@ function throwIfError(error) {
  *   entity.delete(id)
  */
 export function createEntity(tableName, options = {}) {
-  const { publicInsert = false, ignoreDuplicates = false } = options;
+  const { publicInsert = false, ignoreDuplicates = false, countryColumn = null, hospitalColumn = null } = options;
+
+  // On the public site, leave out rows from hidden countries (see
+  // src/lib/siteConfig.js). Done in the query itself so "show 4" still
+  // returns 4 rows. Rows with no country are kept.
+  const hideByCountry = (query) => {
+    if (!countryColumn || !hideCountriesNow()) return query;
+    const list = HIDDEN_COUNTRIES.map((c) => `"${c}"`).join(',');
+    return query.or(`${countryColumn}.is.null,${countryColumn}.not.in.(${list})`);
+  };
+
+  // Also drop rows linked to a hospital in a hidden country.
+  const dropHiddenHospitals = async (rows) => {
+    if (!hospitalColumn || !hideCountriesNow() || rows.length === 0) return rows;
+    const hidden = await getHiddenHospitalIds();
+    return hidden.size ? rows.filter((r) => !hidden.has(String(r[hospitalColumn]))) : rows;
+  };
 
   return {
     async list(sort, limit) {
-      let query = supabase.from(tableName).select('*');
+      let query = hideByCountry(supabase.from(tableName).select('*'));
       const parsedSort = parseSort(sort);
       if (parsedSort) query = query.order(parsedSort.column, { ascending: parsedSort.ascending });
       if (limit) query = query.limit(limit);
       const { data, error } = await query;
       throwIfError(error);
-      return data ?? [];
+      return dropHiddenHospitals(data ?? []);
     },
 
     async filter(queryObj = {}, sort, limit) {
-      let query = supabase.from(tableName).select('*');
+      let query = hideByCountry(supabase.from(tableName).select('*'));
       Object.entries(queryObj).forEach(([key, value]) => {
         query = query.eq(key, value);
       });
@@ -53,13 +83,15 @@ export function createEntity(tableName, options = {}) {
       if (limit) query = query.limit(limit);
       const { data, error } = await query;
       throwIfError(error);
-      return data ?? [];
+      return dropHiddenHospitals(data ?? []);
     },
 
     async get(id) {
-      const { data, error } = await supabase.from(tableName).select('*').eq('id', id).single();
+      const { data, error } = await hideByCountry(supabase.from(tableName).select('*').eq('id', id)).single();
       throwIfError(error);
-      return data;
+      const [row] = await dropHiddenHospitals([data]);
+      if (!row) throwIfError({ message: 'Not found', code: 'PGRST116' });
+      return row;
     },
 
     async create(payload) {

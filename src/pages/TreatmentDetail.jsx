@@ -51,6 +51,7 @@ import { useDocumentMeta } from "@/hooks/useDocumentMeta";
 import DetailPageSkeleton from "@/components/common/DetailPageSkeleton";
 import { visibleGroups } from "@/lib/sectionGroups";
 import { doctorPath } from "@/lib/paths";
+import { isHiddenCountry } from "@/lib/siteConfig";
 
 const parseList = (val) => {
   if (!val) return [];
@@ -79,6 +80,8 @@ const HERO_IMAGE =
 const countryLabel = (country) => {
   if (country === "India") return "India";
   if (country === "Turkey") return "Turkey";
+  // Turkey switched off in src/lib/siteConfig.js → talk about India only.
+  if (isHiddenCountry("Turkey")) return "India";
   return "India and Turkey";
 };
 
@@ -234,7 +237,7 @@ function LandingPage({ treatment, relatedDoctors, relatedHospitals, faqs, openLe
   // which one they're interested in — this choice then drives every "India"
   // / "Turkey" mention on the page (heading, visa section, etc.) and gets
   // sent along with their lead so the team knows their preference.
-  const offersBoth = treatment.country === "Both" || !treatment.country;
+  const offersBoth = (treatment.country === "Both" || !treatment.country) && !isHiddenCountry("Turkey");
   const [selectedDestination, setSelectedDestination] = useState(
     offersBoth ? "India" : treatment.country
   );
@@ -1009,7 +1012,7 @@ const SECTION_ICON_THEME = {
 // apply to this treatment's country) — the caller filters out the nulls.
 function renderTreatmentSection(key, title, treatment) {
   if (key === "why_choose_india" && treatment.country === "Turkey") return null;
-  if (key === "why_choose_turkey" && treatment.country === "India") return null;
+  if (key === "why_choose_turkey" && (treatment.country === "India" || isHiddenCountry("Turkey"))) return null;
 
   if (key === "key_benefits" || CHECKLIST_KEYS.includes(key) || key === "additional_information") {
     const groups = visibleGroups(treatment, key);

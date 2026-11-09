@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { useLeadModal } from "@/lib/LeadModalContext";
 import { formatCountApprox } from "@/lib/utils";
 import { doctorPath } from "@/lib/paths";
+import { SHOW_TURKEY } from "@/lib/siteConfig";
 
 const PAGE_SIZE = 12;
 
@@ -111,8 +112,7 @@ export default function Doctors() {
             transition={{ delay: 0.1 }}
             className="text-white/85 text-base sm:text-lg max-w-2xl mb-6 sm:mb-8 text-balance"
           >
-            Browse our network of world-renowned specialists across leading hospitals in India and
-            Turkey, and get matched with the right expert for your treatment.
+            Browse our network of world-renowned specialists across leading hospitals in India{SHOW_TURKEY ? " and Turkey" : ""}, and get matched with the right expert for your treatment.
           </motion.p>
           
         </div>
@@ -152,7 +152,7 @@ export default function Doctors() {
               <SelectContent>
                 <SelectItem value="all">All Countries</SelectItem>
                 <SelectItem value="India">India</SelectItem>
-                <SelectItem value="Turkey">Turkey</SelectItem>
+                {SHOW_TURKEY && <SelectItem value="Turkey">Turkey</SelectItem>}
               </SelectContent>
             </Select>
           </div>

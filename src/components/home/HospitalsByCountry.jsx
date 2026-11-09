@@ -5,6 +5,7 @@ import { MapPin, ArrowRight, Building2 } from "lucide-react";
 import { db } from "@/api/dataClient";
 import { useSectionContent } from "@/hooks/useSectionContent";
 import { homePicks } from "@/lib/homePicks";
+import { isHiddenCountry } from "@/lib/siteConfig";
 
 const fallback = {
   India: [
@@ -55,17 +56,22 @@ export default function HospitalsByCountry() {
     )
       .then((data) => { if (data.length > 0) setHospitals((prev) => ({ ...prev, India: data.slice(0, 4) })); })
       .catch(() => {});
-    homePicks(db.entities.Hospital, { status: "active", country: "Turkey" }, "-created_date", 4, () =>
-      db.entities.Hospital.filter({ status: "active", country: "Turkey" }, "-created_date", 4)
-    )
-      .then((data) => { if (data.length > 0) setHospitals((prev) => ({ ...prev, Turkey: data.slice(0, 4) })); })
-      .catch(() => {});
+    if (!isHiddenCountry("Turkey")) {
+      homePicks(db.entities.Hospital, { status: "active", country: "Turkey" }, "-created_date", 4, () =>
+        db.entities.Hospital.filter({ status: "active", country: "Turkey" }, "-created_date", 4)
+      )
+        .then((data) => { if (data.length > 0) setHospitals((prev) => ({ ...prev, Turkey: data.slice(0, 4) })); })
+        .catch(() => {});
+    }
   }, []);
 
+  // Countries switched off in src/lib/siteConfig.js (e.g. Turkey) are not shown.
   const sections = [
     { country: "India", items: hospitals.India || [] },
     { country: "Turkey", items: hospitals.Turkey || [] },
-  ];
+  ].filter((sec) => !isHiddenCountry(sec.country));
+  // With one country, its card spans the full width and shows 4 hospitals.
+  const single = sections.length === 1;
 
   return (
     <section className="py-6 sm:py-8 md:py-10 bg-muted">
@@ -79,7 +85,7 @@ export default function HospitalsByCountry() {
             {header.subtitle}
           </p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className={`grid grid-cols-1 gap-6 ${single ? "" : "md:grid-cols-2"}`}>
           {sections.map((sec, i) => {
             const cfg = config[sec.country];
             const count = sec.items.length > 0 ? `${sec.items.length * 10}+` : "30+";
@@ -117,8 +123,8 @@ export default function HospitalsByCountry() {
                 </div>
 
                 {/* Hospital thumbnails */}
-                <div className="grid grid-cols-2 gap-2 sm:gap-3 px-4 sm:px-5">
-                  {sec.items.slice(0, 2).map((h) => (
+                <div className={`grid grid-cols-2 gap-2 sm:gap-3 px-4 sm:px-5 ${single ? "md:grid-cols-4" : ""}`}>
+                  {sec.items.slice(0, single ? 4 : 2).map((h) => (
                     <Link key={h.id} to={`/hospitals/${h.id}`} className="group block">
                       <div className="rounded-xl overflow-hidden bg-gray-50 aspect-[4/3]">
                         {h.cover_image_url ? (

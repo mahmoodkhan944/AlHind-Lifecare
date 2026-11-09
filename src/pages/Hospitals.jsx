@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useLeadModal } from "@/lib/LeadModalContext";
 import { formatCountApprox } from "@/lib/utils";
+import { SHOW_TURKEY } from "@/lib/siteConfig";
 
 const PAGE_SIZE = 12;
 
@@ -120,7 +121,7 @@ export default function Hospitals() {
               <SelectContent>
                 <SelectItem value="all">All Countries</SelectItem>
                 <SelectItem value="India">India</SelectItem>
-                <SelectItem value="Turkey">Turkey</SelectItem>
+                {SHOW_TURKEY && <SelectItem value="Turkey">Turkey</SelectItem>}
               </SelectContent>
             </Select>
           </div>

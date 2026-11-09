@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { db } from "@/api/dataClient";
 import IconOrImage from "@/components/common/IconOrImage";
+import { DESTINATIONS_TEXT } from "@/lib/siteConfig";
 
 const fallbackServices = [
   { icon: Stethoscope, label: "Medical Treatment" },
@@ -139,7 +140,7 @@ const HERO_IMAGE =
 
 const fallbackHero = {
   title: "About Alhind Medical Care",
-  subtitle: "Your trusted bridge to world-class healthcare in India and Turkey",
+  subtitle: `Your trusted bridge to world-class healthcare in ${DESTINATIONS_TEXT}`,
   image: HERO_IMAGE,
 };
 
@@ -147,7 +148,7 @@ const fallbackIntro = {
   badge: "Your Health, Our Priority",
   heading: "Making World-Class Healthcare Accessible to All",
   paragraphs: [
-    "At Alhind Medical Care, we believe quality healthcare should be accessible to everyone, everywhere. That's why we connect international patients with top hospitals and expert doctors in leading medical destinations across India and Turkey.",
+    `At Alhind Medical Care, we believe quality healthcare should be accessible to everyone, everywhere. That's why we connect international patients with top hospitals and expert doctors in leading medical destinations across ${DESTINATIONS_TEXT}.`,
     "With a strong network of JCI & NABH accredited hospitals and clinics, we make medical travel stress-free — from seamless, timely doctor appointments for a second opinion to expediting your visa for treatment abroad.",
   ],
   image:

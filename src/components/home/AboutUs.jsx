@@ -4,12 +4,13 @@ import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import SectionHeader from "@/components/common/SectionHeader";
 import { db } from "@/api/dataClient";
+import { DESTINATIONS_TEXT } from "@/lib/siteConfig";
 
 const fallbackContent = {
   badge: "About Us",
   heading: "Leading Medical Tourism Services for World-Class Healthcare in India",
   paragraph:
-    "At Alhind Medical Care, our mission is to connect international patients with world-class hospitals and renowned doctors in India and Turkey. We provide end-to-end assistance — from medical opinion and cost estimates to travel arrangements, hospital coordination, and post-treatment follow-up — ensuring a seamless and stress-free healthcare journey for every patient.",
+    `At Alhind Medical Care, our mission is to connect international patients with world-class hospitals and renowned doctors in ${DESTINATIONS_TEXT}. We provide end-to-end assistance — from medical opinion and cost estimates to travel arrangements, hospital coordination, and post-treatment follow-up — ensuring a seamless and stress-free healthcare journey for every patient.`,
 };
 
 export default function AboutUs() {

@@ -14,6 +14,7 @@ import FlagIcon from "@/components/common/FlagIcon";
 import { Link } from "react-router-dom";
 import { useSiteSettings, DEFAULT_SETTINGS } from "@/hooks/useSiteSettings";
 import { useSectionContent } from "@/hooks/useSectionContent";
+import { DESTINATIONS_TEXT } from "@/lib/siteConfig";
 
 const BG_VIDEO = `${import.meta.env.BASE_URL}videos/hero-video.mp4`;
 // A static frame shown immediately while the ~2.4MB background video loads
@@ -36,7 +37,7 @@ export default function HeroSection() {
     badge: "Knows No Borders",
     heading: "Better Health",
     subtitle:
-      "Your trusted gateway to world-class healthcare — connecting you with premier doctors and top-accredited hospitals across India and Turkey.",
+      `Your trusted gateway to world-class healthcare — connecting you with premier doctors and top-accredited hospitals across ${DESTINATIONS_TEXT}.`,
   });
   const heroForm = useSectionContent("home_hero_form", {
     badge: "",

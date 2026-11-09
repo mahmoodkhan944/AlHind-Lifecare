@@ -1,3 +1,4 @@
+import { SHOW_TURKEY } from "@/lib/siteConfig";
 import React, { useState, useEffect, useMemo } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -71,7 +72,7 @@ export default function Packages() {
   useDocumentMeta({
     title: "All-Inclusive Treatment Packages | AlHind Lifecare",
     description:
-      "All-inclusive medical treatment packages in India, Turkey and UAE with transparent pricing — hospital, surgeon, hotel stay and aftercare included.",
+      `All-inclusive medical treatment packages in ${SHOW_TURKEY ? "India, Turkey and UAE" : "India and UAE"} with transparent pricing — hospital, surgeon, hotel stay and aftercare included.`,
   });
 
   useEffect(() => {
