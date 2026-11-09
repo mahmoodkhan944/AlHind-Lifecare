@@ -8,6 +8,8 @@ import {
   Building2,
   BedDouble,
   Hotel,
+  CalendarDays,
+  TrendingUp,
   ArrowRight,
   Package as PackageIcon,
   SlidersHorizontal,
@@ -30,6 +32,8 @@ import {
   packagePath,
   pluralize,
   toNumber,
+  SHOW_HOTEL_NIGHTS,
+  successRateText,
 } from "@/lib/packageUtils";
 
 const PAGE_SIZE = 10;
@@ -265,7 +269,7 @@ export default function Packages() {
         </div>
       </section>
 
-      <section className="py-8 sm:py-10 md:py-12 bg-muted/30">
+      <section className="py-6 sm:py-7 md:py-7 bg-muted/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6 lg:gap-8 items-start">
             {/* Filters — sidebar on desktop, collapsible on mobile */}
@@ -402,9 +406,19 @@ export function PackageCard({ pkg, hospital, treatment, index = 0 }) {
               <BedDouble className="w-3.5 h-3.5 shrink-0" /> {pluralize(pkg.days_in_hospital, "day")} in hospital
             </span>
           )}
-          {toNumber(pkg.nights_stay) > 0 && (
+          {SHOW_HOTEL_NIGHTS && toNumber(pkg.nights_stay) > 0 && (
             <span className="flex items-center gap-1">
               <Hotel className="w-3.5 h-3.5 shrink-0" /> {pluralize(pkg.nights_stay, "night")} stay
+            </span>
+          )}
+          {toNumber(pkg.total_days) > 0 && (
+            <span className="flex items-center gap-1">
+              <CalendarDays className="w-3.5 h-3.5 shrink-0" /> Total trip {pluralize(pkg.total_days, "day")}
+            </span>
+          )}
+          {successRateText(pkg.success_rate) && (
+            <span className="flex items-center gap-1 text-accent-jade font-semibold">
+              <TrendingUp className="w-3.5 h-3.5 shrink-0" /> {successRateText(pkg.success_rate)} success rate
             </span>
           )}
         </div>

@@ -16,6 +16,7 @@ import {
   ShieldCheck,
   ArrowRight,
   Stethoscope,
+  TrendingUp,
 } from "lucide-react";
 import { db } from "@/api/dataClient";
 import { Button } from "@/components/ui/button";
@@ -34,6 +35,8 @@ import {
   resolvePackageDetails,
   resolvePackageSections,
   detailHasContent,
+  SHOW_HOTEL_NIGHTS,
+  successRateText,
 } from "@/lib/packageUtils";
 import { doctorPath } from "@/lib/paths";
 
@@ -261,10 +264,13 @@ export default function PackageDetail() {
     `Hi, I'm interested in the package: ${pkg.title}`
   )}`;
 
+  // Package's own success rate; falls back to the linked treatment's.
+  const successRate = successRateText(pkg.success_rate) || successRateText(treatment?.success_rate);
   const facts = [
     toNumber(pkg.days_in_hospital) > 0 && { icon: BedDouble, label: "Hospital stay", value: pluralize(pkg.days_in_hospital, "day") },
-    toNumber(pkg.nights_stay) > 0 && { icon: Hotel, label: "Hotel stay", value: pluralize(pkg.nights_stay, "night") },
+    SHOW_HOTEL_NIGHTS && toNumber(pkg.nights_stay) > 0 && { icon: Hotel, label: "Hotel stay", value: pluralize(pkg.nights_stay, "night") },
     toNumber(pkg.total_days) > 0 && { icon: CalendarDays, label: "Total trip", value: pluralize(pkg.total_days, "day") },
+    successRate && { icon: TrendingUp, label: "Success rate", value: successRate, highlight: true },
     location && { icon: MapPin, label: "Location", value: location },
   ].filter(Boolean);
 
@@ -428,12 +434,12 @@ function PriceCard({ pkg, discount, facts, onBook, onQuote, whatsappHref }) {
 
       {facts.length > 0 && (
         <dl className="mt-5 divide-y divide-border border-y border-border">
-          {facts.map(({ icon: Icon, label, value }) => (
+          {facts.map(({ icon: Icon, label, value, highlight }) => (
             <div key={label} className="flex items-center justify-between gap-3 py-2.5 text-sm">
               <dt className="flex items-center gap-2 text-muted-foreground">
-                <Icon className="w-4 h-4" /> {label}
+                <Icon className={`w-4 h-4 ${highlight ? "text-accent-jade" : ""}`} /> {label}
               </dt>
-              <dd className="font-semibold text-right">{value}</dd>
+              <dd className={`font-semibold text-right ${highlight ? "text-accent-jade" : ""}`}>{value}</dd>
             </div>
           ))}
         </dl>

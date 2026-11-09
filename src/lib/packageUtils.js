@@ -55,6 +55,18 @@ export const packagePath = (pkg) => `/packages/${pkg.slug || pkg.id}`;
 
 export const pluralize = (n, word) => `${n} ${word}${Number(n) === 1 ? "" : "s"}`;
 
+// Hotel nights are hidden on the site for now (days in hospital and total
+// trip still show). Set to true to bring them back everywhere.
+export const SHOW_HOTEL_NIGHTS = false;
+
+// "95", 95, "95%" or "95% success rate" → "95%". Empty / no number → "".
+export const successRateText = (val) => {
+  const m = String(val ?? "").match(/\d+(?:\.\d+)?/);
+  if (!m) return "";
+  const n = Math.min(100, Number(m[0]));
+  return `${n}%`;
+};
+
 // ---------------------------------------------------------------------------
 // Package Details (accordion), Treatment Info and page section order
 // ---------------------------------------------------------------------------

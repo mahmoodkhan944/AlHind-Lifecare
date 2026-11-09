@@ -23,6 +23,9 @@ import {
   defaultPackageDetails,
   resolvePackageDetails,
   cleanDetails,
+  pluralize,
+  SHOW_HOTEL_NIGHTS,
+  successRateText,
 } from "@/lib/packageUtils";
 import ShowOnHomeToggle from "@/components/admin/ShowOnHomeToggle";
 
@@ -176,6 +179,11 @@ export default function PackageForm({ initialData, onCancel, onSaved }) {
     }
     const price = toNumber(form.price);
     const original = toNumber(form.original_price);
+    const rate = toNumber(form.success_rate);
+    if (rate !== null && (rate < 0 || rate > 100)) {
+      toast({ title: "Success rate 0 se 100 ke beech hona chahiye", variant: "destructive" });
+      return;
+    }
     if (original !== null && original < price) {
       toast({ title: "Original price should be higher than the package price", variant: "destructive" });
       return;
@@ -217,6 +225,9 @@ export default function PackageForm({ initialData, onCancel, onSaved }) {
       gallery_images: JSON.stringify(form.gallery_images || []),
       faqs: JSON.stringify((form.faqs || []).filter((f) => f?.question?.trim())),
     };
+    // Sent only once the field exists on the row or was typed in, so saving
+    // still works before migration 010 is run.
+    if ("success_rate" in form) data.success_rate = rate;
 
     try {
       if (isEdit) {
@@ -230,9 +241,14 @@ export default function PackageForm({ initialData, onCancel, onSaved }) {
       onSaved();
     } catch (err) {
       const duplicateSlug = err?.status === "23505";
+      const missingRate = /success_rate/.test(err?.message || "");
       toast({
         title: duplicateSlug ? "This URL slug is already used by another package" : "Failed to save package",
-        description: duplicateSlug ? "Change the slug and try again." : err?.message,
+        description: duplicateSlug
+          ? "Change the slug and try again."
+          : missingRate
+            ? "Success rate ka column abhi database me nahi hai. Supabase SQL Editor me supabase/migrations/010_package_success_rate.sql run karein."
+            : err?.message,
         variant: "destructive",
       });
     }
@@ -357,17 +373,41 @@ export default function PackageForm({ initialData, onCancel, onSaved }) {
 
         {/* Stay */}
         <Card title="Stay Details">
-          <div className="grid grid-cols-3 gap-3">
+          <div className={`grid gap-3 ${SHOW_HOTEL_NIGHTS ? "grid-cols-3" : "grid-cols-2"}`}>
             <Field label="Days in hospital">
-              <Input type="number" min="0" value={form.days_in_hospital ?? ""} onChange={(e) => set("days_in_hospital", e.target.value)} placeholder="1" className="h-10 rounded-lg" />
+              <Input type="number" min="0" value={form.days_in_hospital ?? ""} onChange={(e) => set("days_in_hospital", e.target.value)} placeholder="4" className="h-10 rounded-lg" />
             </Field>
-            <Field label="Hotel nights">
-              <Input type="number" min="0" value={form.nights_stay ?? ""} onChange={(e) => set("nights_stay", e.target.value)} placeholder="3" className="h-10 rounded-lg" />
-            </Field>
-            <Field label="Total trip days">
-              <Input type="number" min="0" value={form.total_days ?? ""} onChange={(e) => set("total_days", e.target.value)} placeholder="4" className="h-10 rounded-lg" />
+            {SHOW_HOTEL_NIGHTS && (
+              <Field label="Hotel nights">
+                <Input type="number" min="0" value={form.nights_stay ?? ""} onChange={(e) => set("nights_stay", e.target.value)} placeholder="3" className="h-10 rounded-lg" />
+              </Field>
+            )}
+            <Field label="Total trip (days)">
+              <Input type="number" min="0" value={form.total_days ?? ""} onChange={(e) => set("total_days", e.target.value)} placeholder="15" className="h-10 rounded-lg" />
             </Field>
           </div>
+          {(toNumber(form.days_in_hospital) > 0 || toNumber(form.total_days) > 0) && (
+            <p className="text-xs text-muted-foreground -mt-1">
+              Website par dikhega:{" "}
+              {[
+                toNumber(form.days_in_hospital) > 0 && `Hospital stay ${pluralize(form.days_in_hospital, "day")}`,
+                toNumber(form.total_days) > 0 && `Total trip ${pluralize(form.total_days, "day")}`,
+              ].filter(Boolean).join(" · ")}
+            </p>
+          )}
+          <Field
+            label="Success Rate (%)"
+            hint={
+              successRateText(form.success_rate)
+                ? `Website par dikhega: Success rate ${successRateText(form.success_rate)}`
+                : "Khali chhodenge to linked treatment ka success rate dikhega (agar hai)."
+            }
+          >
+            <div className="relative">
+              <Input type="number" min="0" max="100" step="0.1" value={form.success_rate ?? ""} onChange={(e) => set("success_rate", e.target.value)} placeholder="95" className="h-10 rounded-lg pr-8" />
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">%</span>
+            </div>
+          </Field>
         </Card>
 
         {/* Images */}

@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { ArrowLeft, ArrowRight, Check, Package as PackageIcon } from "lucide-react";
 import { db } from "@/api/dataClient";
 import { useSectionContent } from "@/hooks/useSectionContent";
-import { formatPrice, discountPercent, packagePath, pluralize, toNumber } from "@/lib/packageUtils";
+import { formatPrice, discountPercent, packagePath, pluralize, toNumber, SHOW_HOTEL_NIGHTS, successRateText } from "@/lib/packageUtils";
 import { homePicks } from "@/lib/homePicks";
 
 const MAX_CARDS = 12;
@@ -148,7 +148,9 @@ function HomePackageCard({ pkg, hospital, treatment, index }) {
     label,
     hospital?.name,
     toNumber(pkg.days_in_hospital) > 0 && `${pluralize(pkg.days_in_hospital, "day")} in hospital`,
-    toNumber(pkg.nights_stay) > 0 && `${pluralize(pkg.nights_stay, "night")} accommodation`,
+    SHOW_HOTEL_NIGHTS && toNumber(pkg.nights_stay) > 0 && `${pluralize(pkg.nights_stay, "night")} accommodation`,
+    toNumber(pkg.total_days) > 0 && `Total trip ${pluralize(pkg.total_days, "day")}`,
+    successRateText(pkg.success_rate) && `${successRateText(pkg.success_rate)} success rate`,
   ].filter(Boolean);
 
   return (
