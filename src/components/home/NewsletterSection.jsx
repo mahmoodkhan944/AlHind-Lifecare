@@ -29,7 +29,7 @@ export default function NewsletterSection() {
   };
 
   return (
-    <section className="bg-gradient-to-b from-accent-jade/5 to-white py-10 sm:py-12 md:py-16">
+    <section className="bg-gradient-to-b from-accent-jade/5 to-white py-7 sm:py-8 md:py-9">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 text-center">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

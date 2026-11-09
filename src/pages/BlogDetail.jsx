@@ -107,7 +107,7 @@ export default function BlogDetail() {
           was silently ignored — the article had no width limit and could stretch
           to an unreadable line length on wide screens. Also "py-5" never changed
           across breakpoints, so this section never got proper breathing room. */}
-      <section className="py-8 sm:py-9 md:py-10">
+      <section className="py-6 sm:py-7">
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
           {post.cover_image_url && (
             <div className="w-full max-h-[28rem] sm:max-h-[32rem] overflow-hidden rounded-2xl shadow-lg mb-6 sm:mb-8 bg-muted flex items-center justify-center">

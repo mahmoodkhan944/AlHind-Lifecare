@@ -351,7 +351,7 @@ export default function About() {
       </section>
 
       {/* Intro / Mission — image + copy, "Your Health, Our Priority" */}
-      <section className="py-10 sm:py-12 md:py-16">
+      <section className="py-7 sm:py-8 md:py-9">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 md:gap-10 items-center">
             <motion.div
@@ -402,7 +402,7 @@ export default function About() {
 
       {/* Stats — only shown once the admin adds some (previously saved but never displayed) */}
       {stats.length > 0 && (
-        <section className="py-8 sm:py-10 bg-secondary">
+        <section className="py-6 sm:py-7 bg-secondary">
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <div className={`grid grid-cols-2 ${stats.length >= 4 ? "md:grid-cols-4" : stats.length === 3 ? "md:grid-cols-3" : ""} gap-6 text-center`}>
               {stats.map((st, i) => (
@@ -423,7 +423,7 @@ export default function About() {
       )}
 
       {/* Our Services */}
-      <section className="py-10 sm:py-12 md:py-14 bg-secondary/30">
+      <section className="py-7 sm:py-8 md:py-8 bg-secondary/30">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 text-center">
           <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wider uppercase mb-4">
             {servicesHeader.badge}
@@ -454,7 +454,7 @@ export default function About() {
       </section>
 
       {/* Mission & Vision */}
-      <section className="py-10 sm:py-12 md:py-14">
+      <section className="py-7 sm:py-8 md:py-8">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
             {missionVision.map(({ icon, title, desc }) => (
@@ -477,7 +477,7 @@ export default function About() {
       </section>
 
       {/* Why patients trust us — alternating image + text rows */}
-      <section className="py-10 sm:py-12 md:py-16">
+      <section className="py-7 sm:py-8 md:py-9">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-10">
             <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wider uppercase mb-4">
@@ -518,7 +518,7 @@ export default function About() {
       </section>
 
       {/* How we help — detailed bullet groups */}
-      <section className="py-10 sm:py-12 md:py-14 bg-secondary/30">
+      <section className="py-7 sm:py-8 md:py-8 bg-secondary/30">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center max-w-2xl mx-auto mb-7 sm:mb-8">
             <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wider uppercase mb-4">
@@ -560,7 +560,7 @@ export default function About() {
       {/* Leadership — hidden for now. Set SHOW_LEADERSHIP to true (top of
           this file) to bring it back; the content in Admin → About Page is kept. */}
       {SHOW_LEADERSHIP && (
-      <section className="py-10 sm:py-12 md:py-14">
+      <section className="py-7 sm:py-8 md:py-8">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <div className="text-center max-w-2xl mx-auto mb-7 sm:mb-8">
             <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wider uppercase mb-4">
@@ -622,7 +622,7 @@ export default function About() {
       )}
 
       {/* Advantages of choosing us */}
-      <section className="py-10 sm:py-12 md:py-14 bg-secondary/30">
+      <section className="py-7 sm:py-8 md:py-8 bg-secondary/30">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center max-w-2xl mx-auto mb-7 sm:mb-8">
             <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wider uppercase mb-4">

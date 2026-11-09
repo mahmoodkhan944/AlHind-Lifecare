@@ -83,7 +83,7 @@ export default function TopDoctors() {
   }, []);
 
   return (
-    <section className="py-6 sm:py-8 md:py-10 bg-muted">
+    <section className="py-5 sm:py-6 md:py-6 bg-muted">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         {/* Header */}
         <div className="text-center mb-4">

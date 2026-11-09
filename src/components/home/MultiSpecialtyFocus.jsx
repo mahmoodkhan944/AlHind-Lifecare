@@ -39,7 +39,7 @@ export default function MultiSpecialtyFocus() {
   }, []);
 
   return (
-    <section className="py-4 sm:py-8 md:py-10 bg-muted">
+    <section className="py-4 sm:py-6 md:py-6 bg-muted">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-6">
           <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-bold tracking-wider uppercase mb-3">

@@ -101,7 +101,7 @@ export default function HospitalsByCountry() {
   ];
 
   return (
-    <section className="py-6 sm:py-8 md:py-10 bg-muted">
+    <section className="py-5 sm:py-6 md:py-6 bg-muted">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-6">
           <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-bold tracking-wider uppercase mb-3">
@@ -120,7 +120,10 @@ export default function HospitalsByCountry() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: Math.min(i, 3) * 0.1 }}
-              className="relative bg-white rounded-3xl shadow-lg shadow-black/5 border border-border/60 overflow-hidden flex flex-col"
+              className={`relative bg-white rounded-3xl shadow-lg shadow-black/5 border border-border/60 overflow-hidden flex flex-col ${
+                // An odd last card sits in the middle instead of leaving the right side empty.
+                cards.length % 2 === 1 && i === cards.length - 1 ? "md:col-span-2 md:justify-self-center md:w-[calc((100%-1.5rem)/2)]" : ""
+              }`}
             >
               {/* Badge — number of hospitals in this region */}
               {card.total > 0 && (

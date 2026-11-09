@@ -74,7 +74,7 @@ export default function Contact() {
         </div>
       </section>
 
-      <section className="py-8 sm:py-10 md:py-12">
+      <section className="py-6 sm:py-7 md:py-7">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
             {/* Form */}

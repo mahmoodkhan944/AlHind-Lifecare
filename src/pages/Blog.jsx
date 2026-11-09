@@ -57,7 +57,7 @@ export default function Blog() {
       {/* FIX: "max-w-8xl" isn't a real Tailwind class (the scale stops at 7xl), so it
           was silently ignored and the grid had no max-width constraint at all —
           on ultra-wide monitors the cards stretched edge to edge. */}
-      <section className="py-8 sm:py-10 md:py-12">
+      <section className="py-6 sm:py-7 md:py-7">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">

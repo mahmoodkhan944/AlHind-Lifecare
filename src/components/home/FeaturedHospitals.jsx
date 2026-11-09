@@ -17,7 +17,7 @@ export default function FeaturedHospitals() {
   if (hospitals.length === 0) return null;
 
   return (
-    <section className="py-10 sm:py-12 md:py-16 mesh-bg-soft">
+    <section className="py-7 sm:py-8 md:py-9 mesh-bg-soft">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <SectionHeader
           badge="Partner Hospitals"
