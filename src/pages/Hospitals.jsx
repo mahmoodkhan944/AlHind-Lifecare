@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useLeadModal } from "@/lib/LeadModalContext";
 import { formatCountApprox } from "@/lib/utils";
 import { SHOW_TURKEY } from "@/lib/siteConfig";
+import { hospitalRegion, sameRegion } from "@/lib/regions";
 
 const PAGE_SIZE = 12;
 
@@ -21,6 +22,8 @@ export default function Hospitals() {
   const [searchParams] = useSearchParams();
   const [search, setSearch] = useState(searchParams.get("q") || "");
   const [country, setCountry] = useState("all");
+  // ?region=Delhi%20NCR — from the homepage region cards.
+  const [region, setRegion] = useState(searchParams.get("region") ? hospitalRegion({ region: searchParams.get("region") }) : "all");
   const [page, setPage] = useState(1);
   const { openLeadModal } = useLeadModal();
 
@@ -36,13 +39,18 @@ export default function Hospitals() {
   // Reset to page 1 whenever a filter changes, so results never open on an empty page.
   useEffect(() => {
     setPage(1);
-  }, [search, country]);
+  }, [search, country, region]);
+
+  // Regions that have hospitals (for the Region filter).
+  const regionOptions = [...new Set(hospitals.filter((h) => h.country !== "Turkey").map(hospitalRegion))].sort();
+  if (region !== "all" && !regionOptions.some((r) => sameRegion(r, region))) regionOptions.push(region);
 
   const filtered = hospitals.filter((h) => {
     const matchSearch =
       !search || h.name?.toLowerCase().includes(search.toLowerCase()) || h.city?.toLowerCase().includes(search.toLowerCase());
     const matchCountry = country === "all" || h.country === country;
-    return matchSearch && matchCountry;
+    const matchRegion = region === "all" || sameRegion(hospitalRegion(h), region);
+    return matchSearch && matchCountry && matchRegion;
   });
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
@@ -122,6 +130,17 @@ export default function Hospitals() {
                 <SelectItem value="all">All Countries</SelectItem>
                 <SelectItem value="India">India</SelectItem>
                 {SHOW_TURKEY && <SelectItem value="Turkey">Turkey</SelectItem>}
+              </SelectContent>
+            </Select>
+            <Select value={region} onValueChange={setRegion}>
+              <SelectTrigger className="w-full md:w-44 h-11 rounded-xl border-0 bg-muted/50">
+                <SelectValue placeholder="Region" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Regions</SelectItem>
+                {regionOptions.map((r) => (
+                  <SelectItem key={r} value={r}>{r}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>

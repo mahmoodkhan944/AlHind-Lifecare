@@ -6,6 +6,7 @@ import { db } from "@/api/dataClient";
 import { useSectionContent } from "@/hooks/useSectionContent";
 import { homePicks } from "@/lib/homePicks";
 import { isHiddenCountry } from "@/lib/siteConfig";
+import { hospitalRegion } from "@/lib/regions";
 
 const fallback = {
   India: [
@@ -41,8 +42,29 @@ const config = {
   },
 };
 
+const PER_CARD = 2;
+
+// Hospitals the admin marked "Show on Homepage" first, then the newest.
+const homeOrder = (a, b) =>
+  Number(!!b.show_on_home) - Number(!!a.show_on_home) ||
+  String(b.created_date || "").localeCompare(String(a.created_date || ""));
+
+// India → one card per region (Delhi NCR, Mumbai, …), each with 2 hospitals.
+// Regions with more hospitals come first.
+function groupByRegion(list) {
+  const map = new Map();
+  [...list].sort(homeOrder).forEach((h) => {
+    const region = hospitalRegion(h);
+    const key = region.toLowerCase();
+    if (!map.has(key)) map.set(key, { region, items: [] });
+    map.get(key).items.push(h);
+  });
+  return [...map.values()].sort((a, b) => b.items.length - a.items.length || a.region.localeCompare(b.region));
+}
+
 export default function HospitalsByCountry() {
-  const [hospitals, setHospitals] = useState(fallback);
+  const [india, setIndia] = useState(fallback.India);
+  const [turkey, setTurkey] = useState(fallback.Turkey);
   const header = useSectionContent("home_hospitals_header", {
     badge: "Medical Destinations",
     heading: "Global Healthcare Destinations",
@@ -50,28 +72,33 @@ export default function HospitalsByCountry() {
   });
 
   useEffect(() => {
-    // Per country: hospitals with "Show on Homepage" on; if none, the 4 newest.
-    homePicks(db.entities.Hospital, { status: "active", country: "India" }, "-created_date", 4, () =>
-      db.entities.Hospital.filter({ status: "active", country: "India" }, "-created_date", 4)
-    )
-      .then((data) => { if (data.length > 0) setHospitals((prev) => ({ ...prev, India: data.slice(0, 4) })); })
+    db.entities.Hospital.filter({ status: "active", country: "India" }, "-created_date", 500)
+      .then((data) => { if (data.length > 0) setIndia(data); })
       .catch(() => {});
     if (!isHiddenCountry("Turkey")) {
-      homePicks(db.entities.Hospital, { status: "active", country: "Turkey" }, "-created_date", 4, () =>
-        db.entities.Hospital.filter({ status: "active", country: "Turkey" }, "-created_date", 4)
+      homePicks(db.entities.Hospital, { status: "active", country: "Turkey" }, "-created_date", PER_CARD, () =>
+        db.entities.Hospital.filter({ status: "active", country: "Turkey" }, "-created_date", PER_CARD)
       )
-        .then((data) => { if (data.length > 0) setHospitals((prev) => ({ ...prev, Turkey: data.slice(0, 4) })); })
+        .then((data) => { if (data.length > 0) setTurkey(data); })
         .catch(() => {});
     }
   }, []);
 
-  // Countries switched off in src/lib/siteConfig.js (e.g. Turkey) are not shown.
-  const sections = [
-    { country: "India", items: hospitals.India || [] },
-    { country: "Turkey", items: hospitals.Turkey || [] },
-  ].filter((sec) => !isHiddenCountry(sec.country));
-  // With one country, its card spans the full width and shows 4 hospitals.
-  const single = sections.length === 1;
+  const cards = [
+    ...groupByRegion(india).map((g) => ({
+      key: `in-${g.region}`,
+      cfg: config.India,
+      title: g.region,
+      label: "India",
+      items: g.items,
+      total: g.items.length,
+      link: `/hospitals?region=${encodeURIComponent(g.region)}`,
+    })),
+    // Countries switched off in src/lib/siteConfig.js (e.g. Turkey) are not shown.
+    ...(isHiddenCountry("Turkey") || turkey.length === 0
+      ? []
+      : [{ key: "tr", cfg: config.Turkey, title: "Turkey", label: "", items: turkey, total: null, link: "/hospitals" }]),
+  ];
 
   return (
     <section className="py-6 sm:py-8 md:py-10 bg-muted">
@@ -85,82 +112,72 @@ export default function HospitalsByCountry() {
             {header.subtitle}
           </p>
         </div>
-        <div className={`grid grid-cols-1 gap-6 ${single ? "" : "md:grid-cols-2"}`}>
-          {sections.map((sec, i) => {
-            const cfg = config[sec.country];
-            const count = sec.items.length > 0 ? `${sec.items.length * 10}+` : "30+";
-            return (
-              <motion.div
-                key={sec.country}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className={`relative bg-white rounded-3xl shadow-lg shadow-black/5 border border-border/60 overflow-hidden`}
-              >
-                {/* Badge */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {cards.map((card, i) => (
+            <motion.div
+              key={card.key}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: Math.min(i, 3) * 0.1 }}
+              className="relative bg-white rounded-3xl shadow-lg shadow-black/5 border border-border/60 overflow-hidden flex flex-col"
+            >
+              {/* Badge — number of hospitals in this region */}
+              {card.total > 0 && (
                 <div className="absolute top-4 right-4 z-10 px-3 sm:px-4 py-1.5 rounded-full bg-gradient-to-r from-secondary to-accent-jade text-white font-heading font-bold text-xs sm:text-sm shadow-md">
-                  {count}
+                  {card.total} {card.total === 1 ? "Hospital" : "Hospitals"}
                 </div>
+              )}
 
-                {/* Header */}
-                <div className="flex items-center gap-3 p-4 sm:p-5 pb-3">
-                  <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-white border border-border shadow-md flex items-center justify-center">
-  <img
-    src={cfg.flag}
-    alt={`${sec.country} Flag`}
-    className="w-8 h-6 object-cover rounded shadow-sm"
-    loading="lazy"
-  />
-</div>
-                  <div>
-                    <div className="flex items-baseline gap-1.5">
-                      <span className="text-xs font-bold text-gray-400 tracking-wider">{cfg.code}</span>
-                      <h3 className="font-heading font-extrabold text-xl text-secondary">{sec.country}</h3>
-                    </div>
-                    <p className="text-xs text-gray-500 font-medium">{cfg.subtitle}</p>
+              {/* Header */}
+              <div className="flex items-center gap-3 p-4 sm:p-5 pb-3 pr-32">
+                <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-white border border-border shadow-md flex items-center justify-center shrink-0">
+                  <img src={card.cfg.flag} alt="" className="w-8 h-6 object-cover rounded shadow-sm" loading="lazy" />
+                </div>
+                <div className="min-w-0">
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-xs font-bold text-gray-400 tracking-wider">{card.cfg.code}</span>
+                    <h3 className="font-heading font-extrabold text-xl text-secondary truncate">{card.title}</h3>
                   </div>
+                  <p className="text-xs text-gray-500 font-medium truncate">
+                    {card.label ? `${card.label} · ${card.cfg.subtitle}` : card.cfg.subtitle}
+                  </p>
                 </div>
+              </div>
 
-                {/* Hospital thumbnails */}
-                <div className={`grid grid-cols-2 gap-2 sm:gap-3 px-4 sm:px-5 ${single ? "md:grid-cols-4" : ""}`}>
-                  {sec.items.slice(0, single ? 4 : 2).map((h) => (
-                    <Link key={h.id} to={`/hospitals/${h.id}`} className="group block">
-                      <div className="rounded-xl overflow-hidden bg-gray-50 aspect-[4/3]">
-                        {h.cover_image_url ? (
-                          <img src={h.cover_image_url} alt={h.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center">
-                            <Building2 className="w-8 h-8 text-gray-300" />
-                          </div>
-                        )}
-                      </div>
-                      <h4 className="font-heading font-bold text-xs sm:text-sm text-secondary mt-2 line-clamp-1">{h.name}</h4>
-                      <span className="flex items-center gap-1 text-xs text-gray-500 mt-0.5">
-                        <MapPin className="w-3 h-3 text-accent-jade" /> {h.city}
-                      </span>
-                    </Link>
-                  ))}
-                </div>
-
-                {/* Description */}
-                <p className="text-xs sm:text-sm text-gray-600 leading-relaxed text-center px-4 sm:px-5 mt-4 mb-4">
-                  {cfg.description}
-                </p>
-
-                {/* Button */}
-                <div className="px-4 sm:px-5 pb-4 sm:pb-5">
-                  <Link
-                    to="/hospitals"
-                    className="flex items-center justify-between w-full px-5 py-3 rounded-xl border border-border hover:border-primary/40 hover:bg-primary/5 transition-all group"
-                  >
-                    <span className="font-heading font-semibold text-xs sm:text-sm text-secondary">View Hospitals in {sec.country}</span>
-                    <ArrowRight className="w-4 h-4 text-secondary group-hover:translate-x-1 transition-transform" />
+              {/* 2 hospitals */}
+              <div className="grid grid-cols-2 gap-2 sm:gap-3 px-4 sm:px-5">
+                {card.items.slice(0, PER_CARD).map((h) => (
+                  <Link key={h.id} to={`/hospitals/${h.id}`} className="group block min-w-0">
+                    <div className="rounded-xl overflow-hidden bg-gray-50 aspect-[4/3]">
+                      {h.cover_image_url ? (
+                        <img src={h.cover_image_url} alt={h.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <Building2 className="w-8 h-8 text-gray-300" />
+                        </div>
+                      )}
+                    </div>
+                    <h4 className="font-heading font-bold text-xs sm:text-sm text-secondary mt-2 line-clamp-1">{h.name}</h4>
+                    <span className="flex items-center gap-1 text-xs text-gray-500 mt-0.5">
+                      <MapPin className="w-3 h-3 text-accent-jade shrink-0" /> <span className="truncate">{h.city}</span>
+                    </span>
                   </Link>
-                </div>
-              </motion.div>
-            );
-          })}
+                ))}
+              </div>
+
+              {/* Button */}
+              <div className="px-4 sm:px-5 pb-4 sm:pb-5 pt-4 mt-auto">
+                <Link
+                  to={card.link}
+                  className="flex items-center justify-between w-full px-5 py-3 rounded-xl border border-border hover:border-primary/40 hover:bg-primary/5 transition-all group"
+                >
+                  <span className="font-heading font-semibold text-xs sm:text-sm text-secondary truncate">View Hospitals in {card.title}</span>
+                  <ArrowRight className="w-4 h-4 text-secondary shrink-0 group-hover:translate-x-1 transition-transform" />
+                </Link>
+              </div>
+            </motion.div>
+          ))}
         </div>
       </div>
     </section>

@@ -14,6 +14,7 @@ const HOSPITAL_GROUP_KEYS = ["full_description", "specialities", "doctors_list",
 import SectionOrderEditor from "@/components/admin/SectionOrderEditor";
 import { DEFAULT_HOSPITAL_SECTIONS } from "@/pages/HospitalDetail";
 import ShowOnHomeToggle from "@/components/admin/ShowOnHomeToggle";
+import { REGION_NAMES, hospitalRegion } from "@/lib/regions";
 
 const parseList = (val) => {
   if (!val) return [];
@@ -121,7 +122,14 @@ export default function HospitalForm({ initialData, onCancel, onSaved }) {
       }
       onSaved();
     } catch (err) {
-      toast({ title: "Failed to save hospital", description: err?.message, variant: "destructive" });
+      const missingRegion = /region/i.test(err?.message || "");
+      toast({
+        title: "Failed to save hospital",
+        description: missingRegion
+          ? "Region column missing — run supabase/migrations/009_hospital_region.sql in Supabase SQL Editor."
+          : err?.message,
+        variant: "destructive",
+      });
     }
     setSaving(false);
   };
@@ -196,6 +204,21 @@ export default function HospitalForm({ initialData, onCancel, onSaved }) {
                 <Input value={form.state || ""} onChange={(e) => set("state", e.target.value)} placeholder="Enter state" className="h-10 rounded-lg border-border" />
               </Field>
             </div>
+            <Field label="Region (Homepage card)">
+              <Input
+                list="hospital-region-options"
+                value={form.region || ""}
+                onChange={(e) => set("region", e.target.value)}
+                placeholder={form.city ? `Auto: ${hospitalRegion({ city: form.city })}` : "e.g. Delhi NCR"}
+                className="h-10 rounded-lg border-border"
+              />
+              <datalist id="hospital-region-options">
+                {REGION_NAMES.map((r) => <option key={r} value={r} />)}
+              </datalist>
+              <p className="text-xs text-muted-foreground/70 mt-1">
+                Homepage par yeh hospital is region ke card mein dikhega. Khaali chhodne par city se apne aap (jaise Faridabad, Gurugram, Noida → Delhi NCR).
+              </p>
+            </Field>
             <Field label="Google Maps Embed URL">
               <Input value={form.google_maps_embed_url || ""} onChange={(e) => set("google_maps_embed_url", e.target.value)} placeholder="Paste Google Maps embed URL here" className="h-10 rounded-lg border-border" />
               <p className="text-xs text-muted-foreground/70 mt-1">Get this from Google Maps → Share → Embed a map → Copy the src URL</p>
