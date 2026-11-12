@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Search, MapPin, Star, UserRound, ChevronLeft, ChevronRight, Stethoscope } from "lucide-react";
+import { Search, Star, UserRound, ChevronLeft, ChevronRight, Stethoscope, GraduationCap, Hourglass, Building2 } from "lucide-react";
 import { db } from "@/api/dataClient";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -10,6 +10,7 @@ import { useLeadModal } from "@/lib/LeadModalContext";
 import { formatCountApprox } from "@/lib/utils";
 import { doctorPath } from "@/lib/paths";
 import { SHOW_TURKEY } from "@/lib/siteConfig";
+import { visibleGroups } from "@/lib/sectionGroups";
 
 const PAGE_SIZE = 12;
 
@@ -119,7 +120,7 @@ export default function Doctors() {
 
       </section>
 
-      <section className="py-8 sm:py-10 md:py-12">
+      <section className="py-6 sm:py-7 md:py-7">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           {/* Filters */}
           <div className="flex flex-col md:flex-row gap-3 sm:gap-4 mb-6 sm:mb-8 bg-white p-4 rounded-2xl shadow-lg shadow-black/5 border">
@@ -159,13 +160,19 @@ export default function Doctors() {
 
           {/* Results */}
           {loading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-              {[...Array(6)].map((_, i) => (
-                <div key={i} className="rounded-2xl border border-border/50 p-5 sm:p-6 animate-pulse flex flex-col items-center">
-                  <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-muted mb-4" />
-                  <div className="h-4 w-2/3 bg-muted rounded mb-2" />
-                  <div className="h-3 w-1/2 bg-muted rounded mb-4" />
-                  <div className="h-8 w-full bg-muted rounded-full" />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5">
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="rounded-2xl border border-border bg-white p-4 sm:p-5 animate-pulse">
+                  <div className="flex gap-4">
+                    <div className="w-28 h-28 sm:w-40 sm:h-40 rounded-xl bg-muted shrink-0" />
+                    <div className="flex-1 space-y-2.5 pt-1">
+                      <div className="h-4 w-2/3 bg-muted rounded" />
+                      <div className="h-3 w-1/2 bg-muted rounded" />
+                      <div className="h-3 w-3/4 bg-muted rounded" />
+                      <div className="h-3 w-2/3 bg-muted rounded" />
+                    </div>
+                  </div>
+                  <div className="h-10 w-full bg-muted rounded-xl mt-4" />
                 </div>
               ))}
             </div>
@@ -175,100 +182,21 @@ export default function Doctors() {
               <p className="font-medium">No doctors found matching your criteria</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-              {paginated.map((doc, i) => {
-                const specializations = parseList(doc.specializations);
-                const visibleTags = specializations.slice(0, 3);
-                const extraTagsCount = specializations.length - visibleTags.length;
-
-                return (
-                  <motion.div
-                    key={doc.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: Math.min(i * 0.05, 0.4) }}
-                    className="flex flex-col h-full bg-white rounded-2xl border border-border/50 shadow-sm hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 transition-all duration-300 p-5 sm:p-6 text-center"
-                  >
-                    {/* Avatar with floating rating badge */}
-                    <div className="relative w-24 h-24 sm:w-28 sm:h-28 mx-auto mb-4">
-                      <div className="w-full h-full rounded-full overflow-hidden bg-gradient-to-br from-primary/10 to-secondary/10 ring-4 ring-white shadow-md">
-                        {doc.photo_url ? (
-                          <img
-                            src={doc.photo_url}
-                            alt={doc.name}
-                            loading="lazy"
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center">
-                            <span className="text-3xl font-bold text-primary/25">{doc.name?.[0]}</span>
-                          </div>
-                        )}
-                      </div>
-                      {doc.rating > 0 && (
-                        <span className="absolute -top-1 -left-1 flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-primary text-primary-foreground text-[11px] font-bold shadow-md">
-                          <Star className="w-3 h-3 fill-current" />
-                          {doc.rating}
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Name & speciality */}
-                    <Link to={doctorPath(doc)} className="group">
-                      <h3 className="font-heading font-bold text-base sm:text-lg text-foreground group-hover:text-primary transition-colors line-clamp-1">
-                        {doc.name}
-                      </h3>
-                    </Link>
-                    <p className="text-primary text-sm font-semibold mb-1 line-clamp-1">{doc.speciality}</p>
-                    {doc.hospital_name && (
-                      <p className="flex items-center justify-center gap-1 text-xs text-muted-foreground mb-3 line-clamp-1">
-                        <MapPin className="w-3.5 h-3.5 shrink-0" />
-                        {doc.hospital_name}
-                      </p>
-                    )}
-
-                    {/* Specialization tags */}
-                    {visibleTags.length > 0 && (
-                      <div className="flex flex-wrap justify-center gap-1.5 mb-4">
-                        {visibleTags.map((tag, idx) => (
-                          <span
-                            key={idx}
-                            className="px-2.5 py-1 rounded-full bg-secondary/10 text-secondary text-[11px] font-medium"
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                        {extraTagsCount > 0 && (
-                          <span className="px-2.5 py-1 rounded-full bg-muted text-muted-foreground text-[11px] font-medium">
-                            +{extraTagsCount} more
-                          </span>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Actions */}
-                    <div className="flex gap-2 mt-auto pt-2">
-                      <Link to={doctorPath(doc)} className="flex-1">
-                        <Button variant="outline" className="w-full h-9 rounded-full text-xs sm:text-sm">
-                          View Profile
-                        </Button>
-                      </Link>
-                      <Button
-                        onClick={() =>
-                          openLeadModal({
-                            title: "Book Appointment",
-                            description: `Book a consultation with ${doc.name}.`,
-                            treatmentInterest: doc.name,
-                          })
-                        }
-                        className="flex-1 h-9 rounded-full text-xs sm:text-sm bg-gradient-to-r from-primary to-secondary text-white"
-                      >
-                        Book Now
-                      </Button>
-                    </div>
-                  </motion.div>
-                );
-              })}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5">
+              {paginated.map((doc, i) => (
+                <DoctorCard
+                  key={doc.id}
+                  doc={doc}
+                  index={i}
+                  onBook={() =>
+                    openLeadModal({
+                      title: "Book Appointment",
+                      description: `Book a consultation with ${doc.name}.`,
+                      treatmentInterest: doc.name,
+                    })
+                  }
+                />
+              ))}
             </div>
           )}
 
@@ -325,5 +253,126 @@ export default function Doctors() {
         </div>
       </section>
     </div>
+  );
+}
+
+// Short degrees for the card, e.g. "MBBS, MD (Medicine), DM (Neurology)" from
+// qualification lines like "MBBS - AIIMS, New Delhi".
+function shortQualifications(doc) {
+  const items = visibleGroups(doc, "qualifications_list").flatMap((g) => g.items);
+  const degrees = items.map((q) => q.split(/\s[-–—|]\s|:/)[0].trim()).filter(Boolean);
+  return [...new Set(degrees)].join(", ");
+}
+
+// Horizontal doctor card: photo on the left; name, designation, speciality,
+// qualification, experience and hospital on the right; buttons underneath.
+function DoctorCard({ doc, index, onBook }) {
+  const to = doctorPath(doc);
+  // Under the name: designation. After "Speciality:": the badge (falls back
+  // to the speciality). Education: its own admin field, else degrees taken
+  // from the qualification list.
+  const designation = doc.designation;
+  const speciality = doc.badge_title || doc.speciality || parseList(doc.specializations)[0];
+  const degrees = String(doc.education || "").trim() || shortQualifications(doc);
+  const years = Number(doc.experience_years) || 0;
+  const place = [doc.hospital_name, doc.city, doc.country]
+    .filter(Boolean)
+    .filter((v, i, arr) => i === 0 || !String(arr[0]).toLowerCase().includes(String(v).toLowerCase()))
+    .join(", ");
+
+  return (
+    <motion.article
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: Math.min(index * 0.05, 0.4) }}
+      className="flex flex-col bg-white rounded-2xl border border-primary/25 hover:border-primary/60 shadow-sm hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 p-4 sm:p-5"
+    >
+      <div className="flex gap-4 sm:gap-5">
+        {/* Photo */}
+        <Link
+          to={to}
+          aria-label={`View profile of ${doc.name}`}
+          className="relative w-28 h-32 sm:w-40 sm:h-44 shrink-0 rounded-xl overflow-hidden bg-gradient-to-br from-primary/10 to-secondary/10 group"
+        >
+          {doc.photo_url ? (
+            <img
+              src={doc.photo_url}
+              alt={doc.name}
+              loading="lazy"
+              className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              <span className="text-4xl font-bold text-primary/25">{doc.name?.[0]}</span>
+            </div>
+          )}
+          {doc.rating > 0 && (
+            <span className="absolute top-2 left-2 flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-white/95 text-secondary text-[11px] font-bold shadow">
+              <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+              {Number(doc.rating).toFixed(1)}
+            </span>
+          )}
+        </Link>
+
+        {/* Details */}
+        <div className="min-w-0 flex-1">
+          <Link to={to} className="group">
+            <h3 className="font-heading font-extrabold text-base sm:text-lg leading-snug text-secondary group-hover:text-primary transition-colors line-clamp-2">
+              {doc.name}
+            </h3>
+          </Link>
+
+          {designation && (
+            <span className="inline-block max-w-full mt-1.5 px-2.5 py-0.5 rounded-md bg-primary/10 border border-primary/20 text-primary text-xs font-semibold truncate">
+              {designation}
+            </span>
+          )}
+
+          <ul className="mt-2.5 space-y-1.5 text-[13px] sm:text-sm text-foreground/80">
+            {speciality && (
+              <li className="line-clamp-2">
+                <span className="font-bold text-secondary">Speciality:</span> {speciality}
+              </li>
+            )}
+            {degrees && (
+              <li className="flex items-start gap-2">
+                <GraduationCap className="w-4 h-4 mt-0.5 text-primary shrink-0" />
+                <span className="line-clamp-1">{degrees}</span>
+              </li>
+            )}
+            {years > 0 && (
+              <li className="flex items-start gap-2">
+                <Hourglass className="w-4 h-4 mt-0.5 text-primary shrink-0" />
+                <span>
+                  <span className="font-bold text-secondary">{years}+ years</span> of experience
+                </span>
+              </li>
+            )}
+            {place && (
+              <li className="flex items-start gap-2">
+                <Building2 className="w-4 h-4 mt-0.5 text-primary shrink-0" />
+                <span className="line-clamp-2">{place}</span>
+              </li>
+            )}
+          </ul>
+        </div>
+      </div>
+
+      {/* Actions */}
+      <div className="flex gap-2.5 mt-4 pt-0.5 sm:mt-auto sm:pt-4">
+        <Link to={to} className="flex-1">
+          <Button className="w-full h-10 sm:h-11 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-heading font-bold text-sm">
+            View Profile
+          </Button>
+        </Link>
+        <Button
+          onClick={onBook}
+          variant="outline"
+          className="flex-1 h-10 sm:h-11 rounded-xl border-primary text-primary hover:bg-primary/5 hover:text-primary font-heading font-bold text-sm"
+        >
+          Book Now
+        </Button>
+      </div>
+    </motion.article>
   );
 }

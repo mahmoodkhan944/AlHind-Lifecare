@@ -132,6 +132,9 @@ export default function DoctorForm({ initialData, onCancel, onSaved }) {
 
     const data = {
       ...form,
+      // "education" is only sent once it exists on the row or was typed in,
+      // so saving still works before migration 011 is run.
+      ...("education" in form ? { education: (form.education || "").trim() || null } : {}),
       slug,
       speciality,
       treatments_offered,
@@ -172,7 +175,13 @@ export default function DoctorForm({ initialData, onCancel, onSaved }) {
       }
       onSaved();
     } catch (err) {
-      toast({ title: "Failed to save doctor", description: err?.message, variant: "destructive" });
+      toast({
+        title: "Failed to save doctor",
+        description: /education/.test(err?.message || "")
+          ? "Education ka column abhi database me nahi hai. Supabase SQL Editor me supabase/migrations/011_doctor_education.sql run karein."
+          : err?.message,
+        variant: "destructive",
+      });
     }
     setSaving(false);
   };
@@ -199,10 +208,15 @@ export default function DoctorForm({ initialData, onCancel, onSaved }) {
             </Field>
             <Field label="Badge (shown under the name)">
               <Input value={form.badge_title || ""} onChange={(e) => set("badge_title", e.target.value)} placeholder="e.g., Senior Cardiac Surgeon" className="h-10 rounded-lg border-border" />
-              <p className="text-xs text-muted-foreground/70 mt-1">Optional. Appears as a green tag between the doctor's name and designation.</p>
+              <p className="text-xs text-muted-foreground/70 mt-1">Optional. Doctor ki profile par naam ke neeche green tag me, aur Doctors page ke card par "Speciality:" ke aage dikhta hai.</p>
             </Field>
             <Field label="Designation" required>
               <Input value={form.designation || ""} onChange={(e) => set("designation", e.target.value)} placeholder="e.g., Senior Consultant Cardiologist" className="h-10 rounded-lg border-border" />
+              <p className="text-xs text-muted-foreground/70 mt-1">Doctors page ke card par naam ke neeche tag me dikhta hai.</p>
+            </Field>
+            <Field label="Education (shown on doctor card)">
+              <Input value={form.education || ""} onChange={(e) => set("education", e.target.value)} placeholder="e.g., MBBS, MD (Medicine), DM (Neurology)" className="h-10 rounded-lg border-border" />
+              <p className="text-xs text-muted-foreground/70 mt-1">Doctors page ke card par 🎓 icon ke saath dikhta hai. Khali chhodenge to neeche wali Qualification list se degrees le li jayengi.</p>
             </Field>
             <Field label="Hospital" required>
               <AutocompleteInput
