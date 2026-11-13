@@ -1,4 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
+import PatientJourney from "@/components/common/PatientJourney";
+import { journeyFor, JOURNEY_SECTION_KEY, JOURNEY_SECTION_TITLE } from "@/lib/patientJourney";
+import { mergeSectionConfig } from "@/lib/sectionConfig";
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -453,7 +456,7 @@ function LandingPage({ treatment, relatedDoctors, relatedHospitals, faqs, openLe
       </section>
 
       {/* Treatment overview */}
-      <section className="pt-6 sm:pt-8 pb-8 sm:pb-10">
+      <section className="pt-5 sm:pt-6 pb-6 sm:pb-7">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="relative bg-gradient-to-br from-secondary via-secondary to-[#0E8C7A] rounded-3xl p-6 sm:p-8 md:p-10 overflow-hidden">
             <div className="decor-blob decor-blob-primary w-72 h-72 -top-20 -right-10" />
@@ -491,7 +494,7 @@ function LandingPage({ treatment, relatedDoctors, relatedHospitals, faqs, openLe
       </section>
 
       {/* Why choose this country */}
-      <section className="py-8 sm:py-10 bg-muted">
+      <section className="py-6 sm:py-7 bg-muted">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-8">
             <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wider uppercase mb-3">
@@ -542,7 +545,7 @@ function LandingPage({ treatment, relatedDoctors, relatedHospitals, faqs, openLe
       </section>
 
       {/* How it works */}
-      <section className="py-8 sm:py-10">
+      <section className="py-6 sm:py-7">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-8">
             <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wider uppercase mb-3">
@@ -583,7 +586,7 @@ function LandingPage({ treatment, relatedDoctors, relatedHospitals, faqs, openLe
       </section>
 
       {/* Visa & travel */}
-      <section className="py-8 sm:py-10 bg-muted">
+      <section className="py-6 sm:py-7 bg-muted">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-8">
             <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wider uppercase mb-3">
@@ -629,7 +632,7 @@ function LandingPage({ treatment, relatedDoctors, relatedHospitals, faqs, openLe
       <RelatedSections relatedDoctors={relatedDoctors} relatedHospitals={relatedHospitals} shaded />
 
       {faqs.length > 0 && (
-        <section className="py-8 sm:py-10 bg-muted">
+        <section className="py-6 sm:py-7 bg-muted">
           <div className="max-w-5xl mx-auto px-4 sm:px-6">
             <div className="text-center mb-8">
               <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wider uppercase mb-3">
@@ -659,7 +662,7 @@ function LandingPage({ treatment, relatedDoctors, relatedHospitals, faqs, openLe
         </section>
       )}
 
-      <section className="py-10 sm:py-14 bg-gradient-to-br from-secondary via-secondary to-[#0E8C7A]">
+      <section className="py-7 sm:py-9 bg-gradient-to-br from-secondary via-secondary to-[#0E8C7A]">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
           <span className="inline-block px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-white/90 text-xs font-semibold tracking-wide mb-4">
             For a Better Life
@@ -788,7 +791,7 @@ function ClassicPage({ treatment, relatedDoctors, relatedHospitals, openLeadModa
         </div>
       </section>
 
-      <section className="pb-8 sm:pb-10 md:pb-12">
+      <section className="pb-6 sm:pb-7 md:pb-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div ref={contentTopRef} className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
             <div className="lg:col-span-2 space-y-4 sm:space-y-5">
@@ -957,6 +960,7 @@ export const DEFAULT_TREATMENT_SECTIONS = [
   { key: "how_its_done", title: "How It Is Done" },
   { key: "treatment_procedures", title: "Treatment Procedures" },
   { key: "additional_information", title: "Additional Information" },
+  { key: JOURNEY_SECTION_KEY, title: JOURNEY_SECTION_TITLE },
   { key: "gvhd_info", title: "GVHD Information" },
   { key: "gvhd_symptoms", title: "GVHD Symptoms" },
   { key: "conditions_treated", title: "Conditions Treated" },
@@ -968,11 +972,7 @@ export const DEFAULT_TREATMENT_SECTIONS = [
 // added after they last saved) is appended at the end, visible by default,
 // so new sections never silently disappear for existing records.
 export function resolveSectionConfig(raw, defaults) {
-  const saved = parseList(raw);
-  if (saved.length === 0) return defaults.map((s) => ({ ...s, visible: true }));
-  const known = new Set(saved.map((s) => s.key));
-  const missing = defaults.filter((s) => !known.has(s.key)).map((s) => ({ ...s, visible: true }));
-  return [...saved, ...missing];
+  return mergeSectionConfig(parseList(raw), defaults);
 }
 
 const CHECKLIST_KEYS = [
@@ -1013,6 +1013,11 @@ const SECTION_ICON_THEME = {
 function renderTreatmentSection(key, title, treatment) {
   if (key === "why_choose_india" && treatment.country === "Turkey") return null;
   if (key === "why_choose_turkey" && (treatment.country === "India" || isHiddenCountry("Turkey"))) return null;
+
+  if (key === JOURNEY_SECTION_KEY) {
+    const { heading, steps } = journeyFor(treatment, "treatment");
+    return <PatientJourney key={key} heading={heading} title={title} steps={steps} />;
+  }
 
   if (key === "key_benefits" || CHECKLIST_KEYS.includes(key) || key === "additional_information") {
     const groups = visibleGroups(treatment, key);

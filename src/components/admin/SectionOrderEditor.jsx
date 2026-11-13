@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { GripVertical, Eye, EyeOff, ChevronUp, ChevronDown, RotateCcw } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { mergeSectionConfig } from "@/lib/sectionConfig";
 
 /**
  * A draggable, renameable, show/hide-able list of section rows, used in
@@ -21,10 +22,9 @@ import { Input } from "@/components/ui/input";
 export default function SectionOrderEditor({ label = "Section Order & Titles", defaultSections, value, onChange }) {
   const [dragIndex, setDragIndex] = useState(null);
 
-  const list =
-    value && value.length > 0
-      ? value
-      : defaultSections.map((s) => ({ key: s.key, title: s.title, visible: true }));
+  // Saved order plus any default section added since it was saved (slotted in
+  // after its neighbour in the defaults), so new sections show up here too.
+  const list = mergeSectionConfig(value, defaultSections).map(({ key, title, visible }) => ({ key, title, visible }));
 
   const move = (from, to) => {
     if (to < 0 || to >= list.length) return;

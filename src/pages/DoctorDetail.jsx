@@ -1,4 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
+import PatientJourney from "@/components/common/PatientJourney";
+import { journeyFor, JOURNEY_SECTION_KEY, JOURNEY_SECTION_TITLE } from "@/lib/patientJourney";
+import { mergeSectionConfig } from "@/lib/sectionConfig";
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -488,6 +491,7 @@ export const DEFAULT_DOCTOR_SECTIONS = [
   { key: "qualifications_list", title: "Qualifications" },
   { key: "clinical_focus", title: "Clinical Focus" },
   { key: "additional_info", title: "Additional Information" },
+  { key: JOURNEY_SECTION_KEY, title: JOURNEY_SECTION_TITLE },
   { key: "research_publications", title: "Research & Publications" },
   { key: "awards_achievements", title: "Awards & Achievements" },
   { key: "why_choose_doctor", title: "Why Choose Dr.?" },
@@ -506,11 +510,7 @@ export function renameOldDoctorTitles(list) {
 }
 
 function resolveDoctorSectionConfig(raw) {
-  const saved = renameOldDoctorTitles(parseList(raw));
-  if (saved.length === 0) return DEFAULT_DOCTOR_SECTIONS.map((s) => ({ ...s, visible: true }));
-  const known = new Set(saved.map((s) => s.key));
-  const missing = DEFAULT_DOCTOR_SECTIONS.filter((s) => !known.has(s.key)).map((s) => ({ ...s, visible: true }));
-  return [...saved, ...missing];
+  return mergeSectionConfig(renameOldDoctorTitles(parseList(raw)), DEFAULT_DOCTOR_SECTIONS);
 }
 
 // Renders one section's content for the given key, or null if there's
@@ -590,6 +590,11 @@ function renderDoctorSection(key, title, doctor) {
         <GroupList groups={groups} render={checklist(SECTION_ICON_THEME[key])} />
       </SectionCard>
     );
+  }
+
+  if (key === JOURNEY_SECTION_KEY) {
+    const { heading, steps } = journeyFor(doctor, "doctor");
+    return <PatientJourney key={key} heading={heading} title={title} steps={steps} />;
   }
 
   if (key === "awards_achievements") {

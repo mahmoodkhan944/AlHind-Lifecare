@@ -8,6 +8,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
 import GroupedListField from "@/components/admin/GroupedListField";
+import PatientJourneyField from "@/components/admin/PatientJourneyField";
+import { applyJourneyToPayload, isMissingJourneyColumn, JOURNEY_MIGRATION_HINT } from "@/lib/patientJourney";
 import ParagraphListField from "@/components/admin/ParagraphListField";
 import { buildGroupsMap, applyGroupsToPayload } from "@/lib/sectionGroups";
 
@@ -164,6 +166,7 @@ export default function DoctorForm({ initialData, onCancel, onSaved }) {
     // Several sub-headings per section → section_groups, plus the old
     // single-list columns (all points) so listings/search keep working.
     applyGroupsToPayload(data, form.section_groups, DOCTOR_GROUP_KEYS);
+    applyJourneyToPayload(data, form);
 
     try {
       if (isEdit) {
@@ -179,7 +182,9 @@ export default function DoctorForm({ initialData, onCancel, onSaved }) {
         title: "Failed to save doctor",
         description: /education/.test(err?.message || "")
           ? "Education ka column abhi database me nahi hai. Supabase SQL Editor me supabase/migrations/011_doctor_education.sql run karein."
-          : err?.message,
+          : isMissingJourneyColumn(err)
+            ? JOURNEY_MIGRATION_HINT
+            : err?.message,
         variant: "destructive",
       });
     }
@@ -299,6 +304,14 @@ export default function DoctorForm({ initialData, onCancel, onSaved }) {
         <GroupedListField label="Qualification" placeholder="e.g., MBBS - AIIMS, New Delhi" number={2} optional groups={form.section_groups?.qualifications_list} onChange={(g) => setGroups("qualifications_list", g)} />
         <GroupedListField label="Clinical Focus" placeholder="e.g., Patient-centered care" number={3} optional groups={form.section_groups?.clinical_focus} onChange={(g) => setGroups("clinical_focus", g)} />
         <GroupedListField label="Additional Information" placeholder="e.g., Fluent in English, Hindi, and Arabic" number={4} optional groups={form.section_groups?.additional_info} onChange={(g) => setGroups("additional_info", g)} />
+        <PatientJourneyField
+          kind="doctor"
+          name={form.name}
+          steps={form.patient_journey}
+          heading={form.patient_journey_heading}
+          onStepsChange={(v) => set("patient_journey", v)}
+          onHeadingChange={(v) => set("patient_journey_heading", v)}
+        />
         <GroupedListField label="Research & Publication" placeholder="e.g., Published in Journal of Medicine" number={5} optional groups={form.section_groups?.research_publications} onChange={(g) => setGroups("research_publications", g)} />
 
         {/* Section 6: Awards (accent card) */}
