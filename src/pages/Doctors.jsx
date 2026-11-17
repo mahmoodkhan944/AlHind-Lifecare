@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Search, Star, UserRound, ChevronLeft, ChevronRight, Stethoscope, GraduationCap, Hourglass, Building2 } from "lucide-react";
+import { Search, Star, UserRound, ChevronLeft, ChevronRight, Stethoscope, GraduationCap, Hourglass, Building2, X, SlidersHorizontal } from "lucide-react";
 import { db } from "@/api/dataClient";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useLeadModal } from "@/lib/LeadModalContext";
 import { formatCountApprox } from "@/lib/utils";
 import { doctorPath } from "@/lib/paths";
 import { SHOW_TURKEY } from "@/lib/siteConfig";
 import { visibleGroups } from "@/lib/sectionGroups";
+import { DEPARTMENTS, doctorDepartments } from "@/lib/departments";
 
 const PAGE_SIZE = 12;
 
@@ -31,10 +33,18 @@ const parseList = (val) => {
 export default function Doctors() {
   const [doctors, setDoctors] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchParams] = useSearchParams();
-  const [search, setSearch] = useState(searchParams.get("q") || "");
-  const [speciality, setSpeciality] = useState("all");
-  const [country, setCountry] = useState("all");
+  const [searchParams, setSearchParams] = useSearchParams();
+  // Filters applied to the list (shared in the URL) …
+  const readFilters = () => ({
+    q: searchParams.get("q") || "",
+    country: searchParams.get("country") || "all",
+    city: searchParams.get("city") || "all",
+    department: searchParams.get("department") || "all",
+    hospital: searchParams.get("hospital") || "all",
+  });
+  const applied = readFilters();
+  // … and what is picked in the bar but not searched yet.
+  const [draft, setDraft] = useState(applied);
   const [page, setPage] = useState(1);
   const { openLeadModal } = useLeadModal();
 
@@ -47,20 +57,67 @@ export default function Doctors() {
       .finally(() => setLoading(false));
   }, []);
 
-  // Reset to page 1 whenever a filter changes, so results never open on an empty page.
+  // Back/forward or an outside link changing the URL → show those filters.
+  const paramsKey = searchParams.toString();
   useEffect(() => {
+    setDraft(readFilters());
     setPage(1);
-  }, [search, speciality, country]);
+  }, [paramsKey]);
 
-  const filtered = doctors.filter((d) => {
-    const matchSearch =
-      !search ||
-      d.name?.toLowerCase().includes(search.toLowerCase()) ||
-      d.speciality?.toLowerCase().includes(search.toLowerCase());
-    const matchSpec = speciality === "all" || d.speciality === speciality;
-    const matchCountry = country === "all" || d.country === country;
-    return matchSearch && matchSpec && matchCountry;
-  });
+  const runSearch = (next = draft, options) => {
+    const params = {};
+    if (next.q.trim()) params.q = next.q.trim();
+    ["country", "city", "department", "hospital"].forEach((k) => {
+      if (next[k] !== "all") params[k] = next[k];
+    });
+    setSearchParams(params, options);
+  };
+
+  // Mobile: the name box searches as you type (the dropdowns live in the
+  // Filter popup and apply on "Apply Filters").
+  const [filterOpen, setFilterOpen] = useState(false);
+  const onMobileQuery = (value) => {
+    setDraft((d) => ({ ...d, q: value }));
+    runSearch({ ...applied, q: value }, { replace: true });
+  };
+  const applyMobileFilters = () => {
+    runSearch({ ...draft, q: applied.q });
+    setFilterOpen(false);
+  };
+  const activeFilterCount = ["country", "city", "department", "hospital"].filter((k) => applied[k] !== "all").length;
+  const clearFilters = () => {
+    const empty = { q: "", country: "all", city: "all", department: "all", hospital: "all" };
+    setDraft(empty);
+    runSearch(empty);
+  };
+  const hasFilters = paramsKey.length > 0;
+
+  // Picking a country/city/hospital resets the choices below it that may no
+  // longer exist (e.g. a city from another country).
+  const setDraftField = (key, value) =>
+    setDraft((d) => {
+      const next = { ...d, [key]: value };
+      if (key === "country") { next.city = "all"; next.hospital = "all"; }
+      if (key === "city") next.hospital = "all";
+      return next;
+    });
+
+  const filtered = doctors.filter((d) => matches(d, applied));
+
+  // Dropdown options come from the doctors that fit the choices above them.
+  const inCountry = doctors.filter((d) => draft.country === "all" || same(d.country, draft.country));
+  const inCity = inCountry.filter((d) => draft.city === "all" || same(doctorCity(d), draft.city));
+  const inHospital = inCity.filter((d) => draft.hospital === "all" || same(d.hospital_name, draft.hospital));
+  const countryOptions = uniqueValues(doctors.map((d) => d.country));
+  const cityOptions = uniqueValues(inCountry.map(doctorCity));
+  const hospitalOptions = uniqueValues(inCity.map((d) => d.hospital_name));
+  const deptCounts = new Map();
+  inHospital.forEach((d) => doctorDepartments(d).forEach((n) => deptCounts.set(n, (deptCounts.get(n) || 0) + 1)));
+  const known = DEPARTMENTS.map((d) => d.name);
+  const departmentOptions = [
+    ...known.filter((n) => deptCounts.has(n)),
+    ...[...deptCounts.keys()].filter((n) => !known.includes(n)).sort((x, y) => x.localeCompare(y)),
+  ];
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
@@ -70,8 +127,6 @@ export default function Doctors() {
     setPage(next);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
-
-  const specialities = [...new Set(doctors.map((d) => d.speciality).filter(Boolean))];
 
   const ratedDoctors = doctors.filter((d) => d.rating > 0);
   const avgRating = ratedDoctors.length
@@ -122,41 +177,109 @@ export default function Doctors() {
 
       <section className="py-6 sm:py-7 md:py-7">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          {/* Filters */}
-          <div className="flex flex-col md:flex-row gap-3 sm:gap-4 mb-6 sm:mb-8 bg-white p-4 rounded-2xl shadow-lg shadow-black/5 border">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+          {/* Filters — labelled dropdowns + Search button */}
+          {/* Mobile: search box + Filter button (dropdowns open in a popup) */}
+          <div className="md:hidden flex items-center gap-2 mb-5">
+            <div className="relative flex-1 min-w-0">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search by name or speciality..."
-                className="pl-10 h-11 border-0 bg-muted/50 rounded-xl"
+                type="search"
+                value={draft.q}
+                onChange={(e) => onMobileQuery(e.target.value)}
+                placeholder="Search doctor..."
+                className="pl-9 h-11 rounded-xl border border-border bg-white shadow-sm text-foreground"
               />
             </div>
-            <Select value={speciality} onValueChange={setSpeciality}>
-              <SelectTrigger className="w-full md:w-48 h-11 rounded-xl border-0 bg-muted/50">
-                <SelectValue placeholder="Speciality" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Specialities</SelectItem>
-                {specialities.map((s) => (
-                  <SelectItem key={s} value={s}>
-                    {s}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select value={country} onValueChange={setCountry}>
-              <SelectTrigger className="w-full md:w-40 h-11 rounded-xl border-0 bg-muted/50">
-                <SelectValue placeholder="Country" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Countries</SelectItem>
-                <SelectItem value="India">India</SelectItem>
-                {SHOW_TURKEY && <SelectItem value="Turkey">Turkey</SelectItem>}
-              </SelectContent>
-            </Select>
+            <Button
+              type="button"
+              onClick={() => { setDraft(readFilters()); setFilterOpen(true); }}
+              className="relative h-11 px-4 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-heading font-bold shadow-sm shadow-primary/30 shrink-0"
+            >
+              <SlidersHorizontal className="w-4 h-4 mr-1.5" /> Filter
+              {activeFilterCount > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 min-w-5 h-5 px-1 rounded-full bg-secondary text-white text-[11px] font-bold flex items-center justify-center ring-2 ring-white">
+                  {activeFilterCount}
+                </span>
+              )}
+            </Button>
           </div>
+
+          <Dialog open={filterOpen} onOpenChange={setFilterOpen}>
+            <DialogContent className="w-[calc(100%-2rem)] max-w-sm rounded-2xl p-0 overflow-hidden gap-0 [&>button]:!text-white [&>button]:!bg-transparent [&>button]:opacity-90 [&>button]:top-5">
+              <DialogHeader className="bg-secondary px-5 py-4 text-left">
+                <DialogTitle className="flex items-center gap-2 font-heading text-lg text-white">
+                  <SlidersHorizontal className="w-4 h-4 text-primary" /> Filter Doctors
+                </DialogTitle>
+                <DialogDescription className="text-white/70 text-xs">Country, city, department ya hospital chunein.</DialogDescription>
+              </DialogHeader>
+              <div className="p-5 space-y-4">
+                <FilterSelect tone="light" label="Country" placeholder="Select Country" value={draft.country} options={countryOptions} onChange={(v) => setDraftField("country", v)} />
+                <FilterSelect tone="light" label="City" placeholder="Select City" value={draft.city} options={cityOptions} onChange={(v) => setDraftField("city", v)} />
+                <FilterSelect tone="light" label="Department" placeholder="Select Department" value={draft.department} options={departmentOptions} onChange={(v) => setDraftField("department", v)} />
+                <FilterSelect tone="light" label="Hospital" placeholder="Select Hospital" value={draft.hospital} options={hospitalOptions} onChange={(v) => setDraftField("hospital", v)} />
+              </div>
+              <div className="flex items-center justify-between gap-3 px-5 pb-5">
+                <button
+                  type="button"
+                  onClick={() => setDraft((d) => ({ ...d, country: "all", city: "all", department: "all", hospital: "all" }))}
+                  className="text-sm font-semibold text-muted-foreground hover:text-primary"
+                >
+                  Reset
+                </button>
+                <Button
+                  type="button"
+                  onClick={applyMobileFilters}
+                  className="h-11 px-6 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground font-heading font-bold shadow-md shadow-primary/30"
+                >
+                  Apply Filters
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+
+          {/* Tablet & desktop: labelled filter bar */}
+          <form
+            onSubmit={(e) => { e.preventDefault(); runSearch(); }}
+            className="hidden md:block mb-6 sm:mb-8 rounded-2xl bg-secondary p-4 sm:p-5 shadow-lg shadow-secondary/10"
+          >
+            <div className="grid grid-cols-2 lg:grid-cols-[1.3fr_1fr_1fr_1.25fr_1.25fr_auto] gap-x-2.5 gap-y-3 sm:gap-3 lg:gap-3.5 items-end">
+              <FilterField label="Doctor Name" className="col-span-2 lg:col-span-1">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    value={draft.q}
+                    onChange={(e) => setDraftField("q", e.target.value)}
+                    placeholder="Search doctor..."
+                    className="pl-9 h-11 rounded-xl border-0 bg-white text-foreground"
+                  />
+                </div>
+              </FilterField>
+              <FilterSelect label="Country" placeholder="Select Country" value={draft.country} options={countryOptions} onChange={(v) => setDraftField("country", v)} />
+              <FilterSelect label="City" placeholder="Select City" value={draft.city} options={cityOptions} onChange={(v) => setDraftField("city", v)} />
+              <FilterSelect label="Department" placeholder="Select Department" value={draft.department} options={departmentOptions} onChange={(v) => setDraftField("department", v)} />
+              <FilterSelect label="Hospital" placeholder="Select Hospital" value={draft.hospital} options={hospitalOptions} onChange={(v) => setDraftField("hospital", v)} />
+              <Button
+                type="submit"
+                className="h-11 px-7 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-heading font-bold col-span-2 lg:col-span-1"
+              >
+                <Search className="w-4 h-4 mr-1.5" /> Search
+              </Button>
+            </div>
+          </form>
+
+          {/* Result count + clear */}
+          {!loading && (
+            <div className="flex items-center justify-between gap-3 -mt-2 sm:-mt-3 mb-4 text-sm text-muted-foreground">
+              <p>
+                <span className="font-bold text-secondary">{filtered.length}</span> {filtered.length === 1 ? "doctor" : "doctors"} found
+              </p>
+              {hasFilters && (
+                <button type="button" onClick={clearFilters} className="inline-flex items-center gap-1 font-semibold text-primary hover:underline">
+                  <X className="w-3.5 h-3.5" /> Clear filters
+                </button>
+              )}
+            </div>
+          )}
 
           {/* Results */}
           {loading ? (
@@ -253,6 +376,82 @@ export default function Doctors() {
         </div>
       </section>
     </div>
+  );
+}
+
+
+// ── Filter helpers ──────────────────────────────────────────────────────────
+const norm = (v) => String(v || "").trim().toLowerCase();
+const same = (a, b) => norm(a) === norm(b);
+
+// City from the doctor's own field, else the last part of "Hospital, City".
+function doctorCity(d) {
+  if (d.city) return String(d.city).trim();
+  const parts = String(d.hospital_name || "").split(",");
+  return parts.length > 1 ? parts[parts.length - 1].trim() : "";
+}
+
+// Distinct values, case-insensitive, sorted A–Z.
+function uniqueValues(list) {
+  const seen = new Map();
+  list.forEach((v) => {
+    const t = String(v || "").trim();
+    if (t && !seen.has(norm(t))) seen.set(norm(t), t);
+  });
+  return [...seen.values()].sort((a, b) => a.localeCompare(b));
+}
+
+function matches(d, f) {
+  const q = norm(f.q);
+  const matchQ =
+    !q ||
+    [d.name, d.speciality, d.designation, d.badge_title, d.hospital_name].some((v) => norm(v).includes(q));
+  return (
+    matchQ &&
+    (f.country === "all" || same(d.country, f.country)) &&
+    (f.city === "all" || same(doctorCity(d), f.city)) &&
+    (f.hospital === "all" || same(d.hospital_name, f.hospital)) &&
+    (f.department === "all" || doctorDepartments(d).some((n) => same(n, f.department)))
+  );
+}
+
+// tone "dark": white labels on the dark filter bar; "light": inside the popup.
+function FilterField({ label, children, className = "", tone = "dark" }) {
+  return (
+    <div className={`min-w-0 ${className}`}>
+      <label
+        className={`block text-[11px] sm:text-xs font-bold uppercase tracking-wide mb-1.5 ${
+          tone === "light" ? "text-secondary" : "text-white/80"
+        }`}
+      >
+        {label}
+      </label>
+      {children}
+    </div>
+  );
+}
+
+function FilterSelect({ label, placeholder, value, options, onChange, tone = "dark" }) {
+  return (
+    <FilterField label={label} tone={tone}>
+      <Select value={value} onValueChange={onChange}>
+        <SelectTrigger
+          className={`w-full h-11 rounded-xl bg-white text-foreground text-sm px-3 [&>span]:truncate ${
+            tone === "light" ? "border border-border focus:ring-primary/30" : "border-0"
+          }`}
+        >
+          <SelectValue placeholder={placeholder} />
+        </SelectTrigger>
+        <SelectContent className="max-h-80">
+          <SelectItem value="all">{placeholder}</SelectItem>
+          {options.map((o) => (
+            <SelectItem key={o} value={o}>
+              {o}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </FilterField>
   );
 }
 
