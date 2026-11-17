@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import PatientJourney from "@/components/common/PatientJourney";
-import { journeyFor, JOURNEY_SECTION_KEY, JOURNEY_SECTION_TITLE } from "@/lib/patientJourney";
+import MedicalDisclaimerBox from "@/components/common/MedicalDisclaimerBox";
+import { journeyFor, JOURNEY_SECTION_KEY, JOURNEY_SECTION_TITLE, DISCLAIMER_SECTION_KEY, DISCLAIMER_SECTION_TITLE } from "@/lib/patientJourney";
 import { mergeSectionConfig } from "@/lib/sectionConfig";
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -492,6 +493,7 @@ export const DEFAULT_DOCTOR_SECTIONS = [
   { key: "clinical_focus", title: "Clinical Focus" },
   { key: "additional_info", title: "Additional Information" },
   { key: JOURNEY_SECTION_KEY, title: JOURNEY_SECTION_TITLE },
+  { key: DISCLAIMER_SECTION_KEY, title: DISCLAIMER_SECTION_TITLE },
   { key: "research_publications", title: "Research & Publications" },
   { key: "awards_achievements", title: "Awards & Achievements" },
   { key: "why_choose_doctor", title: "Why Choose Dr.?" },
@@ -590,6 +592,10 @@ function renderDoctorSection(key, title, doctor) {
         <GroupList groups={groups} render={checklist(SECTION_ICON_THEME[key])} />
       </SectionCard>
     );
+  }
+
+  if (key === DISCLAIMER_SECTION_KEY) {
+    return <MedicalDisclaimerBox key={key} title={title} />;
   }
 
   if (key === JOURNEY_SECTION_KEY) {

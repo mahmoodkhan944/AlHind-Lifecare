@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import PatientJourney from "@/components/common/PatientJourney";
-import { journeyFor, JOURNEY_SECTION_KEY, JOURNEY_SECTION_TITLE } from "@/lib/patientJourney";
+import MedicalDisclaimerBox from "@/components/common/MedicalDisclaimerBox";
+import { journeyFor, JOURNEY_SECTION_KEY, JOURNEY_SECTION_TITLE, DISCLAIMER_SECTION_KEY, DISCLAIMER_SECTION_TITLE } from "@/lib/patientJourney";
 import { mergeSectionConfig } from "@/lib/sectionConfig";
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -961,6 +962,7 @@ export const DEFAULT_TREATMENT_SECTIONS = [
   { key: "treatment_procedures", title: "Treatment Procedures" },
   { key: "additional_information", title: "Additional Information" },
   { key: JOURNEY_SECTION_KEY, title: JOURNEY_SECTION_TITLE },
+  { key: DISCLAIMER_SECTION_KEY, title: DISCLAIMER_SECTION_TITLE },
   { key: "gvhd_info", title: "GVHD Information" },
   { key: "gvhd_symptoms", title: "GVHD Symptoms" },
   { key: "conditions_treated", title: "Conditions Treated" },
@@ -1013,6 +1015,10 @@ const SECTION_ICON_THEME = {
 function renderTreatmentSection(key, title, treatment) {
   if (key === "why_choose_india" && treatment.country === "Turkey") return null;
   if (key === "why_choose_turkey" && (treatment.country === "India" || isHiddenCountry("Turkey"))) return null;
+
+  if (key === DISCLAIMER_SECTION_KEY) {
+    return <MedicalDisclaimerBox key={key} title={title} />;
+  }
 
   if (key === JOURNEY_SECTION_KEY) {
     const { heading, steps } = journeyFor(treatment, "treatment");

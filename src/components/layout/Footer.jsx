@@ -25,7 +25,7 @@ const quickLinks = [
   { label: "Treatment Packages", path: "/packages" },
   { label: "Privacy Policy", path: "/privacy-policy" },
   { label: "Terms & Conditions", path: "/terms" },
-  { label: "Disclaimer", path: "/terms" },
+  { label: "Medical Disclaimer", path: "/medical-disclaimer" },
 ];
 
 // Column heading with a brand-red icon (Quick Links, Get In Touch, …).

@@ -28,6 +28,7 @@ const Testimonials = lazy(() => import('@/pages/Testimonials'));
 const Contact = lazy(() => import('@/pages/Contact'));
 const PrivacyPolicy = lazy(() => import('@/pages/PrivacyPolicy'));
 const Terms = lazy(() => import('@/pages/Terms'));
+const MedicalDisclaimer = lazy(() => import('@/pages/MedicalDisclaimer'));
 const Login = lazy(() => import('@/pages/Login'));
 const Register = lazy(() => import('@/pages/Register'));
 const ForgotPassword = lazy(() => import('@/pages/ForgotPassword'));
@@ -88,6 +89,7 @@ const AuthenticatedApp = () => {
         <Route path="/contact" element={<Contact />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/terms" element={<Terms />} />
+        <Route path="/medical-disclaimer" element={<MedicalDisclaimer />} />
       </Route>
 
       {/* Auth pages (no layout chrome — AuthLayout is built into each page) */}

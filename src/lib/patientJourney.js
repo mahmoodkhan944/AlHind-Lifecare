@@ -89,3 +89,10 @@ export function applyJourneyToPayload(data, form) {
 export const isMissingJourneyColumn = (err) => /patient_journey/.test(err?.message || "");
 export const JOURNEY_MIGRATION_HINT =
   "Patient Journey ke columns abhi database me nahi hain. Supabase SQL Editor me supabase/migrations/012_patient_journey.sql run karein.";
+
+// "Medical Disclaimer" — short box under the patient journey on doctor and
+// treatment pages; the same text opens the full /medical-disclaimer page.
+export const DISCLAIMER_SECTION_KEY = "medical_disclaimer";
+export const DISCLAIMER_SECTION_TITLE = "Medical Disclaimer";
+export const MEDICAL_DISCLAIMER_TEXT =
+  `${BRAND_NAME} acts as a medical tourism and patient coordination facilitator. All medical evaluations, donor suitability assessments, treatment recommendations, transplant approvals and clinical decisions are made solely by the treating hospital and its qualified medical team. ${BRAND_NAME} does not independently provide medical diagnosis, treatment or medical approvals.`;
