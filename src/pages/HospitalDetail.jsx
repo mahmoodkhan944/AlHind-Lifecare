@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import AutoSlider from "@/components/common/AutoSlider";
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -251,7 +252,7 @@ export default function HospitalDetail() {
                 <h2 className="font-heading font-bold text-xl sm:text-2xl">Top Doctors</h2>
                 <p className="text-sm text-muted-foreground mt-1">Highly skilled doctors at {hospital.name}</p>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              <AutoSlider label="doctors">
                 {doctors.map((doc) => (
                   <div
                     key={doc.id}
@@ -304,7 +305,7 @@ export default function HospitalDetail() {
                     </div>
                   </div>
                 ))}
-              </div>
+              </AutoSlider>
             </div>
           )}
         </div>

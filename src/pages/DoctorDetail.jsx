@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import AutoSlider from "@/components/common/AutoSlider";
 import PatientJourney from "@/components/common/PatientJourney";
 import MedicalDisclaimerBox from "@/components/common/MedicalDisclaimerBox";
 import { journeyFor, JOURNEY_SECTION_KEY, JOURNEY_SECTION_TITLE, DISCLAIMER_SECTION_KEY, DISCLAIMER_SECTION_TITLE } from "@/lib/patientJourney";
@@ -331,7 +332,7 @@ export default function DoctorDetail() {
                 <h2 className="font-heading font-bold text-xl sm:text-2xl">Related Doctors</h2>
                 <p className="text-sm text-muted-foreground mt-1">Explore other specialists in our network</p>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+              <AutoSlider label="doctors">
                 {relatedDoctors.map((doc) => (
                   <div
                     key={doc.id}
@@ -389,7 +390,7 @@ export default function DoctorDetail() {
                     </div>
                   </div>
                 ))}
-              </div>
+              </AutoSlider>
               <div className="text-center mt-6">
                 <Link to="/doctors">
                   <Button className="bg-accent-jade hover:bg-accent-jade/90 text-white rounded-xl px-6">

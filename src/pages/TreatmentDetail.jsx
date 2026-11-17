@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import AutoSlider from "@/components/common/AutoSlider";
 import PatientJourney from "@/components/common/PatientJourney";
 import MedicalDisclaimerBox from "@/components/common/MedicalDisclaimerBox";
 import { journeyFor, JOURNEY_SECTION_KEY, JOURNEY_SECTION_TITLE, DISCLAIMER_SECTION_KEY, DISCLAIMER_SECTION_TITLE } from "@/lib/patientJourney";
@@ -1155,7 +1156,7 @@ function RelatedSections({ relatedDoctors, relatedHospitals, shaded = false }) {
         <div className={shaded ? "py-8 sm:py-10 bg-muted" : "mt-8 sm:mt-10"}>
           <div className={shaded ? "max-w-7xl mx-auto px-4 sm:px-6" : ""}>
             <h2 className="font-heading font-bold text-xl sm:text-2xl mb-5 sm:mb-6">Related Doctors</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            <AutoSlider label="doctors">
               {relatedDoctors.map((doc) => (
                 <Link
                   key={doc.id}
@@ -1188,7 +1189,7 @@ function RelatedSections({ relatedDoctors, relatedHospitals, shaded = false }) {
                   )}
                 </Link>
               ))}
-            </div>
+            </AutoSlider>
           </div>
         </div>
       )}
@@ -1197,7 +1198,7 @@ function RelatedSections({ relatedDoctors, relatedHospitals, shaded = false }) {
         <div className={shaded ? "" : "mt-8 sm:mt-10"}>
           <div className={shaded ? "max-w-7xl mx-auto px-4 sm:px-6 pt-8 sm:pt-10" : ""}>
             <h2 className="font-heading font-bold text-xl sm:text-2xl mb-5 sm:mb-6">Related Hospitals</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            <AutoSlider label="hospitals">
               {relatedHospitals.map((h) => (
                 <Link
                   key={h.id}
@@ -1243,7 +1244,7 @@ function RelatedSections({ relatedDoctors, relatedHospitals, shaded = false }) {
                   </div>
                 </Link>
               ))}
-            </div>
+            </AutoSlider>
           </div>
         </div>
       )}
