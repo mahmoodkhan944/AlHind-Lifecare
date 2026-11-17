@@ -70,16 +70,25 @@ export default function DoctorDetail() {
   // otherwise it floats over the hero before the user scrolls at all.
   const contentTopRef = useRef(null);
   const [showFloatingCta, setShowFloatingCta] = useState(false);
+  // The panel itself, measured so it can hide once its bottom would reach
+  // past the end of the details section (i.e. where "Related …" starts).
+  const floatingCtaRef = useRef(null);
 
   useEffect(() => {
+    const NAV_OFFSET = 96; // the panel sits at top-24 (96px)
     const handleScroll = () => {
       if (!contentTopRef.current) return;
-      const top = contentTopRef.current.getBoundingClientRect().top;
-      setShowFloatingCta(top <= 96);
+      const { top, bottom } = contentTopRef.current.getBoundingClientRect();
+      const panelHeight = floatingCtaRef.current?.offsetHeight || 0;
+      setShowFloatingCta(top <= NAV_OFFSET && bottom >= NAV_OFFSET + panelHeight);
     };
     handleScroll();
     window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    window.addEventListener("resize", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleScroll);
+    };
   }, []);
 
   useEffect(() => {
@@ -421,7 +430,7 @@ export default function DoctorDetail() {
 
       {/* Desktop-only fixed panel — hidden until contentTopRef has scrolled
           up near the navbar (so it never floats over the hero), then stays
-          visible throughout the rest of the scroll. */}
+          visible until the details section ends (hidden over "Related …"). */}
       <div
         className={`hidden lg:block fixed top-24 inset-x-0 z-30 pointer-events-none transition-opacity duration-300 ${
           showFloatingCta ? "opacity-100" : "opacity-0"
@@ -429,7 +438,7 @@ export default function DoctorDetail() {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex justify-end">
-            <div className={`w-full lg:w-[calc(33.333%-1rem)] ${showFloatingCta ? "pointer-events-auto" : "pointer-events-none"}`}>
+            <div ref={floatingCtaRef} className={`w-full lg:w-[calc(33.333%-1rem)] ${showFloatingCta ? "pointer-events-auto" : "pointer-events-none"}`}>
               <DoctorSidebarCard doctor={doctor} openLeadModal={openLeadModal} />
             </div>
           </div>
