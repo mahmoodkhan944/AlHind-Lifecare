@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { LayoutDashboard, Stethoscope, Building2, Heart, FileText, MessageSquare, Users, CalendarDays, HelpCircle, Mail, Settings, Menu, X, ChevronLeft, ClipboardList, LayoutList, LogOut, Info, Package } from "lucide-react";
+import { LayoutDashboard, Stethoscope, Building2, Heart, FileText, MessageSquare, Users, CalendarDays, HelpCircle, Mail, Settings, Menu, X, ChevronLeft, ClipboardList, LayoutList, LogOut, Info, Package, ShieldCheck } from "lucide-react";
 import LanguageSelector from "@/components/common/LanguageSelector";
 import { LOGO_URL } from "@/lib/brand-assets";
 import { useAuth } from "@/lib/AuthContext";
@@ -19,6 +19,7 @@ const navItems = [
   { icon: HelpCircle, label: "FAQs", path: "/admin/faqs" },
   { icon: LayoutList, label: "Homepage", path: "/admin/home-content" },
   { icon: Info, label: "About Page", path: "/admin/about-content" },
+  { icon: ShieldCheck, label: "Medical Disclaimer", path: "/admin/medical-disclaimer" },
   { icon: Mail, label: "Newsletter", path: "/admin/newsletter" },
   { icon: Settings, label: "Settings", path: "/admin/settings" },
 ];

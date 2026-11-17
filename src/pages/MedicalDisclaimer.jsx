@@ -2,78 +2,11 @@ import React from "react";
 import { motion } from "framer-motion";
 import { ShieldCheck, Mail, Phone, Globe, MapPin, AlertTriangle } from "lucide-react";
 import { useSiteSettings, getTelLink } from "@/hooks/useSiteSettings";
-import { BRAND_NAME, MEDICAL_DISCLAIMER_TEXT } from "@/lib/patientJourney";
+import { BRAND_NAME } from "@/lib/patientJourney";
+import { useMedicalDisclaimer, parseDisclaimerText } from "@/lib/medicalDisclaimer";
 
 const HERO_IMAGE =
   "https://images.unsplash.com/photo-1587351021355-a479a299d2f9?w=1600&q=80";
-
-const SECTIONS = [
-  {
-    number: "01",
-    title: "Our Role",
-    paragraphs: [
-      `${BRAND_NAME} acts as a medical tourism and patient coordination facilitator. We are not a hospital, clinic or medical provider.`,
-      "We help international patients connect with independent hospitals and doctors, and coordinate reports, consultations, travel and stay.",
-    ],
-  },
-  {
-    number: "02",
-    title: "No Medical Advice",
-    paragraphs: [
-      "Information on this website — including doctor profiles, treatment pages, packages, blogs and FAQs — is for general information only.",
-      "It is not medical advice, diagnosis or treatment, and must not replace a consultation with a qualified healthcare professional.",
-    ],
-  },
-  {
-    number: "03",
-    title: "Clinical Decisions",
-    paragraphs: [
-      "All medical evaluations, donor suitability assessments, treatment recommendations, transplant approvals and clinical decisions are made solely by the treating hospital and its qualified medical team.",
-      `${BRAND_NAME} does not independently provide medical diagnosis, treatment or medical approvals.`,
-    ],
-  },
-  {
-    number: "04",
-    title: "Doctor & Hospital Information",
-    bullets: [
-      "Doctor and hospital details are based on information provided by the hospitals or publicly available sources.",
-      "Qualifications, experience, availability and affiliations may change without notice.",
-      "Patients should confirm all details directly with the hospital before making decisions.",
-    ],
-  },
-  {
-    number: "05",
-    title: "Treatment Outcomes",
-    bullets: [
-      "Every patient is different, and results vary from person to person.",
-      "No treatment outcome, recovery time or success is guaranteed.",
-      "Success rates and statistics shown on this website are indicative only and are not a promise of individual results.",
-    ],
-  },
-  {
-    number: "06",
-    title: "Costs & Estimates",
-    bullets: [
-      "Package prices and cost estimates are approximate.",
-      "The final treatment plan and cost are decided by the hospital after medical assessment.",
-      "Additional tests, longer stays or complications may change the final cost.",
-    ],
-  },
-  {
-    number: "07",
-    title: "Medical Visa",
-    paragraphs: [
-      `${BRAND_NAME} helps coordinate hospital invitation letters where approved. The final visa decision rests with the relevant embassy or authorities.`,
-    ],
-  },
-  {
-    number: "08",
-    title: "Independent Providers",
-    paragraphs: [
-      "All doctors and hospitals listed are independent. They are solely responsible for the medical care they provide, its quality and its outcomes.",
-    ],
-  },
-];
 
 function SectionBadge({ number }) {
   return (
@@ -96,7 +29,7 @@ function BulletList({ items }) {
   );
 }
 
-function SectionCard({ section }) {
+function SectionCard({ section, number }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -106,20 +39,23 @@ function SectionCard({ section }) {
       className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 sm:p-6"
     >
       <div className="flex items-center gap-3 mb-3">
-        <SectionBadge number={section.number} />
+        <SectionBadge number={String(number).padStart(2, "0")} />
         <h2 className="font-heading font-bold text-lg md:text-xl text-slate-900">{section.title}</h2>
       </div>
-      {section.paragraphs?.map((p, i) => (
-        <p key={i} className="text-sm md:text-[15px] text-slate-600 leading-relaxed mb-3">{p}</p>
-      ))}
-      {section.intro && <p className="text-sm md:text-[15px] text-slate-600 leading-relaxed">{section.intro}</p>}
-      {section.bullets && <BulletList items={section.bullets} />}
+      {parseDisclaimerText(section.description).map((block, i) =>
+        block.type === "ul" ? (
+          <BulletList key={i} items={block.items} />
+        ) : (
+          <p key={i} className="text-sm md:text-[15px] text-slate-600 leading-relaxed mb-3 last:mb-0">{block.text}</p>
+        )
+      )}
     </motion.div>
   );
 }
 
 export default function MedicalDisclaimer() {
   const { data: s } = useSiteSettings();
+  const { box, header, sections } = useMedicalDisclaimer();
 
   const contactCards = [
     { icon: Mail, label: "Email", value: s?.email || "support@alhindmedical.com", href: `mailto:${s?.email || "support@alhindmedical.com"}` },
@@ -153,7 +89,7 @@ export default function MedicalDisclaimer() {
             transition={{ delay: 0.05 }}
             className="font-heading font-bold text-3xl md:text-5xl text-white mb-3"
           >
-            Medical Disclaimer
+            {header.title}
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -161,7 +97,7 @@ export default function MedicalDisclaimer() {
             transition={{ delay: 0.1 }}
             className="text-white/80 text-sm md:text-base"
           >
-            Last Updated: November 17, 2026 · {BRAND_NAME}
+            {header.description}
           </motion.p>
         </div>
       </section>
@@ -178,11 +114,11 @@ export default function MedicalDisclaimer() {
             <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center flex-shrink-0">
               <ShieldCheck className="w-5 h-5 text-amber-600" />
             </div>
-            <p className="text-sm md:text-[15px] text-amber-800 leading-relaxed">{MEDICAL_DISCLAIMER_TEXT}</p>
+            <p className="text-sm md:text-[15px] text-amber-800 leading-relaxed whitespace-pre-line">{box.description}</p>
           </motion.div>
 
-          {SECTIONS.map((section) => (
-            <SectionCard key={section.number} section={section} />
+          {sections.map((section, i) => (
+            <SectionCard key={i} section={section} number={i + 1} />
           ))}
 
           {/* Emergency Notice */}

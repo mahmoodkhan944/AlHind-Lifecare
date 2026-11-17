@@ -53,6 +53,7 @@ const AdminAppointments = lazy(() => import('@/pages/admin/AdminAppointments'));
 const AdminFAQs = lazy(() => import('@/pages/admin/AdminFAQs'));
 const AdminHomeContent = lazy(() => import('@/pages/admin/AdminHomeContent'));
 const AdminAboutContent = lazy(() => import('@/pages/admin/AdminAboutContent'));
+const AdminDisclaimerContent = lazy(() => import('@/pages/admin/AdminDisclaimerContent'));
 const AdminNewsletter = lazy(() => import('@/pages/admin/AdminNewsletter'));
 const AdminSettings = lazy(() => import('@/pages/admin/AdminSettings'));
 
@@ -118,6 +119,7 @@ const AuthenticatedApp = () => {
           <Route path="/admin/faqs" element={<AdminFAQs />} />
           <Route path="/admin/home-content" element={<AdminHomeContent />} />
           <Route path="/admin/about-content" element={<AdminAboutContent />} />
+          <Route path="/admin/medical-disclaimer" element={<AdminDisclaimerContent />} />
           <Route path="/admin/newsletter" element={<AdminNewsletter />} />
           <Route path="/admin/settings" element={<AdminSettings />} />
         </Route>

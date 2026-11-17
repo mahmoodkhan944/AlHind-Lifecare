@@ -55,6 +55,32 @@ export default function SiteContentManager({ title, description, sections }) {
     setEditItem(null);
   };
 
+  // Fills an empty tab with the section's built-in default rows, so the admin
+  // can edit the current website text instead of retyping it.
+  const [seeding, setSeeding] = useState(false);
+  const loadDefaults = async () => {
+    setSeeding(true);
+    try {
+      for (const [i, d] of (sectionMeta.defaults || []).entries()) {
+        await db.entities.SiteContent.create({
+          section: activeSection,
+          title: d.title,
+          description: d.description || "",
+          icon: "",
+          link: null,
+          image_url: null,
+          sort_order: i + 1,
+          status: "active",
+        });
+      }
+      toast({ title: "Default content add ho gaya", description: "Ab kisi bhi row ko edit kar sakte hain." });
+      loadItems();
+    } catch (err) {
+      toast({ title: "Failed to add default content", description: err?.message, variant: "destructive" });
+    }
+    setSeeding(false);
+  };
+
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this item? This action cannot be undone.")) return;
     await db.entities.SiteContent.delete(id);
@@ -147,6 +173,13 @@ export default function SiteContentManager({ title, description, sections }) {
         ))}
       </div>
 
+      {sectionMeta.help && (
+        <div className="mb-4 flex items-start gap-2 rounded-xl bg-amber-50 border border-amber-200 p-3 text-xs text-amber-900">
+          <Info className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+          <span className="whitespace-pre-line">{sectionMeta.help}</span>
+        </div>
+      )}
+
       {sectionMeta.singleton && (
         <div className="mb-4 flex items-start gap-2 rounded-xl bg-primary/5 border border-primary/10 p-3 text-xs text-muted-foreground">
           <Info className="w-4 h-4 text-primary shrink-0 mt-0.5" />
@@ -170,7 +203,7 @@ export default function SiteContentManager({ title, description, sections }) {
               <Input
                 value={form.title}
                 onChange={(e) => setForm({ ...form, title: e.target.value })}
-                placeholder="e.g. Cardiology"
+                placeholder={sectionMeta.titlePlaceholder || "e.g. Cardiology"}
                 className="h-10 rounded-lg border-border"
               />
             </div>
@@ -181,9 +214,9 @@ export default function SiteContentManager({ title, description, sections }) {
                 <Textarea
                   value={form.description}
                   onChange={(e) => setForm({ ...form, description: e.target.value })}
-                  placeholder="Short description for this step"
+                  placeholder={sectionMeta.descPlaceholder || "Short description for this step"}
                   className="rounded-lg border-border"
-                  rows={sectionMeta.descLabel?.includes("one per line") ? 5 : 2}
+                  rows={sectionMeta.descRows || (sectionMeta.descLabel?.includes("one per line") ? 5 : 2)}
                 />
               </div>
             )}
@@ -203,6 +236,7 @@ export default function SiteContentManager({ title, description, sections }) {
               </div>
             )}
 
+            {sectionMeta.hasIcon !== false && (
             <div>
               <label className="text-sm font-medium text-foreground/80 block mb-1.5">Icon</label>
               <div className="flex items-center gap-2">
@@ -253,6 +287,7 @@ export default function SiteContentManager({ title, description, sections }) {
                 preview above confirms whether a name matches — or upload your own icon image instead.
               </p>
             </div>
+            )}
 
             {sectionMeta.hasLink && (
               <div>
@@ -315,8 +350,24 @@ export default function SiteContentManager({ title, description, sections }) {
             </div>
           ) : items.length === 0 ? (
             <div className="bg-white rounded-2xl border border-border p-10 text-center text-muted-foreground/70">
-              No items yet for "{sectionMeta.label}". Click "Add Item" to create one — or run the seed SQL to
-              pre-fill this list.
+              {sectionMeta.defaults?.length ? (
+                <>
+                  <p>Abhi website par default content dikh raha hai. Use edit karne ke liye pehle admin me load karein.</p>
+                  <Button
+                    onClick={loadDefaults}
+                    disabled={seeding}
+                    className="mt-4 gap-2 bg-accent-jade hover:bg-accent-jade/90 text-white rounded-xl"
+                  >
+                    {seeding ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+                    Default content load karein
+                  </Button>
+                </>
+              ) : (
+                <>
+                  No items yet for "{sectionMeta.label}". Click "Add Item" to create one — or run the seed SQL to
+                  pre-fill this list.
+                </>
+              )}
             </div>
           ) : (
             <div className="bg-white rounded-2xl border border-border overflow-hidden">
