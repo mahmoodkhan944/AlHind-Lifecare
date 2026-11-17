@@ -29,11 +29,45 @@ export const DEPARTMENTS = [
   { name: "Internal Medicine", re: /internal medicine|general medicine|physician/i },
 ];
 
-/** The departments a doctor belongs to; falls back to their speciality text. */
-export function doctorDepartments(doc) {
+/** Departments picked in admin (doctors.departments, JSON text or array). */
+export function parseDepartments(raw) {
+  let list = raw;
+  if (typeof raw === "string") {
+    try { list = JSON.parse(raw); } catch { list = raw.split(","); }
+  }
+  if (!Array.isArray(list)) return [];
+  const seen = new Set();
+  return list
+    .map((d) => String(d || "").trim())
+    .filter((d) => d && !seen.has(d.toLowerCase()) && seen.add(d.toLowerCase()));
+}
+
+/** Departments guessed from the speciality / badge / designation text. */
+export function autoDepartments(doc) {
   const text = [doc?.speciality, doc?.badge_title, doc?.designation].filter(Boolean).join(" | ");
   const found = DEPARTMENTS.filter((d) => d.re.test(text)).map((d) => d.name);
   if (found.length > 0) return found;
   const raw = String(doc?.speciality || "").trim();
   return raw ? [raw] : [];
 }
+
+/** The departments a doctor belongs to: the ones picked in admin, else the
+ *  automatic guess (falls back to their speciality text). */
+export function doctorDepartments(doc) {
+  const picked = parseDepartments(doc?.departments);
+  return picked.length > 0 ? picked : autoDepartments(doc);
+}
+
+/** Adds "departments" to a doctor save payload — only when the form has it,
+ *  so saving still works before migration 013 is run. */
+export function applyDepartmentsToPayload(data, form) {
+  if ("departments" in form) {
+    const list = parseDepartments(form.departments);
+    data.departments = list.length > 0 ? JSON.stringify(list) : null;
+  }
+  return data;
+}
+
+export const isMissingDepartmentsColumn = (err) => /departments/.test(err?.message || "");
+export const DEPARTMENTS_MIGRATION_HINT =
+  "Department ka column abhi database me nahi hai. Supabase SQL Editor me supabase/migrations/013_doctor_departments.sql run karein.";

@@ -16,6 +16,8 @@ import { buildGroupsMap, applyGroupsToPayload } from "@/lib/sectionGroups";
 // Sections that support several sub-headings (Admin → drag to reorder).
 const DOCTOR_GROUP_KEYS = ["specializations", "treatments_list", "overview_points", "experience_details", "qualifications_list", "clinical_focus", "additional_info", "research_publications", "awards_achievements", "why_choose_doctor"];
 import AutocompleteInput from "@/components/admin/AutocompleteInput";
+import DepartmentField from "@/components/admin/DepartmentField";
+import { applyDepartmentsToPayload, isMissingDepartmentsColumn, DEPARTMENTS_MIGRATION_HINT, parseDepartments } from "@/lib/departments";
 import SectionOrderEditor from "@/components/admin/SectionOrderEditor";
 import { DEFAULT_DOCTOR_SECTIONS, renameOldDoctorTitles } from "@/pages/DoctorDetail";
 import ShowOnHomeToggle from "@/components/admin/ShowOnHomeToggle";
@@ -59,10 +61,16 @@ export default function DoctorForm({ initialData, onCancel, onSaved }) {
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [uploadingDoc, setUploadingDoc] = useState(false);
   const [hospitalNames, setHospitalNames] = useState([]);
+  // Departments other doctors already use (so a custom one typed once shows
+  // up as a chip for the next doctor too).
+  const [usedDepartments, setUsedDepartments] = useState([]);
 
   useEffect(() => {
     db.entities.Hospital.list("name", 2000)
       .then((hospitals) => setHospitalNames(hospitals.map((h) => h.name).filter(Boolean)))
+      .catch(() => {});
+    db.entities.Doctor.list("-created_date", 2000)
+      .then((docs) => setUsedDepartments([...new Set(docs.flatMap((d) => parseDepartments(d.departments)))]))
       .catch(() => {});
   }, []);
 
@@ -167,6 +175,7 @@ export default function DoctorForm({ initialData, onCancel, onSaved }) {
     // single-list columns (all points) so listings/search keep working.
     applyGroupsToPayload(data, form.section_groups, DOCTOR_GROUP_KEYS);
     applyJourneyToPayload(data, form);
+    applyDepartmentsToPayload(data, form);
 
     try {
       if (isEdit) {
@@ -184,7 +193,9 @@ export default function DoctorForm({ initialData, onCancel, onSaved }) {
           ? "Education ka column abhi database me nahi hai. Supabase SQL Editor me supabase/migrations/011_doctor_education.sql run karein."
           : isMissingJourneyColumn(err)
             ? JOURNEY_MIGRATION_HINT
-            : err?.message,
+            : isMissingDepartmentsColumn(err)
+              ? DEPARTMENTS_MIGRATION_HINT
+              : err?.message,
         variant: "destructive",
       });
     }
@@ -218,6 +229,17 @@ export default function DoctorForm({ initialData, onCancel, onSaved }) {
             <Field label="Designation" required>
               <Input value={form.designation || ""} onChange={(e) => set("designation", e.target.value)} placeholder="e.g., Senior Consultant Cardiologist" className="h-10 rounded-lg border-border" />
               <p className="text-xs text-muted-foreground/70 mt-1">Doctors page ke card par naam ke neeche tag me dikhta hai.</p>
+            </Field>
+            <Field label="Department (Doctors page filter)">
+              <DepartmentField
+                value={form.departments}
+                onChange={(v) => set("departments", v)}
+                doctor={form}
+                extraOptions={usedDepartments}
+              />
+              <p className="text-xs text-muted-foreground/70 mt-1">
+                Ek ya zyada department chunein. Doctors page ke "Department" filter me doctor inhi me dikhega.
+              </p>
             </Field>
             <Field label="Education (shown on doctor card)">
               <Input value={form.education || ""} onChange={(e) => set("education", e.target.value)} placeholder="e.g., MBBS, MD (Medicine), DM (Neurology)" className="h-10 rounded-lg border-border" />
