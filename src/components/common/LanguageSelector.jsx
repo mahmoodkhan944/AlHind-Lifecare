@@ -67,7 +67,9 @@ function splitName(name) {
   return m ? { native: m[1], english: m[2] } : { native: name, english: "" };
 }
 
-export default function LanguageSelector({ light = false }) {
+// fullName: show the language's whole name ("English", "Hindi") instead of
+// the short code ("EN").
+export default function LanguageSelector({ light = false, fullName = false }) {
   const [currentLang, setCurrentLang] = useState(SOURCE_LANG);
   const [open, setOpen] = useState(false);
   const [switching, setSwitching] = useState(false);
@@ -178,7 +180,13 @@ export default function LanguageSelector({ light = false }) {
               <FlagIcon emoji={current.flag} className="!h-5 !w-7 !rounded-none" />
             </span>
           )}
-          <span>{current.code.split("-")[0].toUpperCase()}</span>
+          {fullName ? (
+            <span className="whitespace-nowrap text-[13px] font-semibold normal-case tracking-normal">
+              {splitName(current.name).english || current.name}
+            </span>
+          ) : (
+            <span>{current.code.split("-")[0].toUpperCase()}</span>
+          )}
           <ChevronDown
             className={`h-3.5 w-3.5 opacity-70 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
           />

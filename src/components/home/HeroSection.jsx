@@ -103,7 +103,7 @@ export default function HeroSection() {
   };
 
   return (
-    <section className="relative w-full min-h-[100dvh] flex items-center pt-20 sm:pt-24 lg:pt-20 pb-6 sm:pb-8 overflow-hidden">
+    <section className="relative w-full min-h-[100dvh] flex items-center pt-20 sm:pt-24 lg:pt-24 pb-6 sm:pb-8 overflow-hidden">
       {/* Background: static image (always, shown immediately) + video (all
           screen sizes, loaded once the browser is idle — see videoReady
           above) */}
